@@ -3,7 +3,7 @@ clc
 
 par.pct = 0;
 
-main_dir = '/network/lustre/iss01/cenir/analyse/irm/users/asya.ekmen/AMEDYST/rawIRMf/RSall/';
+main_dir = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/data/nifti/';
 
 e = exam(main_dir,'037$|019$|053$|062$|066$');
 
