@@ -11,7 +11,7 @@ main_dir = fullfile(pwd,'nifti');
 stim_dir = fullfile(pwd,'behav');
 
 model_name = 'model_meica';
-
+%model_name = 'model_tedana';
 
 %% fetch dirs
 
@@ -38,7 +38,7 @@ stim_files = e.getSerie('run_ACTIVATION').getStim.toJob(0);
 par.run = 1;
 %par.pct = 1;
 % par.TR = 1.6;
-par.file_reg = '^wS';
+par.file_reg = '^w';
 % par.rp = 1;
 par.mask_thr = 0.07;
 

@@ -8,6 +8,8 @@ par.pct = 0;
 main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti');
 
 e_PARKGAME = exam(main_dir,'PARKGAME');
+%e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
+%e = e_REMINARY(1:3);
 %[e,ei] = removeIncomplete(e_PARKGAME); 
 e = e_PARKGAME; % (3:length(e_PARKGAME)); % choose one
 e.addSerie('ACTIVATION$','run_ACTIVATION',1)
@@ -82,7 +84,7 @@ par.sge      = 0;
 par.jobname  = 'job_afni_proc_multi_echo';
 par.subdir   = 'afni';
 
-par.pct      = 1;
+par.pct      = 0;
 par.redo     = 0;
 par.fake     = 0;
 par.verbose  = 1;
@@ -96,6 +98,9 @@ toc
 e.getSerie('run').addVolume('^vtde1.nii','vtde1',1)
 e.getSerie('run').addVolume('^vtde2.nii','vtde2',1)
 e.getSerie('run').addVolume('^vtde3.nii','vtde3',1)
+
+[ec_vtd, ei_vtd] = e.removeIncomplete;
+e = ec_vtd;
 
 %% temporal mean
 
@@ -149,7 +154,7 @@ par.png        = 1;  % tedana will make some PNG files of the components Beta ma
 par.cmd_arg = ''; % Allows you to use all addition arguments not scripted in this job_tedana.m file
 
 % matvol classic options
-par.pct      = 1; % Parallel Computing Toolbox, will execute in parallel all the subjects
+par.pct      = 0; % Parallel Computing Toolbox, will execute in parallel all the subjects
 par.redo     = 0; % overwrite previous files
 par.fake     = 0; % do everything exept running
 par.verbose  = 2; % 0 : print nothing, 1 : print 2 first and 2 last messages, 2 : print all
@@ -174,21 +179,24 @@ job_tedana( meinfo, 'vtd', 'tedana_vtd_mle', 'bet_mean_vtde1_mask.nii', par );
 %tedana_report (main_dir);
 
 %% Add new preprocessed data to exam object : dn_ts_OC.nii 
-% if exists the tedana_vtd_mle directory
-    e.addSerie('ACTIVATION','tedana_vtd','tedana_ACTIVATION',1);
-    e.addSerie('RS','tedana_vtd','tedana_RS',1);
-    e.getSerie('tedana').addVolume('^dn.*.nii$','dn',1);
+
+e.addSerie('ACTIVATION','tedana_vtd','tedana_ACTIVATION',1);
+e.addSerie('RS','tedana_vtd','tedana_RS',1);
+e.getSerie('tedana').addVolume('^dn.*.nii$','dn',1);
+
+[ec_dn, ei_dn] = e.removeIncomplete;
+e = ec_dn;
+
 % if all in run directory instead of tedana_vtd_mle
 %e(1).getSerie('run').addVolume('^dn.*.nii$','dn',1);
 
-%% Coregister T1 to MNI (CAT12)
+%% to delete if the lower part works
 %% Prepare CAT12 segmentation
-
-%anat segment
-fanat = e.getSerie('anat').getVolume('^s').getPath;
+%%anat segment
+%fanat = e.getSerie('anat').getVolume('^s').getPath;
+%clear par
 
 % global cat; cat_defaults; cat.extopts.subfolders=0; cat.extopts.expertgui=1;clear defaults; spm_jobman('initcfg');
-clear par
 % 
 % par.run     = 1;
 % par.display = 0;
@@ -282,6 +290,10 @@ clear par
 %e.getSerie('UNI').addVolume('^wmcs','wmcs',1)
 
 %% to delete if the upper part works
+%% Run CAT12 segmentation
+clear par
+%anat segment
+fanat = e.getSerie('anat').getVolume('^s').getPath;
 
 % Retrocompatibility for SPM:Spatial:Segment options
 par.GM        = [1 1 1 1]; % warped_space_Unmodulated(wp*) / warped_space_modulated(mwp*) / native_space(p*) / native_space_dartel_import(rp*)
@@ -299,9 +311,6 @@ par.run     = 1;
 par.display = 0;
 par.pct     = 0;
 par.redo    = 0;
-
-
-%% Run CAT12 segmentation
 
 j_segment = job_do_tedana_segmentCAT12(fanat,par);
 
@@ -337,52 +346,89 @@ e.getSerie('anat').addVolume('^p0' ,'p0' );
 % e.getSerie('anat_T1_UNI').addVolume('^bet_mcs_.*_fatnav.nii'     , 'bet_mcs',1)
 % e.getSerie('anat_T1_UNI').addVolume('^bet_mcs_.*_fatnav_mask.nii','mask_mcs',1)
 
-%% run loop / activation
-%for runi = 1: length(e.getSerie('run'))
+
 %% Coregister func @ anat
+% correction of any former transformations of ^dn
+
+    par.ask = 0;
+    par.redo = 1;
+    par.pct = 0;
     
-    clear par
-    par.type   = 'estimate';
-    par.interp = 1;
-    par.prefix = 'r';
-    par.sge    = 0;
-    par.redo   = 0;
-    par.run    = 1;
-    par.display= 0;
-    %e.getSerie('anat').addVolume('^p0','p0',1)
-    %e.explore
-    ref = e.getSerie('anat').getVolume('^p0');
-    src = e.getSerie('run_ACTIVATION').getVolume('^bet_vtde1');
-    e.getSerie('tedana_ACTIVATION').addVolume('^ts','ts',1);
+    if par.redo==1
+        
+        e.getSerie('tedana').addVolume('^ts','ts',1);
+        
+        %% for ACTIVATION vols
+        origin = e.getSerie('tedana_ACTIVATION').getVolume('^ts').toJob(0);
+        influencer = e.getSerie('run_ACTIVATION').getVolume('^bet_vtde1').toJob(0);
+        follower = e.getSerie('tedana_ACTIVATION').getVolume('^dn').toJob(0);
+        %e.getSerie('tedana_ACTIVATION').addVolume('.*.mat$','mat',1);
+        %transf = e.getSerie('tedana_ACTIVATION').getVolume('mat');
+        %if ~isempty(transf)
+    %         for i = 1 : length(transf)
+    %             if exist(transf(i).path, 'file') && par.redo==1
+    %                 par.ask = 0;
+    %                 do_fsl_copy_header(influencer{i}, origin{i}, par); % clear the former transformations if any
+    %                 do_fsl_copy_header(follower{i}, influencer{i}, par); % clear the former transformations if any
+    %             end
+    %         end
+            
+            do_fsl_copy_header(influencer, origin,      par);
+            do_fsl_copy_header(follower,   influencer,  par);
+            clear par
+            par.type   = 'estimate';
+            par.interp = 1;
+            par.prefix = 'r';
+            par.sge    = 0;
+            par.redo   = 0;
+            par.run    = 1;
+            par.display= 0;
+        %end
+        ref = e.getSerie('anat').getVolume('^p0').toJob(0);
+        src = e.getSerie('run_ACTIVATION').getVolume('^bet_vtde1').toJob(0);
+        oth = e.getSerie('tedana_ACTIVATION').getVolume('^dn').toJob(0);
+
+        % include the skip option
+
+        job_coregister(char(src),char(ref),char(oth),par)
+
+    %% for RS vols
+        origin = e.getSerie('tedana_RS').getVolume('^ts').toJob(0);
+        influencer = e.getSerie('run_RS').getVolume('^bet_vtde1').toJob(0);
+        follower = e.getSerie('tedana_RS').getVolume('^dn').toJob(0);
+        %e.getSerie('tedana_ACTIVATION').addVolume('.*.mat$','mat',1);
+        %transf = e.getSerie('tedana_ACTIVATION').getVolume('mat');
+        %if ~isempty(transf)
+    %         for i = 1 : length(transf)
+    %             if exist(transf(i).path, 'file') && par.redo==1
+    %                 par.ask = 0;
+    %                 do_fsl_copy_header(change{i}, origin{i}, par); % clear the former transformations if any
+    %             end
+    %         end
+            par.ask = 0;
+            par.pct = 0;
+            do_fsl_copy_header(influencer, origin,      par);
+            do_fsl_copy_header(follower,   influencer,  par);
+            clear par
+            par.type   = 'estimate';
+            par.interp = 1;
+            par.prefix = 'r';
+            par.sge    = 0;
+            par.redo   = 0;
+            par.run    = 1;
+            par.display= 0;
+        %end
+        ref = e.getSerie('anat').getVolume('^p0').toJob(0);
+        src = e.getSerie('run_RS').getVolume('^bet_vtde1').toJob(0);
+        oth = e.getSerie('tedana_RS').getVolume('^dn').toJob(0);
+
+        % include the skip option
+
+        job_coregister(char(src),char(ref),char(oth),par)
     
-    % correction of any former transformations of ^dn
-    origin = e.getSerie('tedana_ACTIVATION').getVolume('^ts').toJob(0);
-    change = e.getSerie('tedana_ACTIVATION').getVolume('^dn').toJob(0);
-    e.getSerie('tedana_ACTIVATION').addVolume('.*.mat$','mat',1);
-    transf = e.getSerie('tedana_ACTIVATION').getVolume('mat');
-    if ~isempty(transf)
-        for i = 1 : length(transf)
-            if exist(transf(i).path, 'file') && par.redo==1
-                par.ask = 0;
-                do_fsl_copy_header(change{i}, origin{i}, par); % clear the former transformations if any
-            end
-        end
-        clear par
-        par.type   = 'estimate';
-        par.interp = 1;
-        par.prefix = 'r';
-        par.sge    = 0;
-        par.redo   = 0;
-        par.run    = 1;
-        par.display= 0;
     end
-    oth = e.getSerie('tedana_ACTIVATION').getVolume('^dn');
-    
-    % include the skip option
-    
-    job_coregister(src,ref,oth,par)
 
-
+    
     %% Normalize
 
     clear par
@@ -393,19 +439,21 @@ e.getSerie('anat').addVolume('^p0' ,'p0' );
     %par.wrap     = [0 0 0];
     %par.prefix   = 'w';
 
-    par.redo    = 0;
+    par.redo    = 1;
     par.sge     = 0;
     par.run     = 1;
     par.display = 0;
     par.jobname = 'spm_apply_norm';
 
-    e.getSerie('anat').addVolume('^y','y',1)
     warp_field = e.getSerie('anat').getVolume('^y');
-    img = e.getSerie('tedana_ACTIVATION').getVolume('^dn');
+    img = e.getSerie('tedana').getVolume('^dn');
 
     job_apply_normalize(warp_field,img, par)
 
+    e.explore
 
+    save('e','e')
+    
     %%
 
     %e.getSerie('tedana_ACTIVATION').addVolume('^wdn_ts_OC.nii','wdn_ts_OC',1)

@@ -110,7 +110,7 @@ skip=[];
 
 for nbsuj = 1:length(img)
     
-    % skip if y_ exist
+    % skip if p0_ exist
     of = addprefixtofilenames(img(nbsuj),'y_');
     if ~par.redo  &&  exist(of{1},'file')
         skip = [skip nbsuj];

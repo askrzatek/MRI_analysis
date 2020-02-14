@@ -3,30 +3,27 @@ clc
 
 par.pct = 0;
 
-main_dir = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/data/nifti/';
+main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti');
 
-e = exam(main_dir,'PARKGAME');
+e_PARKGAME = exam(main_dir,'PARKGAME');
+e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
 
+%e = e_PARKGAME + e_REMINARY;
+e = exam(main_dir,'2018_07_18_PARKGAMEII_001_NB_18_07_2018_V1');
 
 %% Add series
 
-% T1 high resolution (V1)
-e.addSerie('3DT1HR','S\d{2}_t1_mpr_sag_0_8iso_p2$','anat_HR_raw',1)
-e.getSerie('anat').addVolume('^s.*nii','s',1)
+% T1 anat
+e.addSerie('t1mpr_S256_0_8iso_p2$','anat_T1',1)
+e.getSerie('anat_T1').addVolume('^s.*p2.nii','s',1)
 
-% Postsham
-e.addSerie('Postsham','RS$','rs_post_sham',1)
+% Resting State
+e.addSerie(        'RS$','run_RS'        ,1)
 
-% Poststim
-e.addSerie('Poststim','RS$','rs_post_stim',1)
+% Activation fMRI
+e.addSerie('ACTIVATION$','run_ACTIVATION',1)
 
-% Presham
-e.addSerie('Presham','RS$','rs_pre_sham',1)
-
-% Prestim
-e.addSerie('Prestim','RS$','rs_pre_stim',1)
-
-e.getSerie('rs').addVolume('^f','f',3)
+e.getSerie('run').addVolume('^f','f',3)
 
 % [ ec, ei ] = e.removeIncomplete();
 
@@ -36,14 +33,31 @@ e.unzipVolume(par);
 
 %% remove bad subjects pas fait
 
-fprintf('nSubj before = %d \n', numel(e))
-e = e.removeTag({'Subject019','Subject038','Subject053','Subject062','Subject066'});
-fprintf('nSubj after = %d \n', numel(e))
+% fprintf('nSubj before = %d \n', numel(e))
+% e =
+% e.removeTag({'Subject019','Subject038','Subject053','Subject062','Subject066'});
+% can be used if we add a loop to verify number of volumes per subject
+%fprintf('nSubj after = %d \n', numel(e))
 
 
-%% check number of volumes
+%% check number of volumes ACTIVATION
 
-p = e.getSerie('rs').getVolume('^f').print;
+p = e.getSerie('run_ACTIVATION').getVolume('^f').print;
+p = cellstr(p);
+res =regexp(p,'f630');
+res = cellfun(@isempty,res);
+bad_volumes = char(p(res));
+
+if ~isempty(bad_volumes)
+    disp(bad_volumes)
+    error('wrong number of volumes')
+else
+    fprintf('all echos seem to have 630 volumes \n')
+end
+
+%% check number of volumes RS
+
+p = e.getSerie('run_RS').getVolume('^f').print;
 p = cellstr(p);
 res =regexp(p,'f300');
 res = cellfun(@isempty,res);
@@ -53,9 +67,8 @@ if ~isempty(bad_volumes)
     disp(bad_volumes)
     error('wrong number of volumes')
 else
-    fprintf('all echos seems to have 300 volumes \n')
+    fprintf('all echos seem to have 300 volumes \n')
 end
-
 
 
 %% Sort echos
@@ -68,10 +81,10 @@ par.redo         = 0;
 par.run          = 1;
 par.fake         = 0;
 
-run_list = e.getSerie('rs');
+run_list = e.getSerie('run');
 
 [meinfo, jobs] = job_sort_echos( run_list , par );
-meinfo.volume = e.getSerie('rs').getVolume('^e');
+meinfo.volume = e.getSerie('run').getVolume('^e');
 meinfo.anat   = e.getSerie('anat').getVolume('^s');
 
 
@@ -114,9 +127,9 @@ return
 
 %% get pp from afni
 
-e.getSerie('rs').addVolume('^vtde1.nii','vtde1',1)
-e.getSerie('rs').addVolume('^vtde2.nii','vtde2',1)
-e.getSerie('rs').addVolume('^vtde3.nii','vtde3',1)
+e.getSerie('run_RS').addVolume('^vtde1.nii','vtde1',1)
+e.getSerie('run_RS').addVolume('^vtde2.nii','vtde2',1)
+e.getSerie('run_RS').addVolume('^vtde3.nii','vtde3',1)
 
 
 %% temporal mean
@@ -128,7 +141,7 @@ par.sge   = 1;
 par.fsl_output_format = 'NIFTI';
 
 par.jobname = 'fslmean';
-vtde_in  = e.getSerie('rs').getVolume('^vtde1').removeEmpty.toJob;
+vtde_in  = e.getSerie('run_RS').getVolume('^vtde1').removeEmpty.toJob;
 vtde_out = addprefixtofilenames(vtde_in,'mean_');
 do_fsl_mean(vtde_in,vtde_out,par);
 
@@ -155,8 +168,8 @@ end
 par.jobname = 'fslbet';
 do_cmd_sge(job,par);
 
-e.getSerie('rs').addVolume('^bet_mean_vtde1_mask.nii','mask_vtde1',1)
-e.getSerie('rs').addVolume('^bet_mean_vtde1.nii'     , 'bet_vtde1',1)
+e.getSerie('run_RS').addVolume('^bet_mean_vtde1_mask.nii','mask_vtde1',1)
+e.getSerie('run_RS').addVolume('^bet_mean_vtde1.nii'     , 'bet_vtde1',1)
 
 
 
