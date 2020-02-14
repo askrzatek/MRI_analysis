@@ -428,7 +428,6 @@ e.getSerie('anat').addVolume('^p0' ,'p0' );
     
     end
     
-    eziofjezfjzeiofjzefjzeoifjzeoifjzeijfzeofijozeifj
 
     
     %% Normalize
