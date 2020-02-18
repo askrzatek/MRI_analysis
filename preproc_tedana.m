@@ -9,9 +9,8 @@ main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek
 
 e_PARKGAME = exam(main_dir,'PARKGAME');
 %e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
-%e = e_REMINARY(1:3);
-%[e,ei] = removeIncomplete(e_PARKGAME); 
-e = e_PARKGAME; % (3:length(e_PARKGAME)); % choose one
+
+e = e_PARKGAME; % (3:length(e_PARKGAME)); % choose specific
 e.addSerie('ACTIVATION$','run_ACTIVATION',1)
 e.addSerie(        'RS$','run_RS'        ,1)
 
@@ -27,7 +26,7 @@ dir_func = e.getSerie('run') .toJob;
 dir_anat = e.getSerie('anat').toJob(0);
 
 
-%% quantity control
+%% vol quantity control
 % functional ACTI
 p = e.getSerie('run_ACTIVATION').getVolume('^f').print;
 p = cellstr(p);
@@ -56,7 +55,8 @@ else
     fprintf('all echos seem to have 300 volumes \n')
 end
 
-%%
+%% sort echos
+
 clear par
 
 par.fname        = 'meinfo'; % name of the .mat file that will be saved
@@ -72,7 +72,8 @@ run_list = e.getSerie('run');
 meinfo.volume = e.getSerie('run').getVolume('^e')
 meinfo.anat   = e.getSerie('anat').getVolume('^s')
 
-%% AFNI
+%% AFNI - vtd
+
 clear par
 par.blocks   = {'despike','tshift','volreg'}; % now codded : despike, tshift, align, volreg
 par.seperate = 1;                             % each volume is treated seperatly : useful when runs have different orientations
@@ -93,7 +94,7 @@ tic
 job_afni_proc_multi_echo(meinfo, par)
 toc
 
-%% get pp from afni
+%% add new vols to e
 
 e.getSerie('run').addVolume('^vtde1.nii','vtde1',1)
 e.getSerie('run').addVolume('^vtde2.nii','vtde2',1)
@@ -174,7 +175,7 @@ job_tedana( meinfo, 'vtd', 'tedana_vtd_mle', 'bet_mean_vtde1_mask.nii', par );
 
 %return %not sure if necessary
 
-%% tedana report %how to use it, when meinfo is in main_dir
+%% tedana report % meinfo is in main_dir and tedana outputs in the subdir of run dir (until change - cannot use tedana_report)
 
 %tedana_report (main_dir);
 
@@ -190,106 +191,6 @@ e = ec_dn;
 % if all in run directory instead of tedana_vtd_mle
 %e(1).getSerie('run').addVolume('^dn.*.nii$','dn',1);
 
-%% to delete if the lower part works
-%% Prepare CAT12 segmentation
-%%anat segment
-%fanat = e.getSerie('anat').getVolume('^s').getPath;
-%clear par
-
-% global cat; cat_defaults; cat.extopts.subfolders=0; cat.extopts.expertgui=1;clear defaults; spm_jobman('initcfg');
-% 
-% par.run     = 1;
-% par.display = 0;
-% par.redo    = 1;
-% par.sge     = 0;
-% 
-% par.jobname      = 'spm_segmentCAT12';
-% par.mem          = 8000;
-% par.sge_nb_coeur = 2
-% 
-% par.walltime  = '08:00:00';
-% par.subfolder = 0;
-% expert_mode   = 1;
-% par.cmd_prepend = sprintf('global cat; cat_defaults; cat.extopts.subfolders=%d; cat.extopts.expertgui=%d;clear defaults; spm_jobman(''initcfg'');',...
-%     par.subfolder,expert_mode);
-% par.matlab_opt = ' -nodesktop ';
-% 
-% 
-% jobs = cell(1,length(fanat));
-% for j = 1 : length(fanat)
-%    
-%     jobs{j}.spm.tools.cat.estwrite.data = fanat(j);
-%     jobs{j}.spm.tools.cat.estwrite.nproc = 0;
-%     jobs{j}.spm.tools.cat.estwrite.opts.tpm = {'/network/lustre/iss01/cenir/software/irm/spm12/tpm/TPM.nii'};
-%     jobs{j}.spm.tools.cat.estwrite.opts.affreg = 'mni';
-%     jobs{j}.spm.tools.cat.estwrite.opts.biasstr = 0.5;
-%     jobs{j}.spm.tools.cat.estwrite.opts.samp = 3;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.segmentation.APP = 1070;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.segmentation.NCstr = -Inf;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.segmentation.LASstr = 0.5;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.segmentation.gcutstr = 0.5;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.segmentation.cleanupstr = 0.5;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.segmentation.WMHCstr = 0.5;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.segmentation.WMHC = 1;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.segmentation.restypes.best = [0.5 0.3];
-%     jobs{j}.spm.tools.cat.estwrite.extopts.registration.darteltpm = {'/network/lustre/iss01/cenir/software/irm/spm12/toolbox/cat12/templates_1.50mm/Template_1_IXI555_MNI152.nii'};
-%     jobs{j}.spm.tools.cat.estwrite.extopts.registration.shootingtpm = {'/network/lustre/iss01/cenir/software/irm/spm12/toolbox/cat12/templates_1.50mm/Template_0_IXI555_MNI152_GS.nii'};
-%     jobs{j}.spm.tools.cat.estwrite.extopts.registration.regstr = 0;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.vox = 1.5;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.surface.pbtres = 0.5;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.surface.scale_cortex = 0.7;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.surface.add_parahipp = 0.1;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.surface.close_parahipp = 0;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.admin.ignoreErrors = 0;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.admin.verb = 2;
-%     jobs{j}.spm.tools.cat.estwrite.extopts.admin.print = 2;
-%     jobs{j}.spm.tools.cat.estwrite.output.surface = 12;
-%     jobs{j}.spm.tools.cat.estwrite.output.ROImenu.atlases.hammers = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.ROImenu.atlases.neuromorphometrics = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.ROImenu.atlases.lpba40 = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.ROImenu.atlases.cobra = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.ROImenu.atlases.ibsr = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.ROImenu.atlases.aal = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.ROImenu.atlases.mori = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.ROImenu.atlases.anatomy = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.GM.native = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.GM.warped = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.GM.mod = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.GM.dartel = 2;
-%     jobs{j}.spm.tools.cat.estwrite.output.WM.native = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.WM.warped = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.WM.mod = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.WM.dartel = 2;
-%     jobs{j}.spm.tools.cat.estwrite.output.CSF.native = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.CSF.warped = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.CSF.mod = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.CSF.dartel = 2;
-%     jobs{j}.spm.tools.cat.estwrite.output.WMH.native = 0;
-%     jobs{j}.spm.tools.cat.estwrite.output.WMH.warped = 0;
-%     jobs{j}.spm.tools.cat.estwrite.output.WMH.mod = 0;
-%     jobs{j}.spm.tools.cat.estwrite.output.WMH.dartel = 0;
-%     jobs{j}.spm.tools.cat.estwrite.output.label.native = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.label.warped = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.label.dartel = 2;
-%     jobs{j}.spm.tools.cat.estwrite.output.bias.native = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.bias.warped = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.bias.dartel = 2;
-%     jobs{j}.spm.tools.cat.estwrite.output.las.native = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.las.warped = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.las.dartel = 2;
-%     jobs{j}.spm.tools.cat.estwrite.output.jacobian.warped = 1;
-%     jobs{j}.spm.tools.cat.estwrite.output.warps = [1 1];
-%    
-% end
-% 
-% 
-% 
-% job_ending_rountines(jobs,[],par)
-
-%e.getSerie('UNI').addVolume('^mcs' ,'mcs' ,1)
-%e.getSerie('UNI').addVolume('^wmcs','wmcs',1)
-
-%% to delete if the upper part works
 %% Run CAT12 segmentation
 clear par
 %anat segment
@@ -317,35 +218,6 @@ j_segment = job_do_tedana_segmentCAT12(fanat,par);
 
 e.getSerie('anat').addVolume('^y'  ,'y' );
 e.getSerie('anat').addVolume('^p0' ,'p0' );
-%e.getSerie('anat').addVolume('^ms' ,'ms');
-%e.getSerie('anat').addVolume('^wms','wms');
-
-% %% bet @ anat_T1_UNI - mcs
-%
-% clear par
-% par.run   = 0;
-% par.fake  = 0;
-% par.sge   = 1;
-% par.fsl_output_format = 'NIFTI';
-%
-% anat_in  = gfile(e.getSerie('anat_T1_UNI').getPath,'^p0');
-% anat_out = addprefixtofilenames(anat_in,'bet_');
-%
-% job = cell(0);
-% for iJob = 1 : length(anat_in)
-%     job{iJob,1} = sprintf('export FSLOUTPUTTYPE=NIFTI; /network/lustre/iss01/cenir/software/irm/fsl5/bin/bet %s %s -v -R -m',...
-%         anat_in {iJob} ,...
-%         anat_out{iJob} );
-% end
-% par.jobname = 'fslbet';
-% do_cmd_sge(job,par);
-
-
-%%
-
-% e.getSerie('anat_T1_UNI').addVolume('^bet_mcs_.*_fatnav.nii'     , 'bet_mcs',1)
-% e.getSerie('anat_T1_UNI').addVolume('^bet_mcs_.*_fatnav_mask.nii','mask_mcs',1)
-
 
 %% Coregister func @ anat
 % correction of any former transformations of ^dn
@@ -362,84 +234,54 @@ e.getSerie('anat').addVolume('^p0' ,'p0' );
         origin = e.getSerie('tedana_ACTIVATION').getVolume('^ts').toJob(0);
         influencer = e.getSerie('run_ACTIVATION').getVolume('^bet_vtde1').toJob(0);
         follower = e.getSerie('tedana_ACTIVATION').getVolume('^dn').toJob(0);
-        %e.getSerie('tedana_ACTIVATION').addVolume('.*.mat$','mat',1);
-        %transf = e.getSerie('tedana_ACTIVATION').getVolume('mat');
-        %if ~isempty(transf)
-    %         for i = 1 : length(transf)
-    %             if exist(transf(i).path, 'file') && par.redo==1
-    %                 par.ask = 0;
-    %                 do_fsl_copy_header(influencer{i}, origin{i}, par); % clear the former transformations if any
-    %                 do_fsl_copy_header(follower{i}, influencer{i}, par); % clear the former transformations if any
-    %             end
-    %         end
-            
-            do_fsl_copy_header(influencer, origin,      par);
-            do_fsl_copy_header(follower,   influencer,  par);
-            clear par
-            par.type   = 'estimate';
-            par.interp = 1;
-            par.prefix = 'r';
-            par.sge    = 0;
-            par.redo   = 0;
-            par.run    = 1;
-            par.display= 0;
-        %end
-        ref = e.getSerie('anat').getVolume('^p0').toJob(0);
-        src = e.getSerie('run_ACTIVATION').getVolume('^bet_vtde1').toJob(0);
-        oth = e.getSerie('tedana_ACTIVATION').getVolume('^dn').toJob(0);
-
-        % include the skip option
-
-        job_coregister(char(src),char(ref),char(oth),par)
+                   
+        do_fsl_copy_header(influencer, origin,      par);
+        do_fsl_copy_header(follower,   influencer,  par);
+        
 
     %% for RS vols
         origin = e.getSerie('tedana_RS').getVolume('^ts').toJob(0);
         influencer = e.getSerie('run_RS').getVolume('^bet_vtde1').toJob(0);
         follower = e.getSerie('tedana_RS').getVolume('^dn').toJob(0);
-        %e.getSerie('tedana_ACTIVATION').addVolume('.*.mat$','mat',1);
-        %transf = e.getSerie('tedana_ACTIVATION').getVolume('mat');
-        %if ~isempty(transf)
-    %         for i = 1 : length(transf)
-    %             if exist(transf(i).path, 'file') && par.redo==1
-    %                 par.ask = 0;
-    %                 do_fsl_copy_header(change{i}, origin{i}, par); % clear the former transformations if any
-    %             end
-    %         end
-            par.ask = 0;
-            par.pct = 0;
-            do_fsl_copy_header(influencer, origin,      par);
-            do_fsl_copy_header(follower,   influencer,  par);
-            clear par
-            par.type   = 'estimate';
-            par.interp = 1;
-            par.prefix = 'r';
-            par.sge    = 0;
-            par.redo   = 0;
-            par.run    = 1;
-            par.display= 0;
-        %end
-        ref = e.getSerie('anat').getVolume('^p0').toJob(0);
-        src = e.getSerie('run_RS').getVolume('^bet_vtde1').toJob(0);
-        oth = e.getSerie('tedana_RS').getVolume('^dn').toJob(0);
-        
-        % include the skip option
-
-        job_coregister(char(src),char(ref),char(oth),par)
+       
+        par.ask = 0;
+        par.pct = 0;
+        do_fsl_copy_header(influencer, origin,      par);
+        do_fsl_copy_header(follower,   influencer,  par);
     
     end
-    
 
+%% Coregistration of both runs
+
+% ACTIVATION
+    clear par
+    par.type   = 'estimate';
+    par.interp = 1;
+    par.prefix = 'r';
+    par.sge    = 0;
+    par.redo   = 0;
+    par.run    = 1;
+    par.display= 0;
+
+    ref = e.getSerie('anat').getVolume('^p0').toJob(0);
+    src = e.getSerie('run_ACTIVATION').getVolume('^bet_vtde1').toJob(0);
+    oth = e.getSerie('tedana_ACTIVATION').getVolume('^dn').toJob(0);
+
+        % include the skip option (?)
+
+    job_coregister(char(src),char(ref),char(oth),par)
+    
+% RS
+    src = e.getSerie('run_RS').getVolume('^bet_vtde1').toJob(0);
+    oth = e.getSerie('tedana_RS').getVolume('^dn').toJob(0);
+
+    % include the skip option
+
+    job_coregister(char(src),char(ref),char(oth),par)
     
     %% Normalize
 
     clear par
-    %par.preserve = 0;
-    %par.bb       = [NaN NaN NaN ; NaN NaN NaN];
-    %par.vox      = [2.5 2.5 2.5];
-    %par.interp   = 4;
-    %par.wrap     = [0 0 0];
-    %par.prefix   = 'w';
-
     par.redo    = 1;
     par.sge     = 0;
     par.run     = 1;
@@ -447,60 +289,14 @@ e.getSerie('anat').addVolume('^p0' ,'p0' );
     par.jobname = 'spm_apply_norm';
 
     warp_field = e.getSerie('anat').getVolume('^y');
-    img = e.getSerie('tedana').getVolume('^dn');
+    img = e.getSerie('tedana_RS').getVolume('^dn');
 
     job_apply_normalize(warp_field,img, par)
 
+    e.getSerie('tedana').addVolume('^wdn','wdn',1);
     e.explore
 
     save('e','e')
     
     %%
-
-    %e.getSerie('tedana_ACTIVATION').addVolume('^wdn_ts_OC.nii','wdn_ts_OC',1)
-
-
-%     %% Smooth
-% 
-% 
-%     clear par
-% 
-%     par.sge      = 0;
-%     par.redo     = 0;
-%     par.run      = 1;
-%     par.display  = 0;
-% 
-%     img = e.getSerie('tedana').getVolume('^wdn_ts_OC').removeEmpty;
-% 
-%     par.smooth   = [5 5 5];
-%     par.prefix   = 's5';
-%     job_smooth(img,par)
-% 
-%     par.smooth   = [8 8 8];
-%     par.prefix   = 's8';
-%     job_smooth(img,par)
-% 
-% end
-%%end of run loop
-
-%% apply normalization on fmri tedana volume, using SPM warp field from the segementation
-% 
-% % Prepare
-% 
-% ffunc = e.getSerie('tedana').getVolume('^dn');
-% fy    = e.getSerie('anat').getVolume('^y');
-% 
-% par.display= 0;
-% par.run    = 1;
-% par.pct    = 1;
-% 
-% 
-% %% Run normalize
-% 
-% par.auto_add_obj=0;
-% job_apply_normalize(fy,ffunc,par);
-% e.getSerie('tedana').addVolume('^w.*nii','wdn',1)
-% 
-%% Add the warped data to exam object : (?) wdn_ts_OC(_dn?).nii
-
 
