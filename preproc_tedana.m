@@ -272,6 +272,7 @@ e.getSerie('anat').addVolume('^p0' ,'p0' );
     job_coregister(char(src),char(ref),char(oth),par)
     
 % RS
+    ref = e.getSerie('anat').getVolume('^p0').toJob(0);
     src = e.getSerie('run_RS').getVolume('^bet_vtde1').toJob(0);
     oth = e.getSerie('tedana_RS').getVolume('^dn').toJob(0);
 
