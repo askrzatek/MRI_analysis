@@ -177,8 +177,8 @@ job_tedana( meinfo, 'vtd', 'tedana_vtd_mle', 'bet_mean_vtde1_mask.nii', par );
 %return %not sure if necessary
 
 %% tedana report % meinfo is in main_dir and tedana outputs in the subdir of run dir (until change - cannot use tedana_report)
-
-%tedana_report (main_dir);
+par.subdir = 'tedana_vtd_mle'
+tedana_report (main_dir, par);
 
 %% Add new preprocessed data to exam object : dn_ts_OC.nii 
 
@@ -203,6 +203,7 @@ par.WM        = [1 1 1 1];
 par.CSF       = [1 1 1 1];
 par.bias      = [1 1 0] ;  % native normalize dartel     [0 1]; % bias field / bias corrected image
 par.warp      = [1 1]; % warp field native->template / warp field native<-template
+par.label     = [1 1 0];
 
 par.jacobian  = 0;         % write jacobian determinant in normalize space
 par.doROI     = 0;
@@ -214,7 +215,7 @@ par.display = 0;
 par.pct     = 0;
 par.redo    = 0;
 
-j_segment = job_do_tedana_segmentCAT12(fanat,par);
+j_segment = job_do_segmentCAT12(fanat,par);
 
 
 e.getSerie('anat').addVolume('^y'  ,'y' );
@@ -284,15 +285,19 @@ e.getSerie('anat').addVolume('^p0' ,'p0' );
     %% Normalize
 
     clear par
-    par.redo    = 1;
-    par.sge     = 0;
+    par.redo    = 0;
+    par.sge     = 1;
     par.run     = 1;
     par.display = 0;
+    par.vox     = [2.5 2.5 2.5];
     par.jobname = 'spm_apply_norm';
 
     warp_field = e.getSerie('anat').getVolume('^y');
+% ACTIVATION
+    img = e.getSerie('tedana_ACTIVATION').getVolume('^dn');
+    job_apply_normalize(warp_field,img, par)
+% RS
     img = e.getSerie('tedana_RS').getVolume('^dn');
-
     job_apply_normalize(warp_field,img, par)
 
     e.getSerie('tedana').addVolume('^wdn','wdn',1);
