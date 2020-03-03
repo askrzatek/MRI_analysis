@@ -4,8 +4,8 @@ clear
 clc
 
 addpath /home/anna.skrzatek/data/StimTemplate
-
-%load e % why doesn't the e-object work?!
+cd      /home/anna.skrzatek/data
+load e % why doesn't the e-object work?!
 
 main_dir = fullfile(pwd,'nifti');
 stim_dir = fullfile(pwd,'behav');
@@ -31,6 +31,12 @@ e.getSerie('run_ACTIVATION').addStim(stim_dir, 'MRI_run\d{2}_SPM.mat', 'run', 1 
 stim_files = e.getSerie('run_ACTIVATION').getStim.toJob(0);
 
 % e.explore
+
+%% Make symbolic links from tedana_vtd_mle dir to run dir based on job_meica_afni symbolic link creation
+par.subdir = 'tedana_vtd_mle';
+
+job_symbolic_child_copy(dir_func, par);
+
 
 
 %% Job define model
@@ -92,16 +98,16 @@ contrast_T.names = {
 'IMAGINARY total - REAL total'
 'REAL total       - IMAGINARY total'
 
-
-'Instruction - Rest'
-'Instruction - Total Activation'
-'Total Activation - Instruction'
-'Total_REAL_Activation - Instruction'
-'REAL_Left - Instruction'
-'REAL_Right - Instruction'
-'Total_IMAGINARY_Activation - Instruction'
-'IMAGINARY_Left - Instruction'
-'IMAGINARY_Right - Instruction'
+% 
+% 'Instruction - Rest'
+% 'Instruction - Total Activation'
+% 'Total Activation - Instruction'
+% 'Total_REAL_Activation - Instruction'
+% 'REAL_Left - Instruction'
+% 'REAL_Right - Instruction'
+% 'Total_IMAGINARY_Activation - Instruction'
+% 'IMAGINARY_Left - Instruction'
+% 'IMAGINARY_Right - Instruction'
 
 }';
 
@@ -131,15 +137,15 @@ IMAGINARY_Right - REAL_Right
 (IMAGINARY_Left + IMAGINARY_Right) - (REAL_Left + REAL_Right)
 (REAL_Left + REAL_Right)           - (IMAGINARY_Left + IMAGINARY_Right)
 
-Instruction     - Rest
-4*Instruction   - (REAL_Left + REAL_Right + IMAGINARY_Left + IMAGINARY_Right)
-(REAL_Left + REAL_Right + IMAGINARY_Left + IMAGINARY_Right) - 4*Instruction
-(REAL_Left + REAL_Right)                                    - 2*Instruction
-REAL_Left       - Instruction
-REAL_Right      - Instruction
-(IMAGINARY_Left + IMAGINARY_Right)                          - 2*Instruction
-IMAGINARY_Left  - Instruction
-IMAGINARY_Right - Instruction
+% Instruction     - Rest
+% 4*Instruction   - (REAL_Left + REAL_Right + IMAGINARY_Left + IMAGINARY_Right)
+% (REAL_Left + REAL_Right + IMAGINARY_Left + IMAGINARY_Right) - 4*Instruction
+% (REAL_Left + REAL_Right)                                    - 2*Instruction
+% REAL_Left       - Instruction
+% REAL_Right      - Instruction
+% (IMAGINARY_Left + IMAGINARY_Right)                          - 2*Instruction
+% IMAGINARY_Left  - Instruction
+% IMAGINARY_Right - Instruction
 
 }';
 
