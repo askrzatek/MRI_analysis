@@ -33,16 +33,16 @@ stim_files = e.getSerie('run_ACTIVATION').getStim.toJob(0);
 % e.explore
 
 %% Make symbolic links from tedana_vtd_mle dir to run dir based on job_meica_afni symbolic link creation
-par.subdir = 'tedana_vtd_mle';
+par.subdir        = 'tedana_vtd_mle';
+par.warp_file_reg = 'wdn';
 
-job_symbolic_child_copy(dir_func, par);
-
+job_symbolic_child_to_parent(dir_func, par);
 
 
 %% Job define model
-
-par.run = 1;
-%par.pct = 1;
+par.sge = 1;
+par.run = 0;
+%par.pct = 0;
 % par.TR = 1.6;
 
 par.file_reg = '^wdn';
@@ -177,8 +177,8 @@ contrast.types  = [contrast_F.types  contrast_T.types];
 
 
 %% Contrast : write
-
-par.run = 1;
+par.sge = 1;
+par.run = 0;
 par.display = 0;
 
 % par.sessrep = 'both';
@@ -190,7 +190,7 @@ job_first_level_contrast(fspm,contrast,par);
 
 % add the model and the contrasts to the e object
 
-e.addSerie('^model','model',1);
+e.addSerie('^model_tedana','model',1);
 e.getSerie('model').addVolume('^SPM','m',1);
 e.getSerie('model').addVolume('^spm[TF]_\d{4}','con',length(contrast.names));
 
@@ -211,8 +211,11 @@ e.getSerie('model').addVolume('^spm[TF]_\d{4}','con',length(contrast.names));
 %     job_spm_single_results_display({fspm{n}}, 4, t1(n).path, Coordlist,  output_dir, SPM, wd)
 % end
 % % 
-cd /network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/
-save e
+
+%% Save the new e object
+
+%cd /network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/
+%save e
 
 
 %script_report_edit(e);
