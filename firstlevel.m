@@ -5,7 +5,6 @@ clc
 
 addpath /home/anna.skrzatek/data/StimTemplate
 
-%load e % why doesn't the e-object work?!
 %load e % if in the correct directory - cd wd before
 
 main_dir = fullfile(pwd,'nifti');
