@@ -177,6 +177,8 @@ contrast.types  = [contrast_F.types  contrast_T.types];
 
 
 %% Contrast : write
+clear par
+
 par.sge = 1;
 par.run = 0;
 par.display = 0;
@@ -188,7 +190,7 @@ par.delete_previous = 1;
 par.report          = 0;
 job_first_level_contrast(fspm,contrast,par);
 
-% add the model and the contrasts to the e object
+%% add the model and the contrasts to the e object
 
 e.addSerie('^model_tedana','model',1);
 e.getSerie('model').addVolume('^SPM','m',1);
@@ -217,9 +219,26 @@ e.getSerie('model').addVolume('^spm[TF]_\d{4}','con',length(contrast.names));
 %cd /network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/
 %save e
 
+%% Create figures
 
-%script_report_edit(e);
+%fsub = e.gpath;
+%Coordlist.values = cat(2,[0.0; 0.0; 0.0], [34.0; -24.0; 68.0], [-34.0; -24.0; 68.0], [-4.0; -48.0; -24.0], [0.0; -24.0; 10.0]); % EXAMPLE
+%Coordlist.names = {'centre'; 'RIGHT SM'; 'LEFT SM'; 'CEREBELLUM'; 'MOTOR BI'}; % EXAMPLE
+
+%par.subdir       = 'model_tedana';
+%par.anat_dir_reg = 'S\d{2}_t1mpr_S256_0_8iso_p2$'
+
+%conlist = {'F-all','REAL_Left','REAL_Right','IMAGINARY_Left','IMAGINARY_Right','REAL_Left - Rest','REAL_Right - Rest','IMAGINARY_Left - Rest','IMAGINARY_Right - Rest'};
+addpath /home/anna.skrzatek/matvol/SPM/
+%for icon = 1 : length(conlist)
+%    par.conname  = conlist{icon};
+%    job_spm_single_results_display(fsub, Coordlist, par);
+%end
+
+%close all
+
+%%script_report_edit(e);
 
 %% Display
 
-%e.getOne.getModel(model_name).show
+%%e.getOne.getModel(model_name).show

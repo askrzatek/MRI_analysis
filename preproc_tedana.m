@@ -286,7 +286,7 @@ e.getSerie('anat').addVolume('^p0' ,'p0' );
 
     clear par
     par.redo    = 0;
-    par.sge     = 1;
+    par.sge     = 0;
     par.run     = 1;
     par.display = 0;
     par.vox     = [2.5 2.5 2.5];
