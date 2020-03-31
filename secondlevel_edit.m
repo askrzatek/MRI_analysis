@@ -707,14 +707,17 @@ main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek
 
 % e_PARKGAME = exam(main_dir,'PARKGAME');
 % e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
-e_REMINARYS1 = exam(main_dir,'REMINARY_\w{2}_.*1$');
-e_REMINARYS2 = exam(main_dir,'REMINARY_\w{2}_.*2$');
-e_PARKGAMES2 = exam(main_dir,'PARKGAME.*2$');
-e_PARKGAMES1 = exam(main_dir,'PARKGAME.*1$');
+%e_REMINARYS1 = exam(main_dir,'REMINARY_\w{2}_.*1$');
+%e_REMINARYS2 = exam(main_dir,'REMINARY_\w{2}_.*2$');
+e_PARKGAMES2-a = exam(main_dir,'PARKGAME.*2_a$'); % taking into account the expgroup "_a" for active and "_c" for control
+e_PARKGAMES1-a = exam(main_dir,'PARKGAME.*1_a$'); % taking into account the expgroup "_a" for active and "_c" for control
+e_PARKGAMES2-c = exam(main_dir,'PARKGAME.*2_c$'); % taking into account the expgroup "_a" for active and "_c" for control
+e_PARKGAMES1-c = exam(main_dir,'PARKGAME.*1_c$'); % taking into account the expgroup "_a" for active and "_c" for control
 
-e = {e_PARKGAMES1, e_PARKGAMES2, e_REMINARYS1, e_REMINARYS2};
-dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_test');
-dirgroup = r_mkdir(char(dirstat), {'PARKGAME', 'REMINARY'});
+
+e = {e_PARKGAMES1-a, e_PARKGAMES2-a, e_PARKGAMES1-c, e_PARKGAMES2-c};
+dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_PARK');
+dirgroup = r_mkdir(char(dirstat), {'PARKGAME-a', 'PARKGAME-c'});
 
 done = 0;
 done = job_con_smooth('s',4); % comment this line if you don't want to smooth your contrast data
@@ -722,7 +725,7 @@ if done ==1
     for i = 1:length(e)
         %e{i}.explore
         %'REMINARY_\w{2}_.*1$'
-        e{i}.addSerie('model_meica$','contrasts',1)
+        e{i}.addSerie('model_tedana$','contrasts',1)
 
         e{i}.getSerie('contrasts').addVolume('^scon_0008','REAL_L',1)
         e{i}.getSerie('contrasts').addVolume('^scon_0009','REAL_R',1)
@@ -737,7 +740,7 @@ else
     for i = 1:length(e)
         %e{i}.explore
         %'REMINARY_\w{2}_.*1$'
-        e{i}.addSerie('model_meica$','contrasts',1)
+        e{i}.addSerie('model_tedana$','contrasts',1)
 
         e{i}.getSerie('contrasts').addVolume('^con_0008','REAL_L',1)
         e{i}.getSerie('contrasts').addVolume('^con_0009','REAL_R',1)
@@ -768,7 +771,7 @@ for group=1:2:4
         if group == 1 % keep if we still need 2 exams per group
             dirout = r_mkdir(dirgroup{group}, model_name);
         else
-            dirout = r_mkdir(dirgroup{2}, model_name);
+            dirout = r_mkdir(dirgroup{2}, model_name); % works only if we have no more than 2 groups ergo 2 protocols
         end
         model_dir = cellstr(dirout{imod});
         switch imod                                   
