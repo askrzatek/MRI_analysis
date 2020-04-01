@@ -709,18 +709,20 @@ main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek
 % e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
 %e_REMINARYS1 = exam(main_dir,'REMINARY_\w{2}_.*1$');
 %e_REMINARYS2 = exam(main_dir,'REMINARY_\w{2}_.*2$');
-e_PARKGAMES2-a = exam(main_dir,'PARKGAME.*2_a$'); % taking into account the expgroup "_a" for active and "_c" for control
-e_PARKGAMES1-a = exam(main_dir,'PARKGAME.*1_a$'); % taking into account the expgroup "_a" for active and "_c" for control
-e_PARKGAMES2-c = exam(main_dir,'PARKGAME.*2_c$'); % taking into account the expgroup "_a" for active and "_c" for control
-e_PARKGAMES1-c = exam(main_dir,'PARKGAME.*1_c$'); % taking into account the expgroup "_a" for active and "_c" for control
+e_PARKGAMES2_a = exam(main_dir,'PARKGAME.*2_a$'); % taking into account the expgroup "_a" for active and "_c" for control
+e_PARKGAMES1_a = exam(main_dir,'PARKGAME.*1_a$'); % taking into account the expgroup "_a" for active and "_c" for control
+e_PARKGAMES1_a = e_PARKGAMES1_a(1:length(e_PARKGAMES2_a)); % waiting for all subjects to get a pair session
+
+e_PARKGAMES2_c = exam(main_dir,'PARKGAME.*2_c$'); % taking into account the expgroup "_a" for active and "_c" for control
+e_PARKGAMES1_c = exam(main_dir,'PARKGAME.*1_c$'); % taking into account the expgroup "_a" for active and "_c" for control
 
 
-e = {e_PARKGAMES1-a, e_PARKGAMES2-a, e_PARKGAMES1-c, e_PARKGAMES2-c};
+e = {e_PARKGAMES1_a, e_PARKGAMES2_a, e_PARKGAMES1_c, e_PARKGAMES2_c};
 dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_PARK');
-dirgroup = r_mkdir(char(dirstat), {'PARKGAME-a', 'PARKGAME-c'});
+dirgroup = r_mkdir(char(dirstat), {'PARKGAME_a', 'PARKGAME_c'});
 
 done = 0;
-done = job_con_smooth('s',4); % comment this line if you don't want to smooth your contrast data
+%done = job_con_smooth('s',4); % comment this line if you don't want to smooth your contrast data
 if done ==1
     for i = 1:length(e)
         %e{i}.explore
@@ -765,7 +767,7 @@ par.verbose = 2;
     %% Fetch onset
     % before adding a SPM.mat to the exam we need to create one with a batch for each model with file matrices we would have fetched
     % --> modify the script job_first_level_specify(dir_func, model_dir,par) where we can fetch all needed scans according to each model, create respective folders
-for group=1:2:4
+for group=1:2%:4 % if only one group ready for analysis then the 4 unnecessary
     %for session= 1:2:4
     for imod=1:length(model_name)
         if group == 1 % keep if we still need 2 exams per group
