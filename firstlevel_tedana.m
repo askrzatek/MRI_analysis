@@ -40,8 +40,8 @@ job_symbolic_child_to_parent(dir_func, par);
 
 
 %% Job define model
-par.sge = 1;
-par.run = 0;
+par.sge = 0;
+par.run = 1;
 %par.pct = 0;
 % par.TR = 1.6;
 
@@ -179,8 +179,8 @@ contrast.types  = [contrast_F.types  contrast_T.types];
 %% Contrast : write
 clear par
 
-par.sge = 1;
-par.run = 0;
+par.sge = 0;
+par.run = 1;
 par.display = 0;
 
 % par.sessrep = 'both';

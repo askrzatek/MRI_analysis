@@ -734,6 +734,9 @@ if done ==1
         e{i}.getSerie('contrasts').addVolume('^scon_0010','IMA_L',1)
         e{i}.getSerie('contrasts').addVolume('^scon_0011','IMA_R',1)
 
+        [ec_1st, ei_1st] = e{i}.removeIncomplete;
+        e{i} = ec_1st;
+
         e{i}.explore
         %e{2}.explore
        dirfig = 'auto_figures_smooth';
@@ -748,6 +751,9 @@ else
         e{i}.getSerie('contrasts').addVolume('^con_0009','REAL_R',1)
         e{i}.getSerie('contrasts').addVolume('^con_0010','IMA_L',1)
         e{i}.getSerie('contrasts').addVolume('^con_0011','IMA_R',1)
+
+        [ec_1st, ei_1st] = e{i}.removeIncomplete;
+        e{i} = ec_1st;
 
         e{i}.explore
         %e{2}.explore
@@ -845,8 +851,9 @@ for group=1:2%:4 % if only one group ready for analysis then the 4 unnecessary
             par.sessrep = 'none';
 
             par.delete_previous = 1;
-            par.report          = 1;
-            %par.report          = 0;
+            %par.report          = 1; % error on non designating spm mode
+            %(?)
+            par.report          = 0;
             
             job_second_level_contrast(fspm,model_contrast{imod},par);
     %% create a folder for figures before creating figures with MRIcroGL
