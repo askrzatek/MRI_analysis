@@ -729,10 +729,10 @@ if done ==1
         %'REMINARY_\w{2}_.*1$'
         e{i}.addSerie('model_tedana$','contrasts',1)
 
-        e{i}.getSerie('contrasts').addVolume('^scon_0008','REAL_L',1)
-        e{i}.getSerie('contrasts').addVolume('^scon_0009','REAL_R',1)
-        e{i}.getSerie('contrasts').addVolume('^scon_0010','IMA_L',1)
-        e{i}.getSerie('contrasts').addVolume('^scon_0011','IMA_R',1)
+        e{i}.getSerie('contrasts').addVolume('^scon_0007','REAL_L',1)
+        e{i}.getSerie('contrasts').addVolume('^scon_0008','REAL_R',1)
+        e{i}.getSerie('contrasts').addVolume('^scon_0009','IMA_L',1)
+        e{i}.getSerie('contrasts').addVolume('^scon_0010','IMA_R',1)
 
         [ec_1st, ei_1st] = e{i}.removeIncomplete;
         e{i} = ec_1st;
@@ -800,17 +800,17 @@ for group=1:2%:4 % if only one group ready for analysis then the 4 unnecessary
             case 3
                 fact1 = 'Hand';
                 fact2 = 'Task';
-                l11 = e{group+1}.getSerie('contrasts').getVolume('REAL_R').toJob;
-                l12 = e{group+1}.getSerie('contrasts').getVolume('IMA_R').toJob;
-                l21 = e{group+1}.getSerie('contrasts').getVolume('REAL_L').toJob;
-                l22 = e{group+1}.getSerie('contrasts').getVolume('IMA_L').toJob;
+                l11 = e{group+1}.getSerie('contrasts').getVolume('REAL_L').toJob;
+                l12 = e{group+1}.getSerie('contrasts').getVolume('IMA_L').toJob;
+                l21 = e{group+1}.getSerie('contrasts').getVolume('REAL_R').toJob;
+                l22 = e{group+1}.getSerie('contrasts').getVolume('IMA_R').toJob;
             case 4
                 fact1 = 'Hand';
                 fact2 = 'Task';
-                l11 = e{group}.getSerie('contrasts').getVolume('REAL_R').toJob;
-                l12 = e{group}.getSerie('contrasts').getVolume('IMA_R').toJob;
-                l21 = e{group}.getSerie('contrasts').getVolume('REAL_L').toJob;
-                l22 = e{group}.getSerie('contrasts').getVolume('IMA_L').toJob;
+                l11 = e{group}.getSerie('contrasts').getVolume('REAL_L').toJob;
+                l12 = e{group}.getSerie('contrasts').getVolume('IMA_L').toJob;
+                l21 = e{group}.getSerie('contrasts').getVolume('REAL_R').toJob;
+                l22 = e{group}.getSerie('contrasts').getVolume('IMA_R').toJob;
             case 5
                 fact1 = 'Hand';
                 fact2 = 'Session';
