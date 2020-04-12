@@ -91,8 +91,10 @@ contrast_T.types = cat(1,repmat({'T'},[1 length(contrast_T.names)]));
 contrast_F.names = {
     
     'Avg_Condition_Effect_S1'
-    'Main_LATERALITY_Effect_S1'
-    'Main_TASK_Effect_S1'
+    'Main_LATERALITY_Effect_LEFT_S1'
+    'Main_LATERALITY_Effect_RIGHT_S1'
+    'Main_TASK_Effect_IMA_S1'
+    'Main_TASK_Effect_REAL_S1'
     'Main_LxT_INTERACTION_Effect_S1'
     
 }';
@@ -101,10 +103,14 @@ contrast_F.names = {
 contrast_F.values = {
     %Avg_Condition_Effect_S1            = [1 1 1 1];
     LEFT_REAL_S1 + LEFT_IMAGINARY_S1 + RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1
-    %Main_LATERALITY_Effect_S1             = [1 1 0 0];
+    %Main_LATERALITY_Effect_LEFT_S1             = [1 1 0 0];
     LEFT_REAL_S1                 + LEFT_IMAGINARY_S1
-    %Main_TASK_Effect_S1                = [0 1 0 1];
+    %Main_LATERALITY_Effect_RIGHT_S1             = [0 0 1 1];
+    RIGHT_REAL_S1                 + RIGHT_IMAGINARY_S1
+    %Main_TASK_Effect_IMA_S1                = [0 1 0 1];
     LEFT_IMAGINARY_S1            + RIGHT_IMAGINARY_S1
+    %Main_TASK_Effect_REAL_S1                = [1 0 1 0];
+    LEFT_REAL_S1            + RIGHT_REAL_S1
     %Main_SxT_INTERACTION_Effect_S1     = [1 0 0 1];
     LEFT_REAL_S1                 + RIGHT_IMAGINARY_S1
     
@@ -135,7 +141,8 @@ e_PARKGAME_S1 = exam(main_dir,'PARKGAME.*1'); % taking into account all S1 patie
 
 e = {e_PARKGAME_S1};
 dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_PARK_S1');
-dirgroup = r_mkdir(char(dirstat), {'PARKGAME_S1'});
+dirgroup = dirstat;
+%dirgroup = r_mkdir(char(dirstat), {'PARKGAME_S1'});
 
 done = 0;
 %done = job_con_smooth('s',4); % comment this line if you don't want to smooth your contrast data
