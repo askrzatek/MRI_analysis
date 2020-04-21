@@ -8,6 +8,7 @@
 %%% $Id: run_tutorial.m,v 1.3 2004/08/15 01:19:43 matthewbrett Exp $
 
 %%% Start marsbar to make sure spm_get works
+addpath /network/lustre/iss01/cenir/software/irm/spm12/toolbox/marsbar/
 marsbar('on')
 
 %%% You might want to define the path to the example data here, as in
