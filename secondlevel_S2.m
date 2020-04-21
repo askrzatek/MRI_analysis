@@ -7,10 +7,10 @@ clc
 
 %% Contrast : definition
 
-LEFT_REAL_S1                            = [1 0 0 0];
-LEFT_IMAGINARY_S1                       = [0 1 0 0];
-RIGHT_REAL_S1                           = [0 0 1 0];
-RIGHT_IMAGINARY_S1                      = [0 0 0 1];
+LEFT_REAL_S2                            = [1 0 0 0];
+LEFT_IMAGINARY_S2                       = [0 1 0 0];
+RIGHT_REAL_S2                           = [0 0 1 0];
+RIGHT_IMAGINARY_S2                      = [0 0 0 1];
 
 %% T contrast
 
@@ -18,67 +18,67 @@ RIGHT_IMAGINARY_S1                      = [0 0 0 1];
 
 contrast_T.names = {
     
-    'LEFT-RIGHT_S1'
-    'RIGHT-LEFT_S1'
-    'IMAGINARY-REAL_S1'
-    'REAL-IMAGINARY_S1'
+    'LEFT-RIGHT_S2'
+    'RIGHT-LEFT_S2'
+    'IMAGINARY-REAL_S2'
+    'REAL-IMAGINARY_S2'
     
-    'POS-LATERALITY-TASK-INTERACTION_S1'
-    'NEG-LATERALITY-TASK-INTERACTION_S1'
+    'POS-LATERALITY-TASK-INTERACTION_S2'
+    'NEG-LATERALITY-TASK-INTERACTION_S2'
     
-    'RIGHT_REAL-LEFT_REAL_S1'
-    'RIGHT_IMAGINARY-LEFT_IMAGINARY_S1'
+    'RIGHT_REAL-LEFT_REAL_S2'
+    'RIGHT_IMAGINARY-LEFT_IMAGINARY_S2'
     
-    'LEFT_REAL-RIGHT_REAL_S1'
-    'LEFT_IMAGINARY-RIGHT_IMAGINARY_S1'
+    'LEFT_REAL-RIGHT_REAL_S2'
+    'LEFT_IMAGINARY-RIGHT_IMAGINARY_S2'
     
     
-    'LEFT_REAL_S1'
-    'LEFT_IMAGINARY_S1'
-    'RIGHT_REAL_S1'
-    'RIGHT_IMAGINARY_S1'
+    'LEFT_REAL_S2'
+    'LEFT_IMAGINARY_S2'
+    'RIGHT_REAL_S2'
+    'RIGHT_IMAGINARY_S2'
     
-    'RIGHT_REAL_S1 - RIGHT_IMAGINARY_S1'
-    'RIGHT_IMAGINARY_S1 - RIGHT_REAL_S1'
+    'RIGHT_REAL_S2 - RIGHT_IMAGINARY_S2'
+    'RIGHT_IMAGINARY_S2 - RIGHT_REAL_S2'
     
 }';
 
 contrast_T.values = {
     
-    % [1 1 -1 -1]      'LEFT-RIGHT_S1'
-    (LEFT_REAL_S1 + LEFT_IMAGINARY_S1)       - (RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1)
-    % [-1 -1 1 1]      'RIGHT-LEFT_S1'
-    (RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1)       - (LEFT_REAL_S1 + LEFT_IMAGINARY_S1)
-    % [-1 1 -1 1]      'IMAGINARY-REAL_S1'
-    (LEFT_IMAGINARY_S1 + RIGHT_IMAGINARY_S1)  - (LEFT_REAL_S1 + RIGHT_REAL_S1)
-    % [1 -1 1 -1]      'REAL-IMAGINARY_S1'
-    (LEFT_REAL_S1 + RIGHT_REAL_S1)            - (LEFT_IMAGINARY_S1 + RIGHT_IMAGINARY_S1)
+    % [1 1 -1 -1]      'LEFT-RIGHT_S2'
+    (LEFT_REAL_S2 + LEFT_IMAGINARY_S2)       - (RIGHT_REAL_S2 + RIGHT_IMAGINARY_S2)
+    % [-1 -1 1 1]      'RIGHT-LEFT_S2'
+    (RIGHT_REAL_S2 + RIGHT_IMAGINARY_S2)       - (LEFT_REAL_S2 + LEFT_IMAGINARY_S2)
+    % [-1 1 -1 1]      'IMAGINARY-REAL_S2'
+    (LEFT_IMAGINARY_S2 + RIGHT_IMAGINARY_S2)  - (LEFT_REAL_S2 + RIGHT_REAL_S2)
+    % [1 -1 1 -1]      'REAL-IMAGINARY_S2'
+    (LEFT_REAL_S2 + RIGHT_REAL_S2)            - (LEFT_IMAGINARY_S2 + RIGHT_IMAGINARY_S2)
     
-    % [ 1 -1 -1 1]     'POS-LATERALITY-TASK-INTERACTION_S1'
-    (LEFT_REAL_S1 + RIGHT_IMAGINARY_S1)       - (RIGHT_REAL_S1 + LEFT_IMAGINARY_S1)
-    % [ -1 1 1 -1]     'NEG-LATERALITY-TASK-INTERACTION_S1'
-    (RIGHT_REAL_S1 + LEFT_IMAGINARY_S1)       - (LEFT_REAL_S1 + RIGHT_IMAGINARY_S1)
+    % [ 1 -1 -1 1]     'POS-LATERALITY-TASK-INTERACTION_S2'
+    (LEFT_REAL_S2 + RIGHT_IMAGINARY_S2)       - (RIGHT_REAL_S2 + LEFT_IMAGINARY_S2)
+    % [ -1 1 1 -1]     'NEG-LATERALITY-TASK-INTERACTION_S2'
+    (RIGHT_REAL_S2 + LEFT_IMAGINARY_S2)       - (LEFT_REAL_S2 + RIGHT_IMAGINARY_S2)
     
-    % [-1 0 1 0]       'RIGHT_REAL-LEFT_REAL_S1'
-    RIGHT_REAL_S1                         - LEFT_REAL_S1
-    % [ 0 -1 0 1]      'RIGHT_IMAGINARY-LEFT_IMAGINARY_S1'
-    RIGHT_IMAGINARY_S1                    - LEFT_IMAGINARY_S1
+    % [-1 0 1 0]       'RIGHT_REAL-LEFT_REAL_S2'
+    RIGHT_REAL_S2                         - LEFT_REAL_S2
+    % [ 0 -1 0 1]      'RIGHT_IMAGINARY-LEFT_IMAGINARY_S2'
+    RIGHT_IMAGINARY_S2                    - LEFT_IMAGINARY_S2
     
-    % [1 0 -1 0]       'LEFT_REAL-RIGHT_REAL_S1'
-    LEFT_REAL_S1                         - RIGHT_REAL_S1
-    % [ 0 1 0 -1]      'LEFT_IMAGINARY-RIGHT_IMAGINARY_S1'
-    LEFT_IMAGINARY_S1                    - RIGHT_IMAGINARY_S1
+    % [1 0 -1 0]       'LEFT_REAL-RIGHT_REAL_S2'
+    LEFT_REAL_S2                         - RIGHT_REAL_S2
+    % [ 0 1 0 -1]      'LEFT_IMAGINARY-RIGHT_IMAGINARY_S2'
+    LEFT_IMAGINARY_S2                    - RIGHT_IMAGINARY_S2
     
-    LEFT_REAL_S1        % [ 1 0 0 0]
-    LEFT_IMAGINARY_S1   % [ 0 1 0 0]
-    RIGHT_REAL_S1       % [ 0 0 1 0]
-    RIGHT_IMAGINARY_S1  % [ 0 0 0 1]
+    LEFT_REAL_S2        % [ 1 0 0 0]
+    LEFT_IMAGINARY_S2   % [ 0 1 0 0]
+    RIGHT_REAL_S2       % [ 0 0 1 0]
+    RIGHT_IMAGINARY_S2  % [ 0 0 0 1]
     
     % [0 0 1 -1]
-    RIGHT_REAL_S1 - RIGHT_IMAGINARY_S1
+    RIGHT_REAL_S2 - RIGHT_IMAGINARY_S2
     
     % [0 0 -1 1]
-    RIGHT_IMAGINARY_S1 - RIGHT_REAL_S1
+    RIGHT_IMAGINARY_S2 - RIGHT_REAL_S2
     
 }';
 
@@ -90,29 +90,29 @@ contrast_T.types = cat(1,repmat({'T'},[1 length(contrast_T.names)]));
 
 contrast_F.names = {
     
-    'Avg_Condition_Effect_S1'
-    'Main_LATERALITY_Effect_LEFT_S1'
-    'Main_LATERALITY_Effect_RIGHT_S1'
-    'Main_TASK_Effect_IMA_S1'
-    'Main_TASK_Effect_REAL_S1'
-    'Main_LxT_INTERACTION_Effect_S1'
+    'Avg_Condition_Effect_S2'
+    'Main_LATERALITY_Effect_LEFT_S2'
+    'Main_LATERALITY_Effect_RIGHT_S2'
+    'Main_TASK_Effect_IMA_S2'
+    'Main_TASK_Effect_REAL_S2'
+    'Main_LxT_INTERACTION_Effect_S2'
     
 }';
-%%% CHECK THAT !!! EQUILIBRIUM aspect !!! should it not be 2* (LEFT_REAL_S1 + LEFT_IMAGINARY_S1) ???
+%%% CHECK THAT !!! EQUILIBRIUM aspect !!! should it not be 2* (LEFT_REAL_S2 + LEFT_IMAGINARY_S2) ???
 
 contrast_F.values = {
-    %Avg_Condition_Effect_S1            = [1 1 1 1];
-    LEFT_REAL_S1 + LEFT_IMAGINARY_S1 + RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1
-    %Main_LATERALITY_Effect_LEFT_S1             = [1 1 0 0];
-    LEFT_REAL_S1                 + LEFT_IMAGINARY_S1
-    %Main_LATERALITY_Effect_RIGHT_S1             = [0 0 1 1];
-    RIGHT_REAL_S1                 + RIGHT_IMAGINARY_S1
-    %Main_TASK_Effect_IMA_S1                = [0 1 0 1];
-    LEFT_IMAGINARY_S1            + RIGHT_IMAGINARY_S1
-    %Main_TASK_Effect_REAL_S1                = [1 0 1 0];
-    LEFT_REAL_S1            + RIGHT_REAL_S1
-    %Main_SxT_INTERACTION_Effect_S1     = [1 0 0 1];
-    LEFT_REAL_S1                 + RIGHT_IMAGINARY_S1
+    %Avg_Condition_Effect_S2            = [1 1 1 1];
+    LEFT_REAL_S2 + LEFT_IMAGINARY_S2 + RIGHT_REAL_S2 + RIGHT_IMAGINARY_S2
+    %Main_LATERALITY_Effect_LEFT_S2             = [1 1 0 0];
+    LEFT_REAL_S2                 + LEFT_IMAGINARY_S2
+    %Main_LATERALITY_Effect_RIGHT_S2             = [0 0 1 1];
+    RIGHT_REAL_S2                 + RIGHT_IMAGINARY_S2
+    %Main_TASK_Effect_IMA_S2                = [0 1 0 1];
+    LEFT_IMAGINARY_S2            + RIGHT_IMAGINARY_S2
+    %Main_TASK_Effect_REAL_S2                = [1 0 1 0];
+    LEFT_REAL_S2            + RIGHT_REAL_S2
+    %Main_SxT_INTERACTION_Effect_S2     = [1 0 0 1];
+    LEFT_REAL_S2                 + RIGHT_IMAGINARY_S2
     
 }';
 
@@ -135,20 +135,20 @@ model_contrast = {contrast_2x2_LxT};
 %% Load files from multiple folders
 main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti');
 
- e_PARKGAME = exam(main_dir,'PARKGAME');
-%e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
+% e_PARKGAME = exam(main_dir,'PARKGAME');
+% e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
 
-%e_REMINARY_S1 = exam(main_dir,'REMINARY_\w{2}_.*1$');
+%e_REMINARY_S2 = exam(main_dir,'REMINARY_\w{2}_.*2$');
+%e = {e_REMINARY_S2};
+%dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_REM_S2');
 
-%e = {e_REMINARY_S1};
-%dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_REM_S1');
 
-e_PARKGAME_S1 = exam(main_dir,'PARKGAME.*1'); % taking into account all S1 patients
+e_PARKGAME_S2 = exam(main_dir,'PARKGAME.*2_a'); % taking into account all S2 patients
+e = {e_PARKGAME_S2};
+dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_PARK_S2');
 
-e = {e_PARKGAME_S1};
-dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_PARK_S1');
 dirgroup = dirstat;
-%dirgroup = r_mkdir(char(dirstat), {'PARKGAME_S1'});
+%dirgroup = r_mkdir(char(dirstat), {'PARKGAME_S2'});
 
 done = 0;
 %done = job_con_smooth('s',4); % comment this line if you don't want to smooth your contrast data
