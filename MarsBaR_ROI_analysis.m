@@ -62,13 +62,13 @@ R = maroi(R);
 
 
 % Fetch data into marsbar data object
-mY  = get_marsy(R{1:10}, D, 'mean');
+mY  = get_marsy(R{1:length(roi_files)}, D, 'mean');
 y = summary_data(mY);
 
 % Get contrasts from original design
 xCon = get_contrasts(D);
 
-for i = 1:10
+
 	Y = get_marsy(R{i}, D, 'mean')
 	% Estimate design on ROI data --> each ROI separately or can we pool covariance estimate across ROIs (SPM tells its unlikely to be valid)
 	E = estimate(D, Y{i});
@@ -82,8 +82,9 @@ for i = 1:10
 	% get stats and stuff for all contrasts into statistics structure
 	marsS = compute_contrasts(E, 1:length(xCon));
 
-
-	% Get definitions of all events in model --> impossible because it is a second level analysis data, ergo no event time info left
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Get definitions of all events in model --> impossible because it is a second level analysis data, ergo no event time info left --> we should use 1st level anal here%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	[e_specs, e_names] = event_specs(E);
 	n_events = size(e_specs, 2);
 	dur = 0;
@@ -94,4 +95,3 @@ for i = 1:10
 	for e_s = 1:n_events
   		pct_ev(e_s) = event_signal(E, e_specs(:,e_s), dur);
 	end
-end
