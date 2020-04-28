@@ -36,11 +36,12 @@ spm('defaults', 'fmri');
 
 main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti');
 roi_model_dir = fullfile(char(main_dir), 'secondlevel_ACTIVATION_PARK_S1');
-con_list = {'Main_spe_LEFT_REAL_S1.*_roi.mat', 'Main_spe_LEFT_IMAGINARY_S1.*_roi.mat', 'Main_spe_RIGHT_REAL_S1.*_roi.mat', 'Main_spe_RIGHT_IMAGINARY_S1.*_roi.mat', 'Main_conj_LEFT_IMAGINARY_REAL_S1.*_roi.mat', 'Main_conj_RIGHT_IMAGINARY_REAL_S1.*_roi.mat'};
+con_list.regex = {'Main_spe_LEFT_REAL_S1.*_roi.mat', 'Main_spe_LEFT_IMAGINARY_S1.*_roi.mat', 'Main_spe_RIGHT_REAL_S1.*_roi.mat', 'Main_spe_RIGHT_IMAGINARY_S1.*_roi.mat', 'Main_conj_LEFT_IMAGINARY_REAL_S1.*_roi.mat', 'Main_conj_RIGHT_IMAGINARY_REAL_S1.*_roi.mat'};
+con_list.name = {'Main_spe_LEFT_REAL_S1', 'Main_spe_LEFT_IMAGINARY_S1', 'Main_spe_RIGHT_REAL_S1', 'Main_spe_RIGHT_IMAGINARY_S1', 'Main_conj_LEFT_IMAGINARY_REAL_S1', 'Main_conj_RIGHT_IMAGINARY_REAL_S1'};
 
 % dirgroup = fullfile(char(dirstat), {'PARKGAME_a', 'PARKGAME_c'});
 for c =1 : length(con_list)
-    par.conname = con_list{c};
+    par.conname = con_list.regex{c};
     par.subdir = 'ANOVA2x2_LxT';
 
     %test_batch(par); % batch spm for loading a contrast and saving it in .mat in model dir %turns out not useful at all
@@ -91,8 +92,8 @@ for c =1 : length(con_list)
         [rep_strs, marsS, marsD, changef] = stat_table(E, 1:length(xCon));
 
         %% Creating a file and writing stats in it (in subject's model_dir)
-        fic_name = strcat('/', con_list{c}, '_ROI_stats.txt');
-        fic_stats = addsuffixtofilenames(model_dir{subj},fic_name'); 
+        fic_name = strcat(con_list.name{c}, '_ROI_stats.txt');
+        fic_stats = addsuffixtofilenames(model_dir{subj},fic_name'); % fic_name too long
         fid = fopen(fic_stats,'a+');
         for sno = 1:numel(rep_strs)
             fprintf(fid,'%s\n', rep_strs{sno});
