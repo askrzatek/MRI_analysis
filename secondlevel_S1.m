@@ -18,61 +18,72 @@ RIGHT_IMAGINARY_S1                      = [0 0 0 1];
 
 contrast_T.names = {
     
-    'LEFT-RIGHT_S1'
-    'RIGHT-LEFT_S1'
-    'IMAGINARY-REAL_S1'
-    'REAL-IMAGINARY_S1'
-    
-    'POS-LATERALITY-TASK-INTERACTION_S1'
-    'NEG-LATERALITY-TASK-INTERACTION_S1'
-    
-    'RIGHT_REAL-LEFT_REAL_S1'
-    'RIGHT_IMAGINARY-LEFT_IMAGINARY_S1'
-    
-    'LEFT_REAL-RIGHT_REAL_S1'
-    'LEFT_IMAGINARY-RIGHT_IMAGINARY_S1'
-    
     
     'LEFT_REAL_S1'
     'LEFT_IMAGINARY_S1'
     'RIGHT_REAL_S1'
     'RIGHT_IMAGINARY_S1'
     
+    %'LEFT-RIGHT_S1'
+    %'RIGHT-LEFT_S1'
+    %'IMAGINARY-REAL_S1'
+    %'REAL-IMAGINARY_S1'
+    
+    'POS-LATERALITY-TASK-INTERACTION_S1'
+    'NEG-LATERALITY-TASK-INTERACTION_S1'
+    
+    %'RIGHT_REAL-LEFT_REAL_S1'
+    %'RIGHT_IMAGINARY-LEFT_IMAGINARY_S1'
+    
+    %'LEFT_REAL-RIGHT_REAL_S1'
+    %'LEFT_IMAGINARY-RIGHT_IMAGINARY_S1'
+    
+    'LEFT_REAL_S1 - LEFT_IMAGINARY_S1'
+    'LEFT_IMAGINARY_S1 - LEFT_REAL_S1'
+    
     'RIGHT_REAL_S1 - RIGHT_IMAGINARY_S1'
     'RIGHT_IMAGINARY_S1 - RIGHT_REAL_S1'
+    
     
 }';
 
 contrast_T.values = {
     
-    % [1 1 -1 -1]      'LEFT-RIGHT_S1'
-    (LEFT_REAL_S1 + LEFT_IMAGINARY_S1)       - (RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1)
-    % [-1 -1 1 1]      'RIGHT-LEFT_S1'
-    (RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1)       - (LEFT_REAL_S1 + LEFT_IMAGINARY_S1)
-    % [-1 1 -1 1]      'IMAGINARY-REAL_S1'
-    (LEFT_IMAGINARY_S1 + RIGHT_IMAGINARY_S1)  - (LEFT_REAL_S1 + RIGHT_REAL_S1)
-    % [1 -1 1 -1]      'REAL-IMAGINARY_S1'
-    (LEFT_REAL_S1 + RIGHT_REAL_S1)            - (LEFT_IMAGINARY_S1 + RIGHT_IMAGINARY_S1)
+    LEFT_REAL_S1        % [ 1 0 0 0]
+    LEFT_IMAGINARY_S1   % [ 0 1 0 0]
+    RIGHT_REAL_S1       % [ 0 0 1 0]
+    RIGHT_IMAGINARY_S1  % [ 0 0 0 1] 
+   
+    
+    %% [1 1 -1 -1]      'LEFT-RIGHT_S1'
+    %(LEFT_REAL_S1 + LEFT_IMAGINARY_S1)       - (RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1)
+    %% [-1 -1 1 1]      'RIGHT-LEFT_S1'
+    %(RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1)       - (LEFT_REAL_S1 + LEFT_IMAGINARY_S1)
+    %% [-1 1 -1 1]      'IMAGINARY-REAL_S1'
+    %(LEFT_IMAGINARY_S1 + RIGHT_IMAGINARY_S1)  - (LEFT_REAL_S1 + RIGHT_REAL_S1)
+    %% [1 -1 1 -1]      'REAL-IMAGINARY_S1'
+    %(LEFT_REAL_S1 + RIGHT_REAL_S1)            - (LEFT_IMAGINARY_S1 + RIGHT_IMAGINARY_S1)
     
     % [ 1 -1 -1 1]     'POS-LATERALITY-TASK-INTERACTION_S1'
     (LEFT_REAL_S1 + RIGHT_IMAGINARY_S1)       - (RIGHT_REAL_S1 + LEFT_IMAGINARY_S1)
     % [ -1 1 1 -1]     'NEG-LATERALITY-TASK-INTERACTION_S1'
     (RIGHT_REAL_S1 + LEFT_IMAGINARY_S1)       - (LEFT_REAL_S1 + RIGHT_IMAGINARY_S1)
     
-    % [-1 0 1 0]       'RIGHT_REAL-LEFT_REAL_S1'
-    RIGHT_REAL_S1                         - LEFT_REAL_S1
-    % [ 0 -1 0 1]      'RIGHT_IMAGINARY-LEFT_IMAGINARY_S1'
-    RIGHT_IMAGINARY_S1                    - LEFT_IMAGINARY_S1
+    %% [-1 0 1 0]       'RIGHT_REAL-LEFT_REAL_S1'
+    %RIGHT_REAL_S1                         - LEFT_REAL_S1
+    %% [ 0 -1 0 1]      'RIGHT_IMAGINARY-LEFT_IMAGINARY_S1'
+    %RIGHT_IMAGINARY_S1                    - LEFT_IMAGINARY_S1
     
-    % [1 0 -1 0]       'LEFT_REAL-RIGHT_REAL_S1'
-    LEFT_REAL_S1                         - RIGHT_REAL_S1
-    % [ 0 1 0 -1]      'LEFT_IMAGINARY-RIGHT_IMAGINARY_S1'
-    LEFT_IMAGINARY_S1                    - RIGHT_IMAGINARY_S1
+    %% [1 0 -1 0]       'LEFT_REAL-RIGHT_REAL_S1'
+    %LEFT_REAL_S1                         - RIGHT_REAL_S1
+    %% [ 0 1 0 -1]      'LEFT_IMAGINARY-RIGHT_IMAGINARY_S1'
+    %LEFT_IMAGINARY_S1                    - RIGHT_IMAGINARY_S1
     
-    LEFT_REAL_S1        % [ 1 0 0 0]
-    LEFT_IMAGINARY_S1   % [ 0 1 0 0]
-    RIGHT_REAL_S1       % [ 0 0 1 0]
-    RIGHT_IMAGINARY_S1  % [ 0 0 0 1]
+    % [-1 1 0 0]
+    LEFT_IMAGINARY_S1 - LEFT_REAL_S1
+
+    % [1 -1 0 0]
+    LEFT_REAL_S1 - LEFT_IMAGINARY_S1
     
     % [0 0 1 -1]
     RIGHT_REAL_S1 - RIGHT_IMAGINARY_S1
@@ -97,6 +108,11 @@ contrast_F.names = {
     'Main_TASK_Effect_REAL_S1'
     'Main_LxT_INTERACTION_Effect_S1'
     
+    'Main_LEFT_REAL_S1'
+    'Main_LEFT_IMAGINARY_S1'
+    'Main_RIGHT_REAL_S1'
+    'Main_RIGHT_IMAGINARY_S1'
+    
 }';
 %%% CHECK THAT !!! EQUILIBRIUM aspect !!! should it not be 2* (LEFT_REAL_S1 + LEFT_IMAGINARY_S1) ???
 
@@ -113,6 +129,16 @@ contrast_F.values = {
     LEFT_REAL_S1            + RIGHT_REAL_S1
     %Main_SxT_INTERACTION_Effect_S1     = [1 0 0 1];
     LEFT_REAL_S1                 + RIGHT_IMAGINARY_S1
+   
+    %'Main_LEFT_REAL_S1'            = [1 0 0 0]
+    LEFT_REAL_S1
+    %'Main_LEFT_IMAGINARY_S1'       = [0 1 0 0]
+    LEFT_IMAGINARY_S1
+    %'Main_RIGHT_REAL_S1'           = [0 0 1 0]
+    RIGHT_REAL_S1
+    %'Main_RIGHT_IMAGINARY_S1'      = [0 0 0 1]
+    RIGHT_IMAGINARY_S1
+    
     
 }';
 
