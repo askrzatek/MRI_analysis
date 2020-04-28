@@ -36,15 +36,16 @@ spm('defaults', 'fmri');
 
 main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti');
 dirstat = fullfile(char(main_dir), 'secondlevel_ACTIVATION_PARK_S1');
+
 % dirgroup = fullfile(char(dirstat), {'PARKGAME_a', 'PARKGAME_c'});
 
 %% creating ROIs from SPM thresholded images
 par.conname = 'Main_spe_LEFT_IMAGINARY_S1.*_roi.mat';
 par.subdir = 'ANOVA2x2_LxT';
 
-test_batch(par); % batch spm for loading a contrast and saving it in .mat in model dir %turns out not useful at all
+%test_batch(par); % batch spm for loading a contrast and saving it in .mat in model dir %turns out not useful at all
 
-close all
+%close all
 
 %%
 model_dir = fullfile(char(dirstat), par.subdir);
@@ -52,69 +53,54 @@ rois_dir = get_subdir_regex(char(model_dir),'rois');
 
 %rois_dir = r_mkdir(char(model_dir),'rois')
 spm_name = fullfile(char(model_dir),'SPM.mat');
-all_roi_files = dir(char(rois_dir));
-roi_file_names= {};
-for i = 1:length(all_roi_files)
-    if regexp(all_roi_files(i).name, par.conname)
-        roi_file_names = vertcat(roi_file_names, all_roi_files(i).name); %nope
-    else
-        fprintf('non admis\n')
-    end
-end
+roi_files = fullfile(rois_dir, spm_select('list',rois_dir, par.conname));
 
-roi_files = regexp(all_roi_file_names{:}, par.conname, 'match'); % names of rois files in a cell structure :: we just need their full paths
-roi_files = fullfile(rois_dir, roi_files);
-
-% set design from file
-%spm_names = spm_select(1, 'SPM.mat', 'Select SPM.mat'); useful only if SPM.mat undefined or not found
-
-D = mardo(spm_name);
-
-% extract ROI data if exist
-%roi_files = spm_select([1 Inf], 'mat', 'Select ROI ');
+R = maroi(roi_files);
 
 % create ROIs from contrasts
 
 %%
+%% version to build the ROIs from image by binarizing the spmT/F image.nii
+%V = spm_vol(roi_files);
+%roi_name = char(addsuffixtofilenames(par.conname, '_ROI'));
+%R = maroi_image(struct('vol',V, 'binarize', 0, 'func', 'img'));
+%R = maroi_matrix(R);
+%saveroi(R, roi_name);
 
-V = spm_vol(roi_files);
-roi_name = char(addsuffixtofilenames(par.conname, '_ROI'));
-R = maroi_image(struct('vol',V, 'binarize', 0, 'func', 'img'));
-R = maroi_matrix(R);
-saveroi(R, roi_name);
+%R = maroi(roi_files)
 
+%% Individual stat design part 
 
-% Fetch data into marsbar data object
-mY  = get_marsy(R, D, 'mean');
-y = summary_data(mY);
-
-% Get contrasts from original design
-xCon = get_contrasts(D);
-
-
-	Y = get_marsy(R{i}, D, 'mean')
-	% Estimate design on ROI data --> each ROI separately or can we pool covariance estimate across ROIs (SPM tells its unlikely to be valid)
-	E = estimate(D, Y{i});
-
-	% Put contrasts from original design back into design object
-	E = set_contrasts(E, xCon);
-
-	% get design betas
-	b = betas(E);
-
-	% get stats and stuff for all contrasts into statistics structure
-	marsS = compute_contrasts(E, 1:length(xCon));
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% Get definitions of all events in model --> impossible because it is a second level analysis data, ergo no event time info left --> we should use 1st level anal here%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	[e_specs, e_names] = event_specs(E);
-	n_events = size(e_specs, 2);
-	dur = 0;
-
-% --> we still have the y - summary data though: maybe this could be useful
-	
-	% Return percent signal estimate for all events in design
+% set design from file /use for the individual loop
+%spm_names = spm_select([1 Inf], 'SPM.mat', ''); useful only if SPM.mat undefined or not found
+stat_dir = get_subdir_regex(main_dir, '.*PARKGAME.*1_\w{1}$')
+model_dir = get_subdir_regex(stat_dir, 'model_tedana')
+spm_names = fullfile(model_dir, spm_select('list', model_dir, 'SPM.mat'));
+for i = 1 : length(spm_names)
+%i = 1;
+    D = mardo(spm_names{i});
+    xCon = get_contrasts(D);
+    
+    Y = get_marsy(R{:}, D, 'mean');
+    E = estimate(D, Y);
+    E = set_contrasts(E, xCon);
+    b = betas(E);
+    %marsS = compute_contrasts (E, 1:length(xCon));
+    [rep_strs, marsS, marsD, changef] = stat_table(E, 1:length(xCon))
+    fid = fopen('test_file.txt');
+    for sno = 1:numel(rep_strs)
+        fprintf(fid,'%s\n', rep_strs{sno});
+    end
+    fclose(fid);
+    
+    
+    [e_specs, e_names] = event_specs(E);
+    n_events = size(e_specs, 2);
+    dur = 0;
+    pct_ev = cell(n_events,1)
+    
+    % Return percent signal estimate for all events in design
 	for e_s = 1:n_events
-  		pct_ev(e_s) = event_signal(E, e_specs(:,e_s), dur);
-	end
+  		pct_ev{e_s} = event_signal(E, e_specs(:,e_s), dur);
+    end    
+end
