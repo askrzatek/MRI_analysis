@@ -40,7 +40,7 @@ con_list.regex = {'Main_spe_LEFT_REAL_S1.*_roi.mat', 'Main_spe_LEFT_IMAGINARY_S1
 con_list.name = {'Main_spe_LEFT_REAL_S1', 'Main_spe_LEFT_IMAGINARY_S1', 'Main_spe_RIGHT_REAL_S1', 'Main_spe_RIGHT_IMAGINARY_S1', 'Main_conj_LEFT_IMAGINARY_REAL_S1', 'Main_conj_RIGHT_IMAGINARY_REAL_S1'};
 
 % dirgroup = fullfile(char(dirstat), {'PARKGAME_a', 'PARKGAME_c'});
-for c =1 : length(con_list)
+for c =1 : length(con_list.name)
     par.conname = con_list.regex{c};
     par.subdir = 'ANOVA2x2_LxT';
 
@@ -92,9 +92,11 @@ for c =1 : length(con_list)
         [rep_strs, marsS, marsD, changef] = stat_table(E, 1:length(xCon));
 
         %% Creating a file and writing stats in it (in subject's model_dir)
-        fic_name = strcat(con_list.name{c}, '_ROI_stats.txt');
-        fic_stats = addsuffixtofilenames(model_dir{subj},fic_name'); % fic_name too long
-        fid = fopen(fic_stats,'a+');
+        subj_name = get_parent_path(model_dir,1);
+        subj_name = subj_name{subj}(length(subj_name{subj})-21 :(length(subj_name{subj})));
+        fic_name = strcat(subj_name, '_', con_list.name{c}, '_ROI_stats.txt');
+        cd (roi_model_dir)
+        fid = fopen(fic_name,'a+');
         for sno = 1:numel(rep_strs)
             fprintf(fid,'%s\n', rep_strs{sno});
         end
