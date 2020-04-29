@@ -167,7 +167,7 @@ cd (main_dir)
 %e_REMINARY_S2 = exam(main_dir,'REMINARY_\w{2}_.*2$');
 %e = {e_REMINARY_S2};
 %dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_REM_S2');
-
+%dirgroup = dirstat;
 
 e_PARKGAME_S2_a = exam(main_dir,'PARKGAME.*2_a'); % taking into account all S2 patients
 e_PARKGAME_S2_c = exam(main_dir,'PARKGAME.*2_c'); % taking into account all S2 patients

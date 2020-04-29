@@ -161,7 +161,7 @@ model_contrast = {contrast_2x2_LxT};
 %% Load files from multiple folders
 main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti');
 
- e_PARKGAME = exam(main_dir,'PARKGAME');
+%e_PARKGAME = exam(main_dir,'PARKGAME');
 %e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
 
 %e_REMINARY_S1 = exam(main_dir,'REMINARY_\w{2}_.*1$');
