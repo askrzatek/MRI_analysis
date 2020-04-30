@@ -36,12 +36,12 @@ spm('defaults', 'fmri');
 
 main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti');
 roi_model_dir = fullfile(char(main_dir), 'secondlevel_ACTIVATION_PARK_S1');
-con_list.regex = {'Main_spe_LEFT_REAL_S1.*_roi.mat', 'Main_spe_LEFT_IMAGINARY_S1.*_roi.mat', 'Main_spe_RIGHT_REAL_S1.*_roi.mat', 'Main_spe_RIGHT_IMAGINARY_S1.*_roi.mat', 'Main_conj_LEFT_IMAGINARY_REAL_S1.*_roi.mat', 'Main_conj_RIGHT_IMAGINARY_REAL_S1.*_roi.mat'};
-con_list.name = {'Main_spe_LEFT_REAL_S1', 'Main_spe_LEFT_IMAGINARY_S1', 'Main_spe_RIGHT_REAL_S1', 'Main_spe_RIGHT_IMAGINARY_S1', 'Main_conj_LEFT_IMAGINARY_REAL_S1', 'Main_conj_RIGHT_IMAGINARY_REAL_S1'};
+roi_group.regex = {'Main_spe_LEFT_REAL_S1.*_roi.mat', 'Main_spe_LEFT_IMAGINARY_S1.*_roi.mat', 'Main_spe_RIGHT_REAL_S1.*_roi.mat', 'Main_spe_RIGHT_IMAGINARY_S1.*_roi.mat', 'Main_conj_LEFT_IMAGINARY_REAL_S1.*_roi.mat', 'Main_conj_RIGHT_IMAGINARY_REAL_S1.*_roi.mat'};
+roi_group.name = {'Main_spe_LEFT_REAL_S1', 'Main_spe_LEFT_IMAGINARY_S1', 'Main_spe_RIGHT_REAL_S1', 'Main_spe_RIGHT_IMAGINARY_S1', 'Main_conj_LEFT_IMAGINARY_REAL_S1', 'Main_conj_RIGHT_IMAGINARY_REAL_S1'};
 
 % dirgroup = fullfile(char(dirstat), {'PARKGAME_a', 'PARKGAME_c'});
-for c =1 : length(con_list.name)
-    par.conname = con_list.regex{c};
+for roic =1 : length(roi_group.name)
+    par.conname = roi_group.regex{roic};
     par.subdir = 'ANOVA2x2_LxT';
 
     %test_batch(par); % batch spm for loading a contrast and saving it in .mat in model dir %turns out not useful at all
@@ -91,16 +91,38 @@ for c =1 : length(con_list.name)
         %marsS = compute_contrasts (E, 1:length(xCon));
         [rep_strs, marsS, marsD, changef] = stat_table(E, 1:length(xCon));
 
-        %% Creating a file and writing stats in it (in subject's model_dir)
-        subj_name = get_parent_path(model_dir,1);
-        subj_name = subj_name{subj}(length(subj_name{subj})-21 :(length(subj_name{subj})));
-        fic_name = strcat(subj_name, '_', con_list.name{c}, '_ROI_stats.txt');
-        cd (roi_model_dir)
-        fid = fopen(fic_name,'a+');
-        for sno = 1:numel(rep_strs)
-            fprintf(fid,'%s\n', rep_strs{sno});
+        %% Creating a file and writing stats in it : initialisation
+        subj_names = get_parent_path(model_dir,1);
+        subj_name = subj_names{subj}(length(subj_names{subj})-21 :(length(subj_names{subj})));
+        subj_group = subj_name(length(subj_name));
+        
+        
+        %% prepare the outf structure for output csv file
+        %clear outf
+        outf.suj = subj_name;
+        outf.group = subj_group;
+        
+        for ic = 8:11
+            for iroi = 1:length(roi_files)
+                outf.roix = marsS.columns{iroi};
+                outf.contrastx = marsS.rows{ic}.name; % one in xCon(8:11).name range
+                outf.value = marsS.con(ic,iroi);
+                outf.T = marsS.stat(ic,iroi);
+                outf.pval = marsS.P(ic,iroi);
+                outf.pvalC = marsS.Pc(ic,iroi);
+            end
         end
-        fclose(fid);
+        write_result_to_csv(outf,'test3.csv') % exceeding dimensions
+        
+        %% save to txt file
+        %cd (roi_model_dir)
+        
+        %fic_name = strcat(subj_name, '_', con_list.name{c}, '_ROI_stats.txt');
+        %fid = fopen(fic_name,'a+');
+        %for sno = 1:numel(rep_strs)
+        %    fprintf(fid,'%s\n', rep_strs{sno});
+        %end
+        %fclose(fid);
 %%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%here we should call a function or write a code to make a symbolic link of this file in secondlevel_ACTIVATION dir with subj_name as prefix %
@@ -117,3 +139,6 @@ for c =1 : length(con_list.name)
         end    
     end
 end
+%% save to csv
+write_result_to_csv(outf, 'stats_table.csv')
+        
