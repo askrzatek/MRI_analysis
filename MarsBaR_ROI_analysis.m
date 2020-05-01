@@ -25,6 +25,7 @@
 % % get stats and stuff for all contrasts into statistics 
 % structuremarsS = compute_contrasts(E, 1:length(xCon));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+clear all 
 
 %%% Start marsbar to make sure spm_get works
 addpath /network/lustre/iss01/cenir/software/irm/spm12/toolbox/marsbar/
@@ -38,6 +39,8 @@ main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek
 roi_model_dir = fullfile(char(main_dir), 'secondlevel_ACTIVATION_PARK_S1');
 roi_group.regex = {'Main_spe_LEFT_REAL_S1.*_roi.mat', 'Main_spe_LEFT_IMAGINARY_S1.*_roi.mat', 'Main_spe_RIGHT_REAL_S1.*_roi.mat', 'Main_spe_RIGHT_IMAGINARY_S1.*_roi.mat', 'Main_conj_LEFT_IMAGINARY_REAL_S1.*_roi.mat', 'Main_conj_RIGHT_IMAGINARY_REAL_S1.*_roi.mat'};
 roi_group.name = {'Main_spe_LEFT_REAL_S1', 'Main_spe_LEFT_IMAGINARY_S1', 'Main_spe_RIGHT_REAL_S1', 'Main_spe_RIGHT_IMAGINARY_S1', 'Main_conj_LEFT_IMAGINARY_REAL_S1', 'Main_conj_RIGHT_IMAGINARY_REAL_S1'};
+out_tab = {'id', 'group', 'session', 'roi', 'contrast', 'value', 'T', 'pval', 'pvalC'};
+nrow = 1; % row index/number in out_tab - keep calm and count
 
 % dirgroup = fullfile(char(dirstat), {'PARKGAME_a', 'PARKGAME_c'});
 for roic =1 : length(roi_group.name)
@@ -99,20 +102,31 @@ for roic =1 : length(roi_group.name)
         
         
         %% prepare the outf structure for output csv file
-        clear outf
+        %clear outf
         outf.suj = {subj_name};
         outf.group = subj_group;
-        outf_session = subj_session;
+        outf.session = subj_session;
         
         for ic = 8:11
-            outf.contrastx = marsS.rows{ic}.name; % one in xCon(8:11).name range
+            outf.contrast = marsS.rows{ic}.name;
             for iroi = 1:length(roi_files)
-                outf = marsS.columns{iroi};
-                outf.value = marsS.con(ic,iroi);
-                outf.T = marsS.stat(ic,iroi);
-                outf.pval = marsS.P(ic,iroi);
-                outf.pvalC = marsS.Pc(ic,iroi);
+                nrow = nrow+1;
+                out_tab{nrow,1} = subj_name;
+                out_tab{nrow,2} = subj_group;
+                out_tab{nrow,3} = subj_session;
+                out_tab{nrow,4} = marsS.columns{iroi};
+                out_tab{nrow,5} = marsS.rows{ic}.name; % one in xCon(8:11).name range
+                out_tab{nrow,6} = marsS.con(ic,iroi);
+                out_tab{nrow,7} = marsS.stat(ic,iroi);
+                out_tab{nrow,8} = marsS.P(ic,iroi);
+                out_tab{nrow,9} = marsS.Pc(ic,iroi);
                 
+%                 outf.roi = marsS.columns{iroi};
+%                 outf.value = marsS.con(ic,iroi);
+%                 outf.T = marsS.stat(ic,iroi);
+%                 outf.pval = marsS.P(ic,iroi);
+%                 outf.pvalC = marsS.Pc(ic,iroi);
+%                 
                 %write_result_to_csv(outf,'test3.csv', {'group'; 'roix'; 'contrastx'; 'value'; 'T'; 'pval'; 'pvalC'}) % exceeding dimensions
                 %write_result_to_csv(outf,'test3.csv')
             end
@@ -139,11 +153,26 @@ for roic =1 : length(roi_group.name)
         pct_ev = cell(n_events,1);
 
         % Return percent signal estimate for all events in design
-        for e_s = 1:n_events
+        for e_s = 1:n_events % with respectively Rest, LR, LI, RR, RI
             pct_ev{e_s} = event_signal(E, e_specs(:,e_s), dur);
         end    
     end
 end
-%% save to csv
-write_result_to_csv(outf, 'stats_table.csv')
+% %% save out_tab to csv
+% [r,l] = size(out_tab);
+% nfid = fopen('test_tab.csv','wt'); % nope either = format inaccessible
+% 
+% for k=1:r
+%     fprintf(out_tab,'%s, ',out_tab{k,1:end-1})
+%     fprintf(out_tab,'%s\n',out_tab{k,end})
+% end
+% fclose(nfid);
+
+%% Convert cell to a table and use first row as variable names
+%T = cell2table(out_tab{2:end,:},'VariableNames',out_tab{1,:}) % nope, must
+%be a 2-D cell array
+%% Write the table to a CSV file
+%writetable(T,'test_tab.csv')
+
+%write_result_to_csv(outf, 'stats_table.csv')
         
