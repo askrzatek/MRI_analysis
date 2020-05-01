@@ -95,24 +95,29 @@ for roic =1 : length(roi_group.name)
         subj_names = get_parent_path(model_dir,1);
         subj_name = subj_names{subj}(length(subj_names{subj})-21 :(length(subj_names{subj})));
         subj_group = subj_name(length(subj_name));
+        subj_session = subj_name(length(subj_name)-2);
         
         
         %% prepare the outf structure for output csv file
-        %clear outf
-        outf.suj = subj_name;
+        clear outf
+        outf.suj = {subj_name};
         outf.group = subj_group;
+        outf_session = subj_session;
         
         for ic = 8:11
+            outf.contrastx = marsS.rows{ic}.name; % one in xCon(8:11).name range
             for iroi = 1:length(roi_files)
-                outf.roix = marsS.columns{iroi};
-                outf.contrastx = marsS.rows{ic}.name; % one in xCon(8:11).name range
+                outf = marsS.columns{iroi};
                 outf.value = marsS.con(ic,iroi);
                 outf.T = marsS.stat(ic,iroi);
                 outf.pval = marsS.P(ic,iroi);
                 outf.pvalC = marsS.Pc(ic,iroi);
+                
+                %write_result_to_csv(outf,'test3.csv', {'group'; 'roix'; 'contrastx'; 'value'; 'T'; 'pval'; 'pvalC'}) % exceeding dimensions
+                %write_result_to_csv(outf,'test3.csv')
             end
         end
-        write_result_to_csv(outf,'test3.csv') % exceeding dimensions
+        %write_result_to_csv(outf,'test3.csv', {'group'; 'roix'; 'contrastx'; 'value'; 'T'; 'pval'; 'pvalC'}) % exceeding dimensions
         
         %% save to txt file
         %cd (roi_model_dir)
