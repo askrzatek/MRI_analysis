@@ -41,6 +41,9 @@ roi_group.regex = {'Main_spe_LEFT_REAL_S1.*_roi.mat', 'Main_spe_LEFT_IMAGINARY_S
 roi_group.name = {'Main_spe_LEFT_REAL_S1', 'Main_spe_LEFT_IMAGINARY_S1', 'Main_spe_RIGHT_REAL_S1', 'Main_spe_RIGHT_IMAGINARY_S1', 'Main_conj_LEFT_IMAGINARY_REAL_S1', 'Main_conj_RIGHT_IMAGINARY_REAL_S1'};
 out_tab = {'id', 'group', 'session', 'roi', 'contrast', 'value', 'T', 'pval', 'pvalC'};
 nrow = 1; % row index/number in out_tab - keep calm and count
+ncol = length(out_tab);
+pct_tab = {'id', 'group', 'session', 'roi', 'event1_name', 'event2_name', 'event3_name', 'event4_name', 'event5_name', 'event6_name'};
+pctrow = 1;
 
 % dirgroup = fullfile(char(dirstat), {'PARKGAME_a', 'PARKGAME_c'});
 for roic =1 : length(roi_group.name)
@@ -120,7 +123,15 @@ for roic =1 : length(roi_group.name)
                 out_tab{nrow,7} = marsS.stat(ic,iroi);
                 out_tab{nrow,8} = marsS.P(ic,iroi);
                 out_tab{nrow,9} = marsS.Pc(ic,iroi);
-                
+%                 res(nrow,1) = subj_name;
+%                 res(nrow,2) = subj_group;
+%                 res(nrow,3) = subj_session;
+%                 res(nrow,4) = marsS.columns{iroi};
+%                 res(nrow,5) = marsS.rows{ic}.name;
+%                 res(nrow,6) = marsS.con(ic,iroi);
+%                 res(nrow,7) = marsS.stat(ic,iroi);
+%                 res(nrow,8) = marsS.P(ic,iroi);
+%                 res(nrow,9) = marsS.Pc(ic,iroi);
 %                 outf.roi = marsS.columns{iroi};
 %                 outf.value = marsS.con(ic,iroi);
 %                 outf.T = marsS.stat(ic,iroi);
@@ -144,35 +155,65 @@ for roic =1 : length(roi_group.name)
         %fclose(fid);
 %%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %%here we should call a function or write a code to make a symbolic link of this file in secondlevel_ACTIVATION dir with subj_name as prefix %
+        %%here we could call a function or write a code to make a symbolic link of this file in secondlevel_ACTIVATION dir with subj_name as prefix %
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         [e_specs, e_names] = event_specs(E);
         n_events = size(e_specs, 2);
         dur = 0;
         pct_ev = cell(n_events,1);
-
+        pctrow = pctrow+1;
         % Return percent signal estimate for all events in design
-        for e_s = 1:n_events % with respectively Rest, LR, LI, RR, RI
+        for e_s = 1:n_events % with respectively Rest, LR, LI, RR, RI, Instruction
+            
             pct_ev{e_s} = event_signal(E, e_specs(:,e_s), dur);
-        end    
+            pct_tab{1,e_s+4} = e_names{e_s};
+            for t = 1:length(pct_ev{e_s})
+                pct_tab{pctrow,1} = subj_name;
+                pct_tab{pctrow,2} = subj_group;
+                pct_tab{pctrow,3} = subj_session;
+                pct_tab{pctrow,4} = roi_group.name{roic};
+                
+                pct_tab{pctrow,e_s+4} = pct_ev{e_s}(t);
+            end
+        end
     end
 end
-% %% save out_tab to csv
-% [r,l] = size(out_tab);
-% nfid = fopen('test_tab.csv','wt'); % nope either = format inaccessible
-% 
-% for k=1:r
-%     fprintf(out_tab,'%s, ',out_tab{k,1:end-1})
-%     fprintf(out_tab,'%s\n',out_tab{k,end})
-% end
-% fclose(nfid);
+%% save out_tab to txt
+[r,l] = size(out_tab);
+nfid = fopen('stat_tab.txt','w'); % nope either = format inaccessible
+formatSpec = '%s;%s;%s;%s;%s;%f;%f;%f;%f\n';
 
-%% Convert cell to a table and use first row as variable names
-%T = cell2table(out_tab{2:end,:},'VariableNames',out_tab{1,:}) % nope, must
-%be a 2-D cell array
-%% Write the table to a CSV file
-%writetable(T,'test_tab.csv')
+fprintf(nfid,'%s;%s;%s;%s;%s;%s;%s;%s;%s\n',out_tab{1,:});
+for k= 2:(r-1)
+    fprintf(nfid,formatSpec,out_tab{k,1:end});
+end
+fprintf(nfid,'%s;%s;%s;%s;%s;%f;%f;%f;%f',out_tab{r,1:end});
+
+fclose(nfid);
+
+% %% Convert cell to a table and use first row as variable names
+% res = [];
+% for ncol = 1:length(var_tab)
+%     res(nrow,ncol) = out_tab{nrow,ncol};
+% end
+% 
+% T = cell2table(res{2:end,:},'VariableNames',res{1,:}) % nope, must
+% %be a 2-D cell array
+% %% Write the table to a CSV file
+% %writetable(T,'test_tab.csv')
 
 %write_result_to_csv(outf, 'stats_table.csv')
-        
+
+%% save pct_tab to txt
+[r,l] = size(pct_tab);
+pctfid = fopen('signal_per_event_tab.txt','w'); % nope either = format inaccessible
+formatSpec = '%s;%s;%s;%s;%f;%f;%f;%f;%f;%f\n';
+
+fprintf(nfid,'%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n',pct_tab{1,:});
+for k= 2:(r-1)
+    fprintf(pctfid,formatSpec,pct_tab{k,1:end});
+end
+fprintf(pctfid,'%s;%s;%s;%s;%f;%f;%f;%f;%f;%f',pct_tab{r,1:end});
+
+fclose(pctfid);
