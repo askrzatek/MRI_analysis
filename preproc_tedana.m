@@ -5,7 +5,7 @@ clc
 
 %% Initialisation
 par.pct = 0;
-main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti');
+main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
 
 e_PARKGAME = exam(main_dir,'PARKGAME');
 %e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
@@ -60,7 +60,7 @@ clear par
 
 par.fname        = 'meinfo'; % name of the .mat file that will be saved
 par.sge          = 0;
-par.redo         = 0;
+par.redo         = 1;
 par.run          = 1;
 par.fake         = 0;
 
@@ -146,10 +146,10 @@ e.getSerie('run').addVolume('^bet_mean_vtde1.nii'     , 'bet_vtde1',1)
 %% Tedana
 
 % tedana.py main arguments
-par.tedpca     = 'mle'; % mle, kundu, kundu-stabilize (tedana default = mle)
+par.tedpca     = 'mdl'; % mdl, kundu, kundu-stabilize (tedana default = mdl)
 par.maxrestart = []; % (tedana default = 10)
 par.maxit      = []; % (tedana default = 500)
-par.png        = 1;  % tedana will make some PNG files of the components Beta map, for quality checks
+%par.png        = 1;  % tedana will make some PNG files of the components Beta map, for quality checks
 
 % tedana.py other arguments
 par.cmd_arg = ''; % Allows you to use all addition arguments not scripted in this job_tedana.m file
@@ -157,11 +157,11 @@ par.cmd_arg = ''; % Allows you to use all addition arguments not scripted in thi
 % matvol classic options
 
 par.pct      = 0; % Parallel Computing Toolbox, will execute in parallel all the subjects
-
+par.sge      = 1;
 par.redo     = 0; % overwrite previous files
 par.fake     = 0; % do everything exept running
 par.verbose  = 2; % 0 : print nothing, 1 : print 2 first and 2 last messages, 2 : print all
-par.run      = 1;
+par.run      = 0;
 
 % Cluster
 if par.sge               % for ICM cluster, run the jobs in paralle
@@ -171,20 +171,26 @@ if par.sge               % for ICM cluster, run the jobs in paralle
     par.sge_queu = 'normal,bigmem'; % use both
 end
 
-job_tedana( meinfo, 'vtd', 'tedana_vtd_mle', 'bet_mean_vtde1_mask.nii', par );
+%!source python_path3.6
+%!source activate tedana_0.0.9a1
+
+job_tedana_009a1( meinfo, 'vtd', 'tedana_vtd_mle', 'bet_mean_vtde1_mask.nii', par );
 
 
 %return %not sure if necessary
 
 %% tedana report % meinfo is in main_dir and tedana outputs in the subdir of run dir (until change - cannot use tedana_report)
 par.subdir = 'tedana_vtd_mle'
-tedana_report (main_dir, par);
+%tedana_report (main_dir, par); % changement et necessite de meinfo.path
+
+%% unzip the outputs of tedana
 
 %% Add new preprocessed data to exam object : dn_ts_OC.nii 
 
 e.addSerie('ACTIVATION','tedana_vtd','tedana_ACTIVATION',1);
 e.addSerie('RS','tedana_vtd','tedana_RS',1);
-e.getSerie('tedana').addVolume('^dn.*.nii$','dn',1);
+e.getSerie('tedana').addVolume('^dn.*.nii','dn',1);
+e.unzipVolume();
 
 [ec_dn, ei_dn] = e.removeIncomplete;
 e = ec_dn;
@@ -231,6 +237,9 @@ e.getSerie('anat').addVolume('^p0' ,'p0' );
     if par.redo==1
         
         e.getSerie('tedana').addVolume('^ts','ts',1);
+        e.unzipVolume;
+        e.getSerie('tedana').addVolume('^ts.*.nii$','ts',1);
+        e.getSerie('tedana').getVolume('ts').path
         
         %% for ACTIVATION vols
         origin = e.getSerie('tedana_ACTIVATION').getVolume('^ts').toJob(0);
