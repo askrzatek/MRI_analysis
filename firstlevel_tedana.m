@@ -5,7 +5,7 @@ clc
 
 addpath /home/anna.skrzatek/data/StimTemplate
 cd      /home/anna.skrzatek/data
-load e % why doesn't the e-object work?!
+%load e % why doesn't the e-object work?!
 
 main_dir = fullfile(pwd,'nifti');
 stim_dir = fullfile(pwd,'behav');
