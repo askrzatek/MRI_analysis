@@ -36,17 +36,20 @@ spm('defaults', 'fmri');
 %% Initialisation
 
 main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti');
-roi_model_dir = fullfile(char(main_dir), 'secondlevel_ACTIVATION_PARK_S1');
-roi_group.regex = {'Main_spe_LEFT_REAL_S1.*_roi.mat', 'Main_spe_LEFT_IMAGINARY_S1.*_roi.mat', 'Main_spe_RIGHT_REAL_S1.*_roi.mat', 'Main_spe_RIGHT_IMAGINARY_S1.*_roi.mat', 'Main_conj_LEFT_IMAGINARY_REAL_S1.*_roi.mat', 'Main_conj_RIGHT_IMAGINARY_REAL_S1.*_roi.mat'};
-roi_group.name = {'Main_spe_LEFT_REAL_S1', 'Main_spe_LEFT_IMAGINARY_S1', 'Main_spe_RIGHT_REAL_S1', 'Main_spe_RIGHT_IMAGINARY_S1', 'Main_conj_LEFT_IMAGINARY_REAL_S1', 'Main_conj_RIGHT_IMAGINARY_REAL_S1'};
+roi_model_dir = fullfile(char(main_dir), 'secondlevel_ACTIVATION_PARK_S2');
+roi_group.regex = {'Main_spe_LEFT_REAL_S2.*_roi.mat', 'Main_spe_LEFT_IMAGINARY_S2.*_roi.mat', 'Main_spe_RIGHT_REAL_S2.*_roi.mat', 'Main_spe_RIGHT_IMAGINARY_S2.*_roi.mat', 'Main_conj_LEFT_IMAGINARY_REAL_S2.*_roi.mat', 'Main_conj_RIGHT_IMAGINARY_REAL_S2.*_roi.mat'};
+roi_group.name = {'Main_spe_LEFT_REAL_S2', 'Main_spe_LEFT_IMAGINARY_S2', 'Main_spe_RIGHT_REAL_2', 'Main_spe_RIGHT_IMAGINARY_S2', 'Main_conj_LEFT_IMAGINARY_REAL_S2', 'Main_conj_RIGHT_IMAGINARY_REAL_S2'};
 out_tab = {'id', 'group', 'session', 'roi', 'contrast', 'value', 'T', 'pval', 'pvalC'};
 nrow = 1; % row index/number in out_tab - keep calm and count
 ncol = length(out_tab);
 pct_tab = {'id', 'group', 'session', 'roi', 'event1_name', 'event2_name', 'event3_name', 'event4_name', 'event5_name', 'event6_name'};
 pctrow = 1;
 
-% dirgroup = fullfile(char(dirstat), {'PARKGAME_a', 'PARKGAME_c'});
+dirgroup = {'PARK_a', 'PARK_c'};
+par.group = 1;
+
 for roic =1 : length(roi_group.name)
+    
     par.conname = roi_group.regex{roic};
     par.subdir = 'ANOVA2x2_LxT';
 
@@ -55,8 +58,12 @@ for roic =1 : length(roi_group.name)
     %close all
 
     %%
+    if par.group == 1
+       roi_model_dir = fullfile(char(roi_model_dir), dirgroup{1});
+       par.group = 0;
+    end
     model_dir = fullfile(char(roi_model_dir), par.subdir);
-    rois_dir = get_subdir_regex(char(model_dir),'rois');
+    rois_dir = get_subdir_regex(char(model_dir),'rois_S2_p05');
 
     %rois_dir = r_mkdir(char(model_dir),'rois')
     spm_name = fullfile(char(model_dir),'SPM.mat');
@@ -80,7 +87,7 @@ for roic =1 : length(roi_group.name)
 
     % set design from file /use for the individual loop
     %spm_names = spm_select([1 Inf], 'SPM.mat', ''); useful only if SPM.mat undefined or not found
-    stat_dir = get_subdir_regex(main_dir, '.*PARKGAME.*1_\w{1}$');
+    stat_dir = get_subdir_regex(main_dir, '.*PARKGAME.*2_a$');
     model_dir = get_subdir_regex(stat_dir, 'model_tedana');
     spm_names = fullfile(model_dir, spm_select('list', model_dir, 'SPM.mat'));
 
@@ -172,7 +179,7 @@ for roic =1 : length(roi_group.name)
                 pct_tab{pctrow,1} = subj_name;
                 pct_tab{pctrow,2} = subj_group;
                 pct_tab{pctrow,3} = subj_session;
-                pct_tab{pctrow,4} = roi_group.name{roic};
+                pct_tab{pctrow,4} = marsS.columns{e_s};
                 
                 pct_tab{pctrow,e_s+4} = pct_ev{e_s}(t);
             end
@@ -181,7 +188,7 @@ for roic =1 : length(roi_group.name)
 end
 %% save out_tab to txt
 [r,l] = size(out_tab);
-nfid = fopen('stat_tab.txt','w'); % nope either = format inaccessible
+nfid = fopen('stat_tab_PARK_S2_rois05.txt','w'); % nope either = format inaccessible
 formatSpec = '%s;%s;%s;%s;%s;%f;%f;%f;%f\n';
 
 fprintf(nfid,'%s;%s;%s;%s;%s;%s;%s;%s;%s\n',out_tab{1,:});
@@ -207,7 +214,7 @@ fclose(nfid);
 
 %% save pct_tab to txt
 [r,l] = size(pct_tab);
-pctfid = fopen('signal_per_event_tab.txt','w'); % nope either = format inaccessible
+pctfid = fopen('signal_per_event_tab_PARK_S2_rois05.txt','w'); % nope either = format inaccessible
 formatSpec = '%s;%s;%s;%s;%f;%f;%f;%f;%f;%f\n';
 
 fprintf(nfid,'%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n',pct_tab{1,:});
