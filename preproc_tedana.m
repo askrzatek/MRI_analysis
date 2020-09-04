@@ -8,13 +8,13 @@ CLUSTER = 0;
 par.pct = 0;
 
 %main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
-main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test','PRISMA_REMINARY'); % pour comparer les résultats avec les VS
+main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/', 'nifti_test'); %,'PRISMA_REMINARY'); % pour comparer les résultats avec les VS
 
 e_PARKGAME = exam(main_dir,'PARKGAME');
 e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
 
-%e = e_PARKGAME; % (3:length(e_PARKGAME)); % choose specific
-e = e_REMINARY;
+e = e_PARKGAME; % (3:length(e_PARKGAME)); % choose specific
+%e = e_REMINARY;
 e.addSerie('ACTIVATION$','run_ACTIVATION',1)
 e.addSerie(        'RS$','run_RS'        ,1)
 
@@ -364,6 +364,7 @@ job_apply_normalize(y, img, par);
 e.getSerie('tedana').addVolume('^wts','wts',1);
 e.getSerie('tedana').addVolume('^wdn','wdn',1);
 e.getSerie('run').addVolume('^wbet','wbet',1);
+e.getSerie('anat').addVolume('^wp0','wp0',1);
 
 %% Smooth TEDANA outputs
 
@@ -415,7 +416,7 @@ job_coregister(src, ref, oth, par);
 
 %% Check & Save
 e.explore
-cd main_dir
+cd (main_dir)
 save('e','e')
     
 %%
