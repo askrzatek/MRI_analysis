@@ -45,19 +45,22 @@ e.gser('tedana').addVolume('^s5wdn_ts_OC.nii','s5wdn',1);
 e.getSerie('anat').addVolume('^wp2','wp2',1);
 e.getSerie('anat').addVolume('^wp3','wp3',1);
 
+save ('e','e')
+
 %% Charge needed data from e object
 
 cd /home/anna.skrzatek/data/nifti_test/PRISMA_REMINARY/
 load e
 
-fvol = e.getSerie('tedana_ACTIVATION').getVolume('^wts')
+fvol = e.getSerie('tedana_ACTIVATION').getVolume('^s5wdn').toJob(0);
 %fvol.path
-avol = e.getSerie('anat').getVolume('wp0')
+avol = e.getSerie('anat').getVolume('wp0');
 %avol.path
-ROIvol = e.getSerie('anat').getVolume('^wp[2,3]')
+ROIvol = e.getSerie('anat').getVolume('^wp[2,3]');
 
 par.outdir = {e.getSerie('tedana_ACTIVATION').path}
-outcell = {e.getSerie('tedana_ACTIVATION').path}
+outcell = e.getSerie('run_ACT').mkdir('wdn');
+%outcell = {e.getSerie('tedana_ACTIVATION').path}
 
 %% charge and transform afni displacement parameters
 
@@ -65,11 +68,11 @@ e.addSerie('ACTIVATION','afni','afni_ACT',1)
 e.getSerie('afni_ACT').addVolume('dfile_rall','rp1D',1)
 
 dfile = {e.getSerie('afni_ACT').getVolume('rp').path}
-output_d = {e.getSerie('tedana_ACT').path}
+output_d = {e.getSerie('run_ACT').path}
 job_rp_afni2spm(dfile,output_d)
-e.getSerie('tedana_ACT').addVolume('rp_spm','rp_spm',1)
+e.getSerie('run_ACT').addVolume('rp_spm','rp_spm',1)
 
-rpvol = {e.getSerie('tedana_ACT').getVolume('rp').path}
+%rpvol = {e.getSerie('run_ACT').getVolume('rp').path}
 
 %% get all tissue masks
 
@@ -77,11 +80,14 @@ nvol = length(avol);
 for i = 1:nvol 
     mask{i}(1,:) = {ROIvol(i).path}; mask{i}(2,:) = {ROIvol(i+nvol).path}; 
 end
+e.getSerie('run_ACT').addJson('^rp.*txt$','rp',1)
+rp = e.getSerie('run_ACT').getJson('rp').toJob(0);
 
 par.noiseROI_mask = mask;
-par.noiseROI_volume = {fvol.path};
-par.rp_file = rpvol;
-par.volume = {fvol.path};
+%par.noiseROI_volume = {fvol.path};
+par.noiseROI_volume = fvol;
+par.rp_file = rp;
+par.volume = fvol;
 
 par.nSlice = 630;
 par.physio = 0;
@@ -90,4 +96,8 @@ par.noiseROI = 1;
 par.TR = 1600;
 par.outdir = outcell
 
-job_physio_tapas(par)
+par.redo = 0;
+par.display = 1;
+par.run = 1;
+
+job_physio_tapas( par )
