@@ -12,6 +12,7 @@ main_dir = fullfile(pwd,'/nifti_test/ben');
 
 %model_name = 'model_meica';
 %model_name = 'model_tedana';
+%model_name = {'model_ts_tapas', 'model_dn_tapas'};
 model_name = {'model_tedana','model_ts_tapas', 'model_dn_tapas'};
 
 %% fetch dirs
@@ -45,14 +46,14 @@ par.subdir        = 'tedana009_vtd';
 par.warp_file_reg = '^wdn';
 job_symbolic_child_to_parent(dir_func, par);
 
-par.warp_file_reg = 's5wts';
+par.warp_file_reg = '^wts';
 job_symbolic_child_to_parent(dir_func, par);
 
-par.warp_file_reg = 's5wdn';
-job_symbolic_child_to_parent(dir_func, par);
+%par.warp_file_reg = '^s5wdn';
+%job_symbolic_child_to_parent(dir_func, par);
 
 %% make a symbolic link of rp_spm.txt and of multiple_regressors to dir_func
-par.subdir = 'wts';
+par.subdir = 'wdn';
 par.regfile_regex = 'multiple_regressors.txt';
 for i= 1:length(e)
     wd = e(i).getSerie('run_ACTIVATION').path;
@@ -91,18 +92,18 @@ par.rp_regex = 'rp.*txt';
 job1 = job_first_level_specify(dir_func, model_outdir1, stim_files, par);
 
 %% ts TAPAS
-par.file_reg = '^s5wts';
+par.file_reg = '^wts.*nii';
 par.rp_regex = 'wts_multiple_regressors.txt';
 job2 = job_first_level_specify(dir_func, model_outdir2, stim_files, par);
 
 %% tedana + TAPAS
 
-par.file_reg = '^s5wdn';
+par.file_reg = '^wdn';
 
 par.rp_regex = 'wdn_multiple_regressors.txt';
 job3 = job_first_level_specify(dir_func, model_outdir3, stim_files, par);
 
-jobs = [job1 job2 job3 ];
+jobs = [ job1 job2 job3 ];
 
 par.sge = 1;
 par.run = 0;
@@ -300,12 +301,17 @@ fsub = e.gpath;
 Coordlist.values = cat(2,[0.0; 0.0; 0.0], [34.0; -24.0; 68.0], [-34.0; -24.0; 68.0], [-4.0; -48.0; -24.0], [0.0; -24.0; 10.0]); % EXAMPLE
 Coordlist.names = {'centre'; 'RIGHT SM'; 'LEFT SM'; 'CEREBELLUM'; 'MOTOR BI'}; % EXAMPLE
 
-par.subdir       = 'model_dn_tapas';
+par.subdir       = 'model_ts_tapas';
 par.anat_dir_reg = 'S\d{2}_t1mpr_S256_0_8iso_p2$'
-par.extent       = 20;
+par.extent       = 15;
+par.fixscale     = 1;
+par.minscale     = 0;
+par.maxscale     = 20;
 
-conlist = {'F-all','REAL_Left','REAL_Right','IMAGINARY_Left','IMAGINARY_Right','REAL_Left - Rest','REAL_Right - Rest','IMAGINARY_Left - Rest','IMAGINARY_Right - Rest'};
+%conlist = {'F-all','REAL_Left','REAL_Right','IMAGINARY_Left','IMAGINARY_Right','REAL_Left - Rest','REAL_Right - Rest','IMAGINARY_Left - Rest','IMAGINARY_Right - Rest'};
+conlist = {'REAL_Right - Rest','IMAGINARY_Right - Rest'};
 addpath /home/anna.skrzatek/matvol/SPM/
+
 for icon = 1 : length(conlist)
    par.conname  = conlist{icon};
    job_spm_single_results_display(fsub, Coordlist, par);

@@ -305,7 +305,7 @@ par.cost_fun = 'ncc';
 tmp_exam_a = [e.gser('run_ACTIVATION').removeEmpty.exam];
 ref = tmp_exam_a.gser('anat').getVolume('^p0');
 src = e.getSerie('run_ACTIVATION').removeEmpty.getVolume('bet');
-oth = e.getSerie('tedana_ACTIVATION').removeEmpty.getVolume('.*ts');
+oth = e.getSerie('tedana_ACTIVATION').removeEmpty.getVolume('.*ts'); % on peut qjouter le masque pour qu'il suive l'anat
 
 %keep in mind this option if emergency to get the precedent header
 %do_fsl_copy_header(influencer, origin,      par);
