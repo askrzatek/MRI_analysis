@@ -27,13 +27,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear all 
 
-%%% Start marsbar to make sure spm_get works
+%%% #1 Start marsbar to make sure spm_get works
 addpath /network/lustre/iss01/cenir/software/irm/spm12/toolbox/marsbar/
 marsbar('on')
 % Set up the SPM defaults, just in case
 spm('defaults', 'fmri');
 
-%% Initialisation
+%% #2 Initialisation
 
 main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test','ben');
 %roi_model_dir = fullfile(char(main_dir), 'secondlevel_ACTIVATION_PARK_S1');
@@ -55,6 +55,7 @@ dirgroup = {'PARKGAME','REMINARY'};
 %dirgroup = {'PARK_a', 'PARK_c'};
 par.group = 1;
 
+%% #3a THE ROIS LOOP - getting the existing contrast-related ROIs
 for roic =1 : length(roi_group.name)
     
     par.conname = roi_group.regex{roic};
@@ -84,7 +85,7 @@ for roic =1 : length(roi_group.name)
         roi_files = fullfile(rois_dir, spm_select('list',rois_dir, par.conname));
         R = maroi(roi_files);
 
-    % create ROIs from contrasts
+    %% #3b THE ROIS LOOP - creating ROIs from contrasts
 
     %%
     %% version to build the ROIs from image by binarizing the spmT/F image.nii
@@ -96,20 +97,21 @@ for roic =1 : length(roi_group.name)
 
     %R = maroi(roi_files)
 
-    %% Individual stat design part 
+    %% #4 Individual stat design part 
 
         % set design from file /use for the individual loop
         %spm_names = spm_select([1 Inf], 'SPM.mat', ''); useful only if SPM.mat undefined or not found
 
-        stat_dir = get_subdir_regex(main_dir, '.*PARKGAME.*1$');
+        stat_dir = get_subdir_regex(main_dir, '.*PARKGAME.*1$');  % regular expression for group-session folder to choose
+        model_dir = get_subdir_regex(stat_dir, 'model_ts_tapas'); % regular expression for model folder to choose
 
-        model_dir = get_subdir_regex(stat_dir, 'model_ts_tapas');
         %stat_dir = get_subdir_regex(main_dir, '.*PARKGAME.*1_a$');
         %model_dir = get_subdir_regex(stat_dir, 'model_tedana');
 
         spm_names = fullfile(model_dir, spm_select('list', model_dir, 'SPM.mat'));
 
-        %% subject loop giving us individual statistics
+        %% #5 SUBJECTS LOOP - giving us individual statistics
+
         for subj = 1 : length(spm_names)
         %subj = 1;
             D = mardo(spm_names{subj});
@@ -122,7 +124,8 @@ for roic =1 : length(roi_group.name)
             %marsS = compute_contrasts (E, 1:length(xCon));
             [rep_strs, marsS, marsD, changef] = stat_table(E, 1:length(xCon));
 
-            %% Creating a file and writing stats in it : initialisation
+            %% #6 TAB CREATION - Creating a file and writing stats in it : initialisation
+
             subj_names = get_parent_path(model_dir,1);
             subj_name = subj_names{subj}(length(subj_names{subj})-21 :(length(subj_names{subj})));
             subj_group = subj_name(length(subj_name));
@@ -134,6 +137,8 @@ for roic =1 : length(roi_group.name)
             outf.suj = {subj_name};
             outf.group = subj_group;
             outf.session = subj_session;
+
+            % ROI loop in the TAB
 
             for ic = 8:11
                 outf.contrast = marsS.rows{ic}.name;
@@ -178,11 +183,15 @@ for roic =1 : length(roi_group.name)
             %    fprintf(fid,'%s\n', rep_strs{sno});
             %end
             %fclose(fid);
-    %%
+    
+    %% #8 PERCENT SIGNAL ESTIMATE TABLE :
+
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%here we could call a function or write a code to make a symbolic link of this file in secondlevel_ACTIVATION dir with subj_name as prefix %
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
     %% Correction needed for the 'no-surviving-voxels' case
+    
     %         [e_specs, e_names] = event_specs(E);
     %         n_events = size(e_specs, 2);
     %         dur = 0;
@@ -207,7 +216,8 @@ for roic =1 : length(roi_group.name)
 end
 cd (roi_model_dir)
 
-%% save out_tab to txt
+%% #9 SAVE TABLE TO TXT : creating the out_tab to txt
+
 [r,l] = size(out_tab);
 nfid = fopen('stat_tab_PARK_S1_rois_k10_p001.txt','w'); % nope either = format inaccessible
 formatSpec = '%s;%s;%s;%s;%s;%f;%f;%f;%f\n';
@@ -220,7 +230,7 @@ fprintf(nfid,'%s;%s;%s;%s;%s;%f;%f;%f;%f',out_tab{r,1:end});
 
 fclose(nfid);
 
-% %% Convert cell to a table and use first row as variable names
+% %TEST %% Convert cell to a table and use first row as variable names
 % res = [];
 % for ncol = 1:length(var_tab)
 %     res(nrow,ncol) = out_tab{nrow,ncol};
@@ -233,7 +243,9 @@ fclose(nfid);
 
 %write_result_to_csv(outf, 'stats_table.csv')
 
-%% SAME CASE US ABOVE : if corrected above than uncomment
+%% #10 SAVE SIGNAL PERCENT ESTIMATE TABLE TO TXT
+
+%%SAME CASE US ABOVE @ #8 : if corrected than uncomment
 
 % %% save pct_tab to txt
 % [r,l] = size(pct_tab);
