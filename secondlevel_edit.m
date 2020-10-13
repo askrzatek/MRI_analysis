@@ -707,27 +707,35 @@ main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek
 
 % e_PARKGAME = exam(main_dir,'PARKGAME');
 % e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
-e_REMINARYS1 = exam(main_dir,'REMINARY_\w{2}_.*1$');
-e_REMINARYS2 = exam(main_dir,'REMINARY_\w{2}_.*2$');
-e_PARKGAMES2 = exam(main_dir,'PARKGAME.*2$');
-e_PARKGAMES1 = exam(main_dir,'PARKGAME.*1$');
+%e_REMINARYS1 = exam(main_dir,'REMINARY_\w{2}_.*1$');
+%e_REMINARYS2 = exam(main_dir,'REMINARY_\w{2}_.*2$');
+e_PARKGAMES2_a = exam(main_dir,'PARKGAME.*2_a$'); % taking into account the expgroup "_a" for active and "_c" for control
+e_PARKGAMES1_a = exam(main_dir,'PARKGAME.*1_a$'); % taking into account the expgroup "_a" for active and "_c" for control
+e_PARKGAMES1_a = e_PARKGAMES1_a(1:length(e_PARKGAMES2_a)); % waiting for all subjects to get a pair session
 
-e = {e_PARKGAMES1, e_PARKGAMES2, e_REMINARYS1, e_REMINARYS2};
-dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_test');
-dirgroup = r_mkdir(char(dirstat), {'PARKGAME', 'REMINARY'});
+e_PARKGAMES2_c = exam(main_dir,'PARKGAME.*2_c$'); % taking into account the expgroup "_a" for active and "_c" for control
+e_PARKGAMES1_c = exam(main_dir,'PARKGAME.*1_c$'); % taking into account the expgroup "_a" for active and "_c" for control
+
+
+e = {e_PARKGAMES1_a, e_PARKGAMES2_a, e_PARKGAMES1_c, e_PARKGAMES2_c};
+dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_PARK');
+dirgroup = r_mkdir(char(dirstat), {'PARKGAME_a', 'PARKGAME_c'});
 
 done = 0;
-done = job_con_smooth('s',4); % comment this line if you don't want to smooth your contrast data
+%done = job_con_smooth('s',4); % comment this line if you don't want to smooth your contrast data
 if done ==1
     for i = 1:length(e)
         %e{i}.explore
         %'REMINARY_\w{2}_.*1$'
-        e{i}.addSerie('model_meica$','contrasts',1)
+        e{i}.addSerie('model_tedana$','contrasts',1)
 
-        e{i}.getSerie('contrasts').addVolume('^scon_0008','REAL_L',1)
-        e{i}.getSerie('contrasts').addVolume('^scon_0009','REAL_R',1)
-        e{i}.getSerie('contrasts').addVolume('^scon_0010','IMA_L',1)
-        e{i}.getSerie('contrasts').addVolume('^scon_0011','IMA_R',1)
+        e{i}.getSerie('contrasts').addVolume('^scon_0007','REAL_L',1)
+        e{i}.getSerie('contrasts').addVolume('^scon_0008','REAL_R',1)
+        e{i}.getSerie('contrasts').addVolume('^scon_0009','IMA_L',1)
+        e{i}.getSerie('contrasts').addVolume('^scon_0010','IMA_R',1)
+
+        [ec_1st, ei_1st] = e{i}.removeIncomplete;
+        e{i} = ec_1st;
 
         e{i}.explore
         %e{2}.explore
@@ -737,12 +745,15 @@ else
     for i = 1:length(e)
         %e{i}.explore
         %'REMINARY_\w{2}_.*1$'
-        e{i}.addSerie('model_meica$','contrasts',1)
+        e{i}.addSerie('model_tedana$','contrasts',1)
 
         e{i}.getSerie('contrasts').addVolume('^con_0008','REAL_L',1)
         e{i}.getSerie('contrasts').addVolume('^con_0009','REAL_R',1)
         e{i}.getSerie('contrasts').addVolume('^con_0010','IMA_L',1)
         e{i}.getSerie('contrasts').addVolume('^con_0011','IMA_R',1)
+
+        [ec_1st, ei_1st] = e{i}.removeIncomplete;
+        e{i} = ec_1st;
 
         e{i}.explore
         %e{2}.explore
@@ -762,13 +773,13 @@ par.verbose = 2;
     %% Fetch onset
     % before adding a SPM.mat to the exam we need to create one with a batch for each model with file matrices we would have fetched
     % --> modify the script job_first_level_specify(dir_func, model_dir,par) where we can fetch all needed scans according to each model, create respective folders
-for group=1:2:4
+for group=1:2%:4 % if only one group ready for analysis then the 4 unnecessary
     %for session= 1:2:4
     for imod=1:length(model_name)
         if group == 1 % keep if we still need 2 exams per group
             dirout = r_mkdir(dirgroup{group}, model_name);
         else
-            dirout = r_mkdir(dirgroup{2}, model_name);
+            dirout = r_mkdir(dirgroup{2}, model_name); % works only if we have no more than 2 groups ergo 2 protocols
         end
         model_dir = cellstr(dirout{imod});
         switch imod                                   
@@ -789,17 +800,17 @@ for group=1:2:4
             case 3
                 fact1 = 'Hand';
                 fact2 = 'Task';
-                l11 = e{group+1}.getSerie('contrasts').getVolume('REAL_R').toJob;
-                l12 = e{group+1}.getSerie('contrasts').getVolume('IMA_R').toJob;
-                l21 = e{group+1}.getSerie('contrasts').getVolume('REAL_L').toJob;
-                l22 = e{group+1}.getSerie('contrasts').getVolume('IMA_L').toJob;
+                l11 = e{group+1}.getSerie('contrasts').getVolume('REAL_L').toJob;
+                l12 = e{group+1}.getSerie('contrasts').getVolume('IMA_L').toJob;
+                l21 = e{group+1}.getSerie('contrasts').getVolume('REAL_R').toJob;
+                l22 = e{group+1}.getSerie('contrasts').getVolume('IMA_R').toJob;
             case 4
                 fact1 = 'Hand';
                 fact2 = 'Task';
-                l11 = e{group}.getSerie('contrasts').getVolume('REAL_R').toJob;
-                l12 = e{group}.getSerie('contrasts').getVolume('IMA_R').toJob;
-                l21 = e{group}.getSerie('contrasts').getVolume('REAL_L').toJob;
-                l22 = e{group}.getSerie('contrasts').getVolume('IMA_L').toJob;
+                l11 = e{group}.getSerie('contrasts').getVolume('REAL_L').toJob;
+                l12 = e{group}.getSerie('contrasts').getVolume('IMA_L').toJob;
+                l21 = e{group}.getSerie('contrasts').getVolume('REAL_R').toJob;
+                l22 = e{group}.getSerie('contrasts').getVolume('IMA_R').toJob;
             case 5
                 fact1 = 'Hand';
                 fact2 = 'Session';
@@ -840,8 +851,9 @@ for group=1:2:4
             par.sessrep = 'none';
 
             par.delete_previous = 1;
-            par.report          = 1;
-            %par.report          = 0;
+            %par.report          = 1; % error on non designating spm mode
+            %(?)
+            par.report          = 0;
             
             job_second_level_contrast(fspm,model_contrast{imod},par);
     %% create a folder for figures before creating figures with MRIcroGL

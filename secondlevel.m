@@ -2,7 +2,7 @@
 clear
 clc
 
-addpath /home/anna.skrzatek/
+addpath /home/anna.skrzatek/data/nifti_test/ben/
 
 %% contrasts definition for each model
 %% Contrast : definition case 1 & 2 for both REMINARY & PARKGAME
@@ -427,8 +427,8 @@ model_contrast = { contrast_2x2Session,  contrast_2x2Session_CTL, contrast_2x2Ha
 
 %% fetch dirs for SPM
 %% Load files from multiple folders
-main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti');
-
+main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test','ben');
+cd (main_dir)
 % e_PARKGAME = exam(main_dir,'PARKGAME');
 % e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
 e_REMINARYS1 = exam(main_dir,'REMINARY_\w{2}_.*1$');
@@ -437,13 +437,13 @@ e_PARKGAMES2 = exam(main_dir,'PARKGAME.*2$');
 e_PARKGAMES1 = exam(main_dir,'PARKGAME.*1$');
 
 e = {e_PARKGAMES1, e_PARKGAMES2, e_REMINARYS1, e_REMINARYS2};
-dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION');
+dirstat = r_mkdir(main_dir, 'model_tedana_secondlevel_ACTIVATION');
 dirgroup = r_mkdir(char(dirstat), {'PARKGAME', 'REMINARY'});
 
 for i = 1:length(e)
     %e{i}.explore
     %'REMINARY_\w{2}_.*1$'
-    e{i}.addSerie('model_meica$','contrasts',1)
+    e{i}.addSerie('model_tedana$','contrasts',1)
 
     e{i}.getSerie('contrasts').addVolume('^con_0008','REAL_L',1)
     e{i}.getSerie('contrasts').addVolume('^con_0009','REAL_R',1)
@@ -453,6 +453,9 @@ for i = 1:length(e)
     %e{i}.explore
 end
 %%
+
+[ec, ei] = e{1}.removeIncomplete;
+e{1} = ec
 
 %%
 par.display = 0;
@@ -544,9 +547,10 @@ par.verbose = 2;
             mkdir(dirout{imod},'auto_figures');
         end
     end
+    close all
 %end
 
-%% Display
-
-%!linux command for mricrogl script
-!/network/lustre/iss01/cenir/software/irm/mricrogl_lx/MRIcroGL '/home/anna.skrzatek/data/nifti/secondlevel_ACTIVATION/second_level_p001_auto.gls'
+%%% Display
+%
+%%!linux command for mricrogl script
+%!/network/lustre/iss01/cenir/software/irm/mricrogl_lx/MRIcroGL '/home/anna.skrzatek/data/nifti/secondlevel_ACTIVATION/second_level_p001_auto.gls'
