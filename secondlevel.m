@@ -2,7 +2,7 @@
 clear
 clc
 
-addpath /home/anna.skrzatek/data/nifti_test/ben/
+addpath /home/anna.skrzatek/data/nifti_test/
 
 %% contrasts definition for each model
 %% Contrast : definition case 1 & 2 for both REMINARY & PARKGAME
@@ -22,10 +22,10 @@ S2IMAGINARY_L                      = [0 0 0 1];
 
 contrast_T.names = {
     
-    'SESSION1-SESSION2_R'
-    'SESSION2-SESSION1_R'
-    'IMAGINARY-REAL_R'
-    'REAL-IMAGINARY_R'
+%     'SESSION1-SESSION2_R'
+%     'SESSION2-SESSION1_R'
+%     'IMAGINARY-REAL_R'
+%     'REAL-IMAGINARY_R'
     
     'POS-SESSION-TASK-INTERACTION_R'
     'NEG-SESSION-TASK-INTERACTION_R'
@@ -46,14 +46,14 @@ contrast_T.names = {
 
 contrast_T.values = {
     
-% [1 1 -1 -1]
-(S1REAL_R + S1IMAGINARY_R)       - (S2REAL_R + S2IMAGINARY_R)
-% [-1 -1 1 1]
-(S2REAL_R + S2IMAGINARY_R)       - (S1REAL_R + S1IMAGINARY_R)
-% [-1 1 -1 1]
-(S1IMAGINARY_R + S2IMAGINARY_R)  - (S1REAL_R + S2REAL_R)
-% [1 -1 1 -1]
-(S1REAL_R + S2REAL_R)          - (S1IMAGINARY_R + S2IMAGINARY_R)
+% % [1 1 -1 -1]
+% (S1REAL_R + S1IMAGINARY_R)       - (S2REAL_R + S2IMAGINARY_R)
+% % [-1 -1 1 1]
+% (S2REAL_R + S2IMAGINARY_R)       - (S1REAL_R + S1IMAGINARY_R)
+% % [-1 1 -1 1]
+% (S1IMAGINARY_R + S2IMAGINARY_R)  - (S1REAL_R + S2REAL_R)
+% % [1 -1 1 -1]
+% (S1REAL_R + S2REAL_R)          - (S1IMAGINARY_R + S2IMAGINARY_R)
     
 % [1 -1 -1 1]
 (S1REAL_R + S2IMAGINARY_R)       - (S2REAL_R + S1IMAGINARY_R)
@@ -117,12 +117,12 @@ contrast_2x2Session.types  = [contrast_F.types  contrast_T.types];
 %% ANOVA2x2_SESSION_CTL
 
 contrast_T.names = {
-    
-    'SESSION1-SESSION2_L'
-    'SESSION2-SESSION1_L'
-    'IMAGINARY-REAL_L'
-    'REAL-IMAGINARY_L'
-    
+%     
+%     'SESSION1-SESSION2_L'
+%     'SESSION2-SESSION1_L'
+%     'IMAGINARY-REAL_L'
+%     'REAL-IMAGINARY_L'
+%     
     'POS-SESSION-TASK-INTERACTION_L'
     'NEG-SESSION-TASK-INTERACTION_L'
     
@@ -140,16 +140,16 @@ contrast_T.names = {
 }';
 
 contrast_T.values = {
-    
-    % [1 1 -1 -1]
-    (S1REAL_L + S1IMAGINARY_L)       - (S2REAL_L + S2IMAGINARY_L)
-    % [-1 -1 1 1]
-    (S2REAL_L + S2IMAGINARY_L)       - (S1REAL_L + S1IMAGINARY_L)
-    % [-1 1 -1 1]
-    (S1IMAGINARY_L + S2IMAGINARY_L)  - (S1REAL_L + S2REAL_L)
-    % [1 -1 1 -1]
-    (S1REAL_L + S2REAL_L)            - (S1IMAGINARY_L + S2IMAGINARY_L)
-    
+%     
+%     % [1 1 -1 -1]
+%     (S1REAL_L + S1IMAGINARY_L)       - (S2REAL_L + S2IMAGINARY_L)
+%     % [-1 -1 1 1]
+%     (S2REAL_L + S2IMAGINARY_L)       - (S1REAL_L + S1IMAGINARY_L)
+%     % [-1 1 -1 1]
+%     (S1IMAGINARY_L + S2IMAGINARY_L)  - (S1REAL_L + S2REAL_L)
+%     % [1 -1 1 -1]
+%     (S1REAL_L + S2REAL_L)            - (S1IMAGINARY_L + S2IMAGINARY_L)
+%     
     % [ 1 -1 -1 1]
     (S1REAL_L + S2IMAGINARY_L)       - (S2REAL_L + S1IMAGINARY_L)
     % [ -1 1 1 -1]
@@ -228,12 +228,12 @@ RIGHT_IMAGINARY_S2                      = [0 0 0 1];
 % ANOVA2x2_HAND
 
 contrast_T.names = {
-    
-    'RIGHT-LEFT_S2'
-    'LEFT-RIGHT_S2'
-    'IMAGINARY-REAL_S2'
-    'REAL-IMAGINARY_S2'
-    
+%     
+%     'RIGHT-LEFT_S2'
+%     'LEFT-RIGHT_S2'
+%     'IMAGINARY-REAL_S2'
+%     'REAL-IMAGINARY_S2'
+%     
     'POS-LATERALITY-TASK-INTERACTION_S2'
     'NEG-LATERALITY-TASK-INTERACTION_S2'
     
@@ -251,16 +251,16 @@ contrast_T.names = {
 }';
 
 contrast_T.values = {
-    
-    % [1 1 -1 -1]      'LEFT-RIGHT_S2'
-    (LEFT_REAL_S2 + LEFT_IMAGINARY_S2)       - (RIGHT_REAL_S2 + RIGHT_IMAGINARY_S2)
-    % [-1 -1 1 1]      'RIGHT-LEFT_S2'
-    (RIGHT_REAL_S2 + RIGHT_IMAGINARY_S2)     - (LEFT_REAL_S2 + LEFT_IMAGINARY_S2)
-    % [-1 1 -1 1]      'IMAGINARY-REAL_S2'
-    (LEFT_IMAGINARY_S2 + RIGHT_IMAGINARY_S2)  - (LEFT_REAL_S2 + RIGHT_REAL_S2)
-    % [1 -1 1 -1]      'REAL-IMAGINARY_S2'
-    (LEFT_REAL_S2 + RIGHT_REAL_S2)            - (LEFT_IMAGINARY_S2 + RIGHT_IMAGINARY_S2)
-    
+%     
+%     % [1 1 -1 -1]      'LEFT-RIGHT_S2'
+%     (LEFT_REAL_S2 + LEFT_IMAGINARY_S2)       - (RIGHT_REAL_S2 + RIGHT_IMAGINARY_S2)
+%     % [-1 -1 1 1]      'RIGHT-LEFT_S2'
+%     (RIGHT_REAL_S2 + RIGHT_IMAGINARY_S2)     - (LEFT_REAL_S2 + LEFT_IMAGINARY_S2)
+%     % [-1 1 -1 1]      'IMAGINARY-REAL_S2'
+%     (LEFT_IMAGINARY_S2 + RIGHT_IMAGINARY_S2)  - (LEFT_REAL_S2 + RIGHT_REAL_S2)
+%     % [1 -1 1 -1]      'REAL-IMAGINARY_S2'
+%     (LEFT_REAL_S2 + RIGHT_REAL_S2)            - (LEFT_IMAGINARY_S2 + RIGHT_IMAGINARY_S2)
+%     
     % [ 1 -1 -1 1]     'POS-LATERALITY-TASK-INTERACTION_S2'
     (LEFT_REAL_S2 + RIGHT_IMAGINARY_S2)       - (RIGHT_REAL_S2 + LEFT_IMAGINARY_S2)
     % [ -1 1 1 -1]     'NEG-LATERALITY-TASK-INTERACTION_S2'
@@ -325,12 +325,12 @@ contrast_2x2Hand.types  = [contrast_F.types  contrast_T.types];
 %% ANOVA2x2_HAND_CTL
 
 contrast_T.names = {
-    
-    'LEFT-RIGHT_S1'
-    'RIGHT-LEFT_S1'
-    'IMAGINARY-REAL_S1'
-    'REAL-IMAGINARY_S1'
-    
+%     
+%     'LEFT-RIGHT_S1'
+%     'RIGHT-LEFT_S1'
+%     'IMAGINARY-REAL_S1'
+%     'REAL-IMAGINARY_S1'
+%     
     'POS-LATERALITY-TASK-INTERACTION_S1'
     'NEG-LATERALITY-TASK-INTERACTION_S1'
     
@@ -349,15 +349,15 @@ contrast_T.names = {
 }';
 
 contrast_T.values = {
-    
-    % [1 1 -1 -1]      'LEFT-RIGHT_S1'
-    (LEFT_REAL_S1 + LEFT_IMAGINARY_S1)       - (RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1)
-    % [-1 -1 1 1]      'RIGHT-LEFT_S1'
-    (RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1)       - (LEFT_REAL_S1 + LEFT_IMAGINARY_S1)
-    % [-1 1 -1 1]      'IMAGINARY-REAL_S1'
-    (LEFT_IMAGINARY_S1 + RIGHT_IMAGINARY_S1)  - (LEFT_REAL_S1 + RIGHT_REAL_S1)
-    % [1 -1 1 -1]      'REAL-IMAGINARY_S1'
-    (LEFT_REAL_S1 + RIGHT_REAL_S1)            - (LEFT_IMAGINARY_S1 + RIGHT_IMAGINARY_S1)
+%     
+%     % [1 1 -1 -1]      'LEFT-RIGHT_S1'
+%     (LEFT_REAL_S1 + LEFT_IMAGINARY_S1)       - (RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1)
+%     % [-1 -1 1 1]      'RIGHT-LEFT_S1'
+%     (RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1)       - (LEFT_REAL_S1 + LEFT_IMAGINARY_S1)
+%     % [-1 1 -1 1]      'IMAGINARY-REAL_S1'
+%     (LEFT_IMAGINARY_S1 + RIGHT_IMAGINARY_S1)  - (LEFT_REAL_S1 + RIGHT_REAL_S1)
+%     % [1 -1 1 -1]      'REAL-IMAGINARY_S1'
+%     (LEFT_REAL_S1 + RIGHT_REAL_S1)            - (LEFT_IMAGINARY_S1 + RIGHT_IMAGINARY_S1)
     
     % [ 1 -1 -1 1]     'POS-LATERALITY-TASK-INTERACTION_S1'
     (LEFT_REAL_S1 + RIGHT_IMAGINARY_S1)       - (RIGHT_REAL_S1 + LEFT_IMAGINARY_S1)
@@ -421,29 +421,32 @@ contrast_2x2Hand_CTL.types  = [contrast_F.types  contrast_T.types];
 
 %% save the model_names to create directories and their corresponding contrast structures
 
-model_name     = {'ANOVA2x2_SESSION',   'ANOVA2x2_SESSION_CTL',  'ANOVA2x2_HAND',  'ANOVA2x2_HAND_CTL'};
-model_contrast = { contrast_2x2Session,  contrast_2x2Session_CTL, contrast_2x2Hand, contrast_2x2Hand_CTL};
+%model_name     = {'ANOVA2x2_SESSION',   'ANOVA2x2_SESSION_CTL',  'ANOVA2x2_HAND',  'ANOVA2x2_HAND_CTL'};
+%model_contrast = { contrast_2x2Session,  contrast_2x2Session_CTL, contrast_2x2Hand, contrast_2x2Hand_CTL};
 
+model_name     = {'ANOVA2x2_SxT_R',   'ANOVA2x2_SxT_L',  'ANOVA2x2_LxT_S2',  'ANOVA2x2_LxT_S1'};
+model_contrast = { contrast_2x2Session,  contrast_2x2Session_CTL, contrast_2x2Hand, contrast_2x2Hand_CTL};
 
 %% fetch dirs for SPM
 %% Load files from multiple folders
-main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test','ben');
+main_dir2 = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test','ben');
+main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
 cd (main_dir)
 % e_PARKGAME = exam(main_dir,'PARKGAME');
 % e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
-e_REMINARYS1 = exam(main_dir,'REMINARY_\w{2}_.*1$');
-e_REMINARYS2 = exam(main_dir,'REMINARY_\w{2}_.*2$');
-e_PARKGAMES2 = exam(main_dir,'PARKGAME.*2$');
-e_PARKGAMES1 = exam(main_dir,'PARKGAME.*1$');
+e_REMINARYS1 = exam(main_dir2,'REMINARY_\w{2}_.*1$');
+e_REMINARYS2 = exam(main_dir2,'REMINARY_\w{2}_.*2$');
+e_PARKGAMES2 = exam(main_dir,'PARKGAME.*V2');
+e_PARKGAMES1 = exam(main_dir,'PARKGAME.*V1');
 
 e = {e_PARKGAMES1, e_PARKGAMES2, e_REMINARYS1, e_REMINARYS2};
-dirstat = r_mkdir(main_dir, 'model_tedana_secondlevel_ACTIVATION');
+dirstat = r_mkdir(main_dir, 'secondlevel_smodel_ts_tapas_mix');
 dirgroup = r_mkdir(char(dirstat), {'PARKGAME', 'REMINARY'});
 
 for i = 1:length(e)
     %e{i}.explore
     %'REMINARY_\w{2}_.*1$'
-    e{i}.addSerie('model_tedana$','contrasts',1)
+    e{i}.addSerie('smodel_ts_tapas$','contrasts',1)
 
     e{i}.getSerie('contrasts').addVolume('^con_0008','REAL_L',1)
     e{i}.getSerie('contrasts').addVolume('^con_0009','REAL_R',1)
@@ -522,7 +525,7 @@ par.verbose = 2;
             par.verbose = 2;
             par.run = 1;
             par.file_reg = '^con';
-            par.mask_thr = 0.07;
+            par.mask_thr = 0.1; %from 0.07
 
             job_second_level_specify(fact1,fact2,l11,l12,l21,l22,model_dir,par);
 
@@ -544,7 +547,7 @@ par.verbose = 2;
             
             job_second_level_contrast(fspm,model_contrast{imod},par);
     %% create a folder for figures before creating figures with MRIcroGL
-            mkdir(dirout{imod},'auto_figures');
+            %mkdir(dirout{imod},'auto_figures');
         end
     end
     close all
