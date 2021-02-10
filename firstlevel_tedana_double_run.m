@@ -122,7 +122,7 @@ par.display = 0;
 
 %par.mask_thr = 0.1;
 par.mask_thr = 0.07;
-par.mask = 0;
+par.mask = 1;
 par.TR = 1.6;
 par.rp = 1;
 
