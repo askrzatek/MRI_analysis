@@ -7,10 +7,10 @@ clear all
 CLUSTER = 1;
 par.pct = 0;
 
-%main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
-main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test', 'firstlevel_sts_tapas_PARK_doublerun'); %,'PRISMA_REMINARY'); % pour comparer les résultats avec les VS
+main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
+%main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test', 'firstlevel_sts_tapas_PARK_doublerun'); %,'PRISMA_REMINARY'); % pour comparer les résultats avec les VS
 
-e_PARKGAME = exam(main_dir,'PARKGAME');
+e_PARKGAME = exam(main_dir,'PARKGAME.*._[a,c]$');
 e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
 
 e = e_PARKGAME; % (3:length(e_PARKGAME)); % choose specific
@@ -147,6 +147,10 @@ par.fsl_output_format = 'NIFTI_GZ';
 e.gser('run').addVolume('^bet.*vtde1.nii.gz','bet',1);
 e.gser('run').gvol('bet').removeEmpty.unzip_and_keep(par);
 
+% copy original gz mask & unzip
+e.gser('run').addVolume('^bet.*vtde1_mask.nii','mask',1);
+%e.gser('run').gvol('mask').removeEmpty.unzip_and_keep(par);
+
 % %% temporal mean #obsolete !!!
 % 
 % clear par
@@ -226,15 +230,18 @@ job_tedana_009a1( meinfo, 'vtd', 'tedana009a1_vtd', 'bet_Tmean_vtde1_mask.nii.gz
 par.subdir = 'tedana009a1_vtd';
 %tedana_report (main_dir, par); % changement et necessite de meinfo.path
 
-%% Add new preprocessed data to exam object : dn_ts_OC.nii 
+%% Add new preprocessed data to exam object : dn_ts_OC.nii for tedana denoising and ts_OC.nii for TAPAS denoising
 
 e.addSerie('ACTIVATION','tedana009.*_vtd','tedana_ACTIVATION',1);
 e.addSerie('RS','tedana009.*_vtd','tedana_RS',1);
-e.getSerie('tedana').addVolume('^ts_OC','ts',1);
-e.getSerie('tedana').addVolume('^dn_ts','dn_ts',1);
+e.getSerie('tedana').addVolume('^ts_OC','ts',1);     % tapas
+%e.getSerie('tedana').addVolume('^dn_ts','dn_ts',1); % tedana
 
 % copy original gz & unzip 
 e.getSerie('tedana').getVolume('.*ts').removeEmpty.unzip_and_keep(par)
+
+% if already unziped then
+e.getSerie('tedana').addVolume('^ts_OC.nii','ts',1); % tapas
 
 % unzip the outputs of tedana
 %e.unzipVolume();
@@ -363,6 +370,15 @@ y = tmp_exam.gser('anat').gvol('^y');
 par.jobname = 'spm_normalize_meanepi';
 job_apply_normalize(y, img, par);
 
+%% Normalize the Tmean mask used later for PhysIO Noise ROI
+par.auto_add_obj = 1;
+e.gser('ACTIVATION').addVolume('mask','mask',1)
+img = e.gser('ACTIVATION').getVolume('mask');
+tmp_exam = [img.exam];
+y = tmp_exam.gser('anat').gvol('^y');
+
+par.jobname = 'spm_normalize_maskepi';
+job_apply_normalize(y, img, par);
 
 %% add outputs to exam object
 e.getSerie('tedana').addVolume('^wts','wts',1);
@@ -385,7 +401,7 @@ end
 par.auto_add_obj = 0;
 par.smooth       = [5 5 5];
 par.prefix       = 's5';
-par.jobname      = 'spm_smooth_5';
+par.jobname      = 'spm_smooth_4748_5';
 
 img = e.gser('tedana').gvol('^w').removeEmpty;
 
@@ -410,7 +426,7 @@ end
 par.auto_add_obj = 0;
 par.smooth       = [6 6 6];
 par.prefix       = 's6';
-par.jobname      = 'spm_smooth_6';
+par.jobname      = 'spm_smooth_4748_6';
 
 img = e.gser('tedana').gvol('^w').removeEmpty;
 
