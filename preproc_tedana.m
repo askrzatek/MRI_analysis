@@ -4,11 +4,11 @@ clc
 clear all
 
 %% Initialisation
-CLUSTER = 0;
+CLUSTER = 1;
 par.pct = 0;
 
 %main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
-main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/', 'nifti_test'); %,'PRISMA_REMINARY'); % pour comparer les résultats avec les VS
+main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test', 'firstlevel_sts_tapas_PARK_doublerun'); %,'PRISMA_REMINARY'); % pour comparer les résultats avec les VS
 
 e_PARKGAME = exam(main_dir,'PARKGAME');
 e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
@@ -18,9 +18,12 @@ e = e_PARKGAME; % (3:length(e_PARKGAME)); % choose specific
 e.addSerie('ACTIVATION$','run_ACTIVATION',1)
 e.addSerie(        'RS$','run_RS'        ,1)
 
-e.getSerie('run').addVolume('^f\d{3}','f',3)
+%e.getSerie('run').addVolume('^f\d{3}','f',3)
+e.getSerie('run_ACT').addVolume('^v.*ACTIVATION.*nii','f',3)
+e.getSerie('run_RS').addVolume('^v.*RS.*nii','f',3)
+%e.addSerie('t1mpr_.*p2$','anat_T1',1)
 e.addSerie('t1mpr_S256_0_8iso_p2$','anat_T1',1)
-e.getSerie('anat_T1').addVolume('^s.*p2.nii','s',1)
+e.getSerie('anat_T1').addVolume('^v.*p2.nii','s',1)
 
 e.reorderSeries('path');
 e.unzipVolume(par);
@@ -29,34 +32,34 @@ dir_func = e.getSerie('run') .toJob;
 dir_anat = e.getSerie('anat').toJob(0);
 
 
-%% vol quantity control
-% functional ACTI
-p = e.getSerie('run_ACTIVATION').getVolume('^f').print;
-p = cellstr(p);
-res =regexp(p,'f630');
-res = cellfun(@isempty,res);
-bad_volumes = char(p(res));
-
-if ~isempty(bad_volumes)
-    disp(bad_volumes)
-    %error('wrong number of volumes')
-else
-    fprintf('all echos seem to have 630 volumes \n')
-end
-
-% functional RS
-p = e.getSerie('run_RS').getVolume('^f').print;
-p = cellstr(p);
-res =regexp(p,'f300');
-res = cellfun(@isempty,res);
-bad_volumes = char(p(res));
-
-if ~isempty(bad_volumes)
-    disp(bad_volumes)
-    %error('wrong number of volumes')
-else
-    fprintf('all echos seem to have 300 volumes \n')
-end
+%% vol quantity control %% not useful anymore - file names changed with xnat - need to update if want to use this functionality
+% % functional ACTI
+% p = e.getSerie('run_ACTIVATION').getVolume('^f').print;
+% p = cellstr(p);
+% res =regexp(p,'f630');
+% res = cellfun(@isempty,res);
+% bad_volumes = char(p(res));
+% 
+% if ~isempty(bad_volumes)
+%     disp(bad_volumes)
+%     %error('wrong number of volumes')
+% else
+%     fprintf('all echos seem to have 630 volumes \n')
+% end
+% 
+% % functional RS
+% p = e.getSerie('run_RS').getVolume('^f').print;
+% p = cellstr(p);
+% res =regexp(p,'f300');
+% res = cellfun(@isempty,res);
+% bad_volumes = char(p(res));
+% 
+% if ~isempty(bad_volumes)
+%     disp(bad_volumes)
+%     %error('wrong number of volumes')
+% else
+%     fprintf('all echos seem to have 300 volumes \n')
+% end
 
 %% sort echos
 
@@ -118,7 +121,7 @@ e.getSerie('run').addVolume('^vtde1.nii','vtde1',1)
 e.getSerie('run').addVolume('^vtde2.nii','vtde2',1)
 e.getSerie('run').addVolume('^vtde3.nii','vtde3',1)
 
-[ec_vtd, ei_vtd] = e.removeIncomplete;
+[ec_vtd, ei_vtd ] = e.removeIncomplete; % need to check if is working as supposed
 e = ec_vtd;
 
 %% do_fsl_robust_mask_epi
@@ -187,7 +190,7 @@ e.gser('run').gvol('bet').removeEmpty.unzip_and_keep(par);
 %% Tedana
 
 % tedana.py main arguments
-par.tedpca     = 'mdl'; % mdl, kundu, kundu-stabilize (tedana default = mdl)
+par.tedpca     = 'mle'; % mdl, kundu, kundu-stabilize (tedana default = mdl)
 par.maxrestart = []; % (tedana default = 10)
 par.maxit      = []; % (tedana default = 500)
 %par.png        = 1;  % tedana will make some PNG files of the components Beta map, for quality checks
@@ -220,7 +223,7 @@ job_tedana_009a1( meinfo, 'vtd', 'tedana009a1_vtd', 'bet_Tmean_vtde1_mask.nii.gz
 
 
 %% tedana report % meinfo is in main_dir and tedana outputs in the subdir of run dir (until change - cannot use tedana_report)
-par.subdir = 'tedana009a1_vtd'
+par.subdir = 'tedana009a1_vtd';
 %tedana_report (main_dir, par); % changement et necessite de meinfo.path
 
 %% Add new preprocessed data to exam object : dn_ts_OC.nii 
@@ -345,6 +348,7 @@ warp_field = tmp_exam.getSerie('anat').getVolume('^y');
 job_apply_normalize(warp_field, img_a, par);
 
 % RS
+par.jobname = 'spm_normalize_epi_rs';
 img_rs = e.getSerie('tedana_RS').getVolume('.*ts').removeEmpty;
 tmp_exam_rs = [img_rs.exam];
 warp_field = tmp_exam_rs.getSerie('anat').getVolume('^y');
@@ -367,6 +371,7 @@ e.getSerie('run').addVolume('^wbet','wbet',1);
 e.getSerie('anat').addVolume('^wp0','wp0',1);
 
 %% Smooth TEDANA outputs
+%% smooth with 5
 
 clear par
 par.redo         = 0;
@@ -386,9 +391,35 @@ img = e.gser('tedana').gvol('^w').removeEmpty;
 
 job_smooth(img, par);
 
-%% save smoothed outputs
+% save smoothed outputs
 e.gser('tedana').addVolume('^s5wts_OC.nii','s5wts',1);
 e.gser('tedana').addVolume('^s5wdn_ts_OC.nii','s5wdn',1);
+
+
+%% smooth with 6
+
+clear par
+par.redo         = 0;
+if CLUSTER
+    par.run      = 0;
+    par.sge      = 1;
+else
+    par.run      = 1;
+    par.sge      = 0;
+end
+par.auto_add_obj = 0;
+par.smooth       = [6 6 6];
+par.prefix       = 's6';
+par.jobname      = 'spm_smooth_6';
+
+img = e.gser('tedana').gvol('^w').removeEmpty;
+
+job_smooth(img, par);
+
+% save smoothed outputs
+
+e.gser('tedana').addVolume('^s6wts_OC.nii','s6wts',1);
+e.gser('tedana').addVolume('^s6wdn_ts_OC.nii','s6wdn',1);
 
 return
 
