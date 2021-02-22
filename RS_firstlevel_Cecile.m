@@ -5,6 +5,8 @@ clc
 
 load e
 
+%addpath '/network/lustre/iss01/cenir/analyse/irm/users/cecile.gallea/ASYA/asyasuit/'
+
 %% Modeling low frequency fluctuations
 
 % -> four binaries Fourier pairs with 90 degree phase lag at the frequency
@@ -27,21 +29,43 @@ y8 = square(2*pi*0.08*t);
 
 %% Prepare dirs
 
-dir_RS   = e.getSerie('RS$').removeEmpty. toJob(0);
-dir_RS   = cellstr(dir_RS(1:length(dir_RS)/2));
-dirFunc  = e.getSerie('tedana').removeEmpty.toJob(0);
+dir_RS   = e.getSerie('run_RS$').removeEmpty. toJob(0);
+%dir_RS   = cellstr(dir_RS(1:length(dir_RS)/2));
+dirFunc  = e.getSerie('tedana_RS').removeEmpty.toJob(0);
 
 dirStats = e.getSerie('RS$').mkdir('model','model_1'); % basic model ALFF
 dirStats = dirStats(1:length(dirStats)/2);
 %% Make symbolic links from tedana_vtd_mle dir to run dir based on job_meica_afni symbolic link creation 
 addpath /home/anna.skrzatek/MRI_analysis/
-% %par.subdir        = 'tedana_vtd_mle';
-% par.subdir        = 'tedana009a1_vtd';
-% par.sge = 0;
-% par.run = 1;
-% 
-% par.warp_file_reg = '^s6wts';
-% job_symbolic_child_to_parent(dir_RS, par);
+clear par
+%par.subdir        = 'tedana_vtd_mle';
+par.subdir        = 'tedana009a1_vtd';
+par.sge = 0;
+par.run = 1;
+
+par.regfile_regex = '^s6wts';
+
+for i= 1:length(e)
+    wd = e(i).getSerie('RS').path;
+    reg_dir = char(get_subdir_regex(wd, par.subdir));
+    A_src = get_subdir_regex_files(reg_dir, par.regfile_regex);
+    regfile_out = char(A_src);
+    regfile_out = regfile_out(end-11:end);
+    A_dst = fullfile(wd, regfile_out);
+    
+    par.redo = 0;
+    par.verbose = 2;
+    %par.run = 0;
+    par.run = 1;
+    par.jobname = sprintf('job_symbolic_link');
+    %par.jobname = sprintf('%s_%s_%s', 'job_symbolic_link', wd(end-46:end-16), par.subdir);
+    [job_session(i)] = r_movefile(A_src, A_dst, 'linkn', par);
+    job = [job_session];
+    
+end
+
+% job_symbolic_child_to_parent(dir_RS, par); % used to work but now doesn't
+% file format is not corresponding anymore
 % 
 %% make a symbolic link of rp_spm.txt and of multiple_regressors to dir_func
 clear par
@@ -119,7 +143,8 @@ par.rp_regex = 'wts_multiple.*txt';
 
 % Masking
 par.mask_thr = 0.8; % spm default option
-par.mask     =  {}; % cell(char) of the path for the mask of EACH model : N models means N paths
+%par.mask     =  {}; % cell(char) of the path for the mask of EACH model : N models means N paths
+par.mask     =  {e.gser('run_RS').gvol('wmask').path}; % cell(char) of the path for the mask of EACH model : N models means N paths
 par.cvi      = 'AR(1)'; % 'AR(1)' / 'FAST' / 'none'
 
 % Regressors
@@ -130,7 +155,7 @@ par.user_regressor = {};
 % The regressors in the file will be concatenated with rp_*.txt
 par.file_regressor = addsuffixtofilenames(dir_RS, '/wts_multiple_regressors.txt');
 
-par.jobname  = 'spm_glm';
+par.jobname  = 'spm_glm_rs';
 par.walltime = '04:00:00';
 
 par.sge   = 0;
@@ -244,13 +269,13 @@ main_dir = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_te
 % subj_dir = gdir(main_dir,'^Subj|^___S')
 subj_dir = gdir(main_dir,'PARKGAME.*[a,c]$')
 SessDir = gdir(subj_dir,'.*RS$');
-StatDir = gdir(SessDir,'model','model_1');
+StatDir = gdir(SessDir,'model','^model_1');
 regressors_test = gfile(SessDir,'wts_multiple_regressors');
 
-par.run=0;
-par.sge =1;
+par.run = 0;
+par.sge = 1;
 par.display = 0;
-par.jobname = 'spm_first_level_spec_RS'
+par.jobname = 'spm_first_level_spec_RS';
 
 [ jobs ] = job_ending_rountines( jobs, skip, par );
 %% Estimate
@@ -267,6 +292,7 @@ par.jobname = 'spm_first_level_spec_RS'
 fspm = addsuffixtofilenames(StatDir, 'SPM.mat');
 
 clear par
+%par.run = 1;
 par.sge = 1;
 par.sge_queu = 'normal,bigmem';
 par.jobname  = 'spm_first_level_est_RS';
