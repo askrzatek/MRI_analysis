@@ -314,7 +314,8 @@ par.cost_fun = 'ncc';
 
 tmp_exam_a = [e.gser('run_ACTIVATION').removeEmpty.exam];
 ref = tmp_exam_a.gser('anat').getVolume('^p0');
-src = e.getSerie('run_ACTIVATION').removeEmpty.getVolume('bet');
+e.getSerie('run_ACTIVATION').getVolume('bet').removeEmpty.unzip_and_keep;
+src = e.getSerie('run_ACTIVATION').getVolume('bet');
 oth = e.getSerie('tedana_ACTIVATION').removeEmpty.getVolume('.*ts'); % on peut qjouter le masque pour qu'il suive l'anat
 
 %keep in mind this option if emergency to get the precedent header
@@ -323,15 +324,27 @@ oth = e.getSerie('tedana_ACTIVATION').removeEmpty.getVolume('.*ts'); % on peut q
 
 
 job_coregister(src,ref,oth,par);
+
+%apply same transformation to the mask as the one for bet_Tmean
+follower = e.getSerie('run_ACTIVATION').removeEmpty.getVolume('mask') .toJob;
+influencer = oth. toJob;
+do_fsl_copy_header(follower,   influencer,  par);
    
 % RS
 tmp_exam_rs = [e.getSerie('run_RS').removeEmpty.exam];
 ref = tmp_exam_rs.getSerie('anat').getVolume('^p0');
+e.getSerie('run_RS').removeEmpty.getVolume('bet').removeEmpty.unzip_and_keep;
 src = e.getSerie('run_RS').removeEmpty.getVolume('bet');
-oth = e.getSerie('tedana_RS').removeEmpty.getVolume('.*ts');
+oth = e.getSerie('tedana_RS').removeEmpty.getVolume('^ts'); %changed from .* to ^
 
 job_coregister(src,ref,oth,par);
     
+%apply same transformation to the mask as the one for bet_Tmean
+follower = e.getSerie('run_RS').removeEmpty.getVolume('mask') .toJob;
+influencer = oth. toJob;
+do_fsl_copy_header(follower,   influencer,  par);
+
+
 %% Normalize TEDANA outputs
 
 clear par
@@ -346,7 +359,7 @@ end
 par.auto_add_obj = 0;
 par.display      = 0;
 par.vox          = [2.5 2.5 2.5]; % important to keep original EPI vox size
-par.jobname      = 'spm_normalize_epi';
+par.jobname      = 'spm_normalize_epi_mask';
 
 % ACTIVATION
 img_a = e.getSerie('tedana_ACTIVATION').getVolume('.*ts').removeEmpty;
@@ -361,7 +374,7 @@ tmp_exam_rs = [img_rs.exam];
 warp_field = tmp_exam_rs.getSerie('anat').getVolume('^y');
 job_apply_normalize(warp_field, img_rs, par);
 
-%% Normalize the Tmean mask used later for PhysIO Noise ROI
+%% Normalize the Tmean used later for PhysIO Noise ROI
 par.auto_add_obj = 1;
 img = e.gser('run').removeEmpty.gvol('bet');
 tmp_exam = [img.exam];
@@ -372,19 +385,31 @@ job_apply_normalize(y, img, par);
 
 %% Normalize the Tmean mask used later for PhysIO Noise ROI
 par.auto_add_obj = 1;
-e.gser('ACTIVATION').addVolume('mask','mask',1)
-img = e.gser('ACTIVATION').getVolume('mask');
+
+%% ACT
+%e.gser('ACTIVATION').addVolume('mask','mask',1)
+img = e.gser('ACTIVATION').getVolume('mask'); %% do same for RS
 tmp_exam = [img.exam];
 y = tmp_exam.gser('anat').gvol('^y');
 
-par.jobname = 'spm_normalize_maskepi';
+par.jobname = 'spm_normalize_maskepi_ACT';
+job_apply_normalize(y, img, par);
+
+%% RS
+%e.gser('ACTIVATION').addVolume('mask','mask',1)
+img = e.gser('run_RS').getVolume('mask'); %% do same for RS
+tmp_exam = [img.exam];
+y = tmp_exam.gser('anat').gvol('^y');
+
+par.jobname = 'spm_normalize_maskepi_RS';
 job_apply_normalize(y, img, par);
 
 %% add outputs to exam object
 e.getSerie('tedana').addVolume('^wts','wts',1);
 e.getSerie('tedana').addVolume('^wdn','wdn',1);
-e.getSerie('run').addVolume('^wbet','wbet',1);
+e.getSerie('run').addVolume('^wbet.*vtde1.nii','wbet',1);
 e.getSerie('anat').addVolume('^wp0','wp0',1);
+e.getSerie('run').addVolume('^wbet.*mask.nii$','wmask',1)
 
 %% Smooth TEDANA outputs
 %% smooth with 5
