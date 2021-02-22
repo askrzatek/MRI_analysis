@@ -120,9 +120,11 @@ par.sge = 0;
 par.run = 0;
 par.display = 0;
 
-%par.mask_thr = 0.1;
-par.mask_thr = 0.07;
-par.mask = 1;
+par.mask_thr = 0.1;
+%par.mask_thr = 0.07;
+par.mask = 1; % if we want to use a personalised mask
+par.mask_path = {'/home/anna.skrzatek/data/nifti_test/wmean_mask.nii'}; % specify if we want to use the mean mask, otherwise blank to get the individual warped mask
+par.mask_path = {''};
 par.TR = 1.6;
 par.rp = 1;
 

@@ -72,7 +72,11 @@ for i = 1 : length(dirFonc)
     jobs{i}.spm.stats.fmri_spec.mthresh = par.mask_thr;
     
     if par.mask
-        jobs{i}.spm.stats.fmri_spec.mask = unzip_volume(get_subdir_regex_files(dirFonc{i,2},'mask'));
+        if par.mask_path{1} == ''
+            jobs{i}.spm.stats.fmri_spec.mask = unzip_volume(get_subdir_regex_files(dirFonc{i,2},'wbet.*mask'));
+        else
+            jobs{i}.spm.stats.fmri_spec.mask = unzip_volume(par.mask_path);
+        end
     else
         jobs{i}.spm.stats.fmri_spec.mask = {''};
     end
