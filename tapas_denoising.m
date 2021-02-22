@@ -179,7 +179,7 @@ par.TR = 1.600;
 rp_threshold = 1;
 %par.rp_threshold =  %plus bas mieux c'est
 %par.outdir = outcell(33:64); % Activation
-par.outdir = outcell(1:32); % Resting state
+par.outdir = outcell(1:30); % Resting state
 
 par.redo = 0;
 par.display = 0;
