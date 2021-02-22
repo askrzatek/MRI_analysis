@@ -1,26 +1,35 @@
-function [job] = spm_job_voi(fspm, roi_struct, fmask, par)
+function [jobs] = spm_job_voi(fspm, roi_name, fmask, par)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Function used to create Volume Of Interest files necessary to later VOI analysis      %%
 %% INPUTS :                                                                               %%
 %%%%%%%%% fspm - list of SPM.mat model paths                                             %%
-%%%%%%%%% fmask - list of model mask.image(1) paths : 1 per SPM model                    %%
-%%%%%%%%% roi_struct - structure containing lists of voi.name & mask.image               %%
-%%%%%%%%%%%%%%%%%%%% roi_struct.name - voi.name string : x per SPM model                 %%
-%%%%%%%%%%%%%%%%%%%% roi_struct.froi - mask.image(2) path for each voi : x per SPM model %%
-%%%%%%%%% par - jobname, walltime, run                                                   %%
-%                                                                                        %%
-%% OUTPUT :                                                                              %%
-%%%%%%%%% jobs - SPM.mat model files                                                     %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                                                                        %%
-%% EXEMPLES : %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%% fmask - list of model mask.image(1) paths : 1 per SPM model                                 %%
+%%%%%%%%% roi_struct - structure containing lists of voi.name & mask.image               %unnecessary %%
+%%%%%%%%%%%%%%%%%%%% roi_name - voi.name string : x per SPM model                                     %%
+%%%%%%%%%%%%%%%%%%%% roi_froi - mask.image(2) path for each voi : x per SPM model        %unnecessary %%
+%%%%%%%%% par - roi_dir, jobname, walltime, run                                                       %%
+%                                                                                                     %%
+%% OUTPUT :                                                                                           %%
+%%%%%%%%% jobs - SPM.mat model files                                                                  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                                                     %%
+%% EXAMPLES : %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                                                                                                                               %
 %fspm            = {'/home/anna.skrzatek/data/nifti_test/2018_07_18_PARKGAMEII_001_NB_18_07_2018_V1_a/S05_RS/model/model_1/SPM.mat'}
-%fspm            = addsuffixtofilenames(gpath(e),'SPM.mat');                                            %
+%fspm            = addsuffixtofilenames(gpath(e(i)),'SPM.mat');                                            %
+%
 %fmask           = {'/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/2018_07_18_PARKGAMEII_001_NB_18_07_2018_V1_a/S05_RS/model/model_1/mask.nii,1'}      %
-%roi_struct.name = 'Putamen_Right'                                                                                                                                              %
-%roi_struct.froi = {'/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROI_RestingState/Putamen_Right.nii,1'}                                              %
+%fmask           = {sprintf('%s,1',string(addsuffixtofilenames(gpath(e(i)),'mask.nii')))};
+%
+%roi_name = 'Putamen_Right'                                                                                                                                              %
+%roi_name = {'Putamen_R','Putamen_L'};                                                                                                                                              %
+%
+%% NOT NEEDED anymore for the roi_name and par.roi_dir are enough to find the roi files
+%roi_froi = {'/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROI_RestingState/Putamen_Right.nii,1'}
+%roi_struct_path{iroi} = sprintf('%s/%s.nii,1',par.roi_dir,roi_name{iroi}) ;
+%roi_froi = roi_struct_path{:}
+%
 %par.jobname     = 'spm_voi_ts_extract_loop_test'                                                                                                                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -33,29 +42,37 @@ function [job] = spm_job_voi(fspm, roi_struct, fmask, par)
     defpar.jobname                            = 'spm_voi_ts_extract';
     defpar.walltime                           = '04:00:00';
     defpar.run                                = 0;
+    defpar.roi_dir                            = '/home/anna.skrzatek/data/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/ROI_aal_pariet_mot_premot_cereb_BG';
+    defpar.run                                = 1;
     
     par = complet_struct(par, defpar);
     
     %% SPM : util.voi
-        %% subject loop
-        if iscell(fspm(1))
-            nrSubject = length(fspm)
-        for i = 1 : nrSubject
-        %     job{1}.spm.util.voi.spmmat                = {'/home/anna.skrzatek/data/nifti_test/2018_07_18_PARKGAMEII_001_NB_18_07_2018_V1_a/S05_RS/model/model_1/SPM.mat'};
-            job{i}.spm.util.voi.spmmat                = fspm(i);
-            job{i}.spm.util.voi.adjust                = NaN;
-            job{i}.spm.util.voi.session               = 1;
-        %     job{1}.spm.util.voi.name                  = 'Putamen_Right';
-            job{i}.spm.util.voi.name                  = roi_struct.name;
-        %    job{1}.spm.util.voi.roi{1}.mask.image     = {'/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/2018_07_18_PARKGAMEII_001_NB_18_07_2018_V1_a/S05_RS/model/model_1/mask.nii,1'};
-            job{i}.spm.util.voi.roi{1}.mask.image     = fmask;
-            job{i}.spm.util.voi.roi{1}.mask.threshold = 0.5;
-        %     job{1}.spm.util.voi.roi{2}.mask.image     = {'/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROI_RestingState/Putamen_Right.nii,1'};
-            job{i}.spm.util.voi.roi{2}.mask.image     = roi_struct.froi;
-            job{i}.spm.util.voi.roi{2}.mask.threshold = 0.5;
-            job{i}.spm.util.voi.expression            = 'i1&i2';
-
+    idx = 1;
+    %% subject loop
+    if iscell(fspm(1)) %% not sure what to do if iscell = 0
+        nrSubject = length(fspm);
+    end
+    for i = 1 : nrSubject
+        for j = 1 : length(roi_name)
+        %     jobs{1}.spm.util.voi.spmmat                = {'/home/anna.skrzatek/data/nifti_test/2018_07_18_PARKGAMEII_001_NB_18_07_2018_V1_a/S05_RS/model/model_1/SPM.mat'};
+            jobs{idx}.spm.util.voi.spmmat                = fspm(i);
+            jobs{idx}.spm.util.voi.adjust                = NaN;
+            jobs{idx}.spm.util.voi.session               = 1;
+        %     jobs{1}.spm.util.voi.name                  = 'Putamen_Right';
+            jobs{idx}.spm.util.voi.name                  = roi_name{j};
+        %    jobs{1}.spm.util.voi.roi{1}.mask.image     = {'/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/2018_07_18_PARKGAMEII_001_NB_18_07_2018_V1_a/S05_RS/model/model_1/mask.nii,1'};
+            jobs{idx}.spm.util.voi.roi{1}.mask.image     = spm_select('expand',cellstr(fmask{i}));
+            jobs{idx}.spm.util.voi.roi{1}.mask.threshold = 0.5;
+        %     jobs{1}.spm.util.voi.roi{2}.mask.image     = {'/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROI_RestingState/Putamen_Right.nii,1'};
+            jobs{idx}.spm.util.voi.roi{2}.mask.image     = spm_select('expand',cellstr(sprintf('%s/%s.nii',par.roi_dir,roi_name{j})));
+            jobs{idx}.spm.util.voi.roi{2}.mask.threshold = 0.5;
+            jobs{idx}.spm.util.voi.expression            = 'i1&i2';
+            idx = idx +1;
         end
-            job = do_cmd_sge(job,par);
+    end
+    skip = [];
 
-%end
+    spm('defaults','FMRI')
+    [ jobs ] = job_ending_rountines( jobs, skip, par );
+end
