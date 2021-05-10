@@ -3,6 +3,9 @@
 clear
 clc
 
+main_dir = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
+cd(main_dir)
+
 load e
 
 %addpath '/network/lustre/iss01/cenir/analyse/irm/users/cecile.gallea/ASYA/asyasuit/'
@@ -33,8 +36,9 @@ dir_RS   = e.getSerie('run_RS$').removeEmpty. toJob(0);
 %dir_RS   = cellstr(dir_RS(1:length(dir_RS)/2));
 dirFunc  = e.getSerie('tedana_RS').removeEmpty.toJob(0);
 
-dirStats = e.getSerie('RS$').mkdir('model','model_1'); % basic model ALFF
-dirStats = dirStats(1:length(dirStats)/2);
+dirStats = e.getSerie('run_RS$').mkdir('model','model_1'); % basic model ALFF
+dirStats = e.getSerie('run_RS$').mkdir('model','model_2'); % basic model ALFF %better denoising from tapas resliced masks
+%dirStats = dirStats(1:length(dirStats)/2);
 %% Make symbolic links from tedana_vtd_mle dir to run dir based on job_meica_afni symbolic link creation 
 addpath /home/anna.skrzatek/MRI_analysis/
 clear par
@@ -134,6 +138,7 @@ clear y1 y2 y3 y4 y5 y6 y7 y8 t Matrix Mat_sub u1 u2 u3 u4 u5 u6 u7 u8
 
 
 %% Parameters
+clear par
 
 par.TR = 1.6;
 
@@ -142,9 +147,9 @@ par.rp       = 1;
 par.rp_regex = 'wts_multiple.*txt';
 
 % Masking
-par.mask_thr = 0.8; % spm default option
+par.mask_thr = 0.1; % spm default option
 %par.mask     =  {}; % cell(char) of the path for the mask of EACH model : N models means N paths
-par.mask     =  {e.gser('run_RS').gvol('wmask').path}; % cell(char) of the path for the mask of EACH model : N models means N paths
+par.mask     =  gpath(e.gser('run_RS').gvol('wmask')); % cell(char) of the path for the mask of EACH model : N models means N paths
 par.cvi      = 'AR(1)'; % 'AR(1)' / 'FAST' / 'none'
 
 % Regressors
@@ -155,7 +160,7 @@ par.user_regressor = {};
 % The regressors in the file will be concatenated with rp_*.txt
 par.file_regressor = addsuffixtofilenames(dir_RS, '/wts_multiple_regressors.txt');
 
-par.jobname  = 'spm_glm_rs';
+par.jobname  = 'spm_glm_rs_wbet';
 par.walltime = '04:00:00';
 
 par.sge   = 0;
@@ -171,7 +176,7 @@ par.redo     = 0;
 
 
 %% Job
-%jobs = job_first_level_specify(dirFunc,dirStats, par)
+%jobs = job_first_level_specify(dirFunc(1),dirStats(1), par)
 
 
 nrSubject=length(dirFunc);
@@ -216,7 +221,8 @@ for subj = 1:nrSubject
             elseif ~par.rp && ~isempty(par.file_regressor)
                 jobs{subj}.spm.stats.fmri_spec.sess(run).multi_reg = par.file_regressor(subj);
             elseif par.rp && ~isempty(par.file_regressor)
-                jobs{subj}.spm.stats.fmri_spec.sess(run).multi_reg = [par.file_regressor{subj}(run) ; fileRP(run)];
+%                 jobs{subj}.spm.stats.fmri_spec.sess(run).multi_reg = [par.file_regressor{subj}(run) ; fileRP(run)];
+                jobs{subj}.spm.stats.fmri_spec.sess(run).multi_reg = [par.file_regressor{subj} ; fileRP(run)];
             else
                 jobs{subj}.spm.stats.fmri_spec.sess(run).multi_reg = {''};
             end
@@ -270,12 +276,13 @@ main_dir = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_te
 subj_dir = gdir(main_dir,'PARKGAME.*[a,c]$')
 SessDir = gdir(subj_dir,'.*RS$');
 StatDir = gdir(SessDir,'model','^model_1');
+StatDir = gdir(SessDir,'model','^model_2'); %new resliced version of denoised files
 regressors_test = gfile(SessDir,'wts_multiple_regressors');
 
 par.run = 0;
 par.sge = 1;
 par.display = 0;
-par.jobname = 'spm_first_level_spec_RS';
+par.jobname = 'spm_first_level_spec_RS_wbet';
 
 [ jobs ] = job_ending_rountines( jobs, skip, par );
 %% Estimate
@@ -295,7 +302,7 @@ clear par
 %par.run = 1;
 par.sge = 1;
 par.sge_queu = 'normal,bigmem';
-par.jobname  = 'spm_first_level_est_RS';
+par.jobname  = 'spm_first_level_est_RS_wbet';
 job_first_level_estimate(fspm,par)
 
 %% Contrast estimation
@@ -303,7 +310,7 @@ job_first_level_estimate(fspm,par)
 clear par
 par.sge=1;
 par.sge_queu = 'normal,bigmem';
-par.jobname = 'spm_first_level_con_RS';
+par.jobname = 'spm_first_level_con_RS_wbet';
 
 
 EffectsOfInterest= [1 0 0 0 0 0 0 0; ...
@@ -326,3 +333,18 @@ contrast.types={'F','T','T','T','T'};
 par.delete_previous=1
 
 j=job_first_level_contrast(fspm,contrast,par)
+
+%% VOI extraction
+% fspm %check
+% fmask = gpath(e.gser('run_RS').gvol('wmask'));
+fmask = addsuffixtofilenames(StatDir, 'mask.nii');
+
+clear par
+par.roi_dir = sprintf('%s/ROI_pariet_mot_premot_cereb_BG_PPN',main_dir);
+par.jobname = 'spm_voi_ts_extract_atlas_wbet';
+
+spm_job_voi(fspm, fmask, par);
+
+clear par
+par.jobname = 'spm_voi_PCC_wbet'
+spm_job_voi_PCC(fspm,fmask,par);

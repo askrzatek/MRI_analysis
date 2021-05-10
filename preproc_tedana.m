@@ -13,13 +13,14 @@ main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek
 e_PARKGAME = exam(main_dir,'PARKGAME.*._[a,c]$');
 e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
 
+%e_PARKGAME = exam(main_dir,'PARKGAME.*._waiting$');
 e = e_PARKGAME; % (3:length(e_PARKGAME)); % choose specific
 %e = e_REMINARY;
 e.addSerie('ACTIVATION$','run_ACTIVATION',1)
 e.addSerie(        'RS$','run_RS'        ,1)
 
 %e.getSerie('run').addVolume('^f\d{3}','f',3)
-e.getSerie('run_ACT').addVolume('^v.*ACTIVATION.*nii','f',3)
+e.getSerie('run_ACTIVATION').addVolume('^v.*ACTIVATION.*nii','f',3)
 e.getSerie('run_RS').addVolume('^v.*RS.*nii','f',3)
 %e.addSerie('t1mpr_.*p2$','anat_T1',1)
 e.addSerie('t1mpr_S256_0_8iso_p2$','anat_T1',1)
@@ -102,7 +103,7 @@ else
     par.sge     = 0;
 end
 
-par.jobname  = 'job_afni_proc_multi_echo';
+par.jobname  = 'zjob_afni_proc_multi_echo';
 par.subdir   = 'afni';
 
 par.pct      = 0;
@@ -126,7 +127,7 @@ e = ec_vtd;
 
 %% do_fsl_robust_mask_epi
 
-fin = e.gser('run').gvol('^vtde1');
+fin = e.getSerie('run').gvol('^vtde1');
 
 clear par
 if CLUSTER
@@ -141,15 +142,18 @@ par.fake       = 0;
 par.redo       = 0;
 
 par.fsl_output_format = 'NIFTI_GZ';
-[job, fmask] = do_fsl_robust_mask_epi(fin, par);
+[job, fmask] = do_fsl_robust_mask_epi(fin(28), par);
 
 % copy original gz & unzip
 e.gser('run').addVolume('^bet.*vtde1.nii.gz','bet',1);
 e.gser('run').gvol('bet').removeEmpty.unzip_and_keep(par);
+%e.gser('run').addVolume('^bet.*vtde1.nii$','bet',1);
+
 
 % copy original gz mask & unzip
 e.gser('run').addVolume('^bet.*vtde1_mask.nii','mask',1);
-%e.gser('run').gvol('mask').removeEmpty.unzip_and_keep(par);
+e.gser('run').gvol('mask').removeEmpty.unzip_and_keep(par);
+%e.gser('run').addVolume('^bet.*vtde1_mask.nii$','mask',1);
 
 % %% temporal mean #obsolete !!!
 % 
@@ -258,9 +262,9 @@ clear par
 fanat = e.getSerie('anat').getVolume('^s').getPath;
 
 % Retrocompatibility for SPM:Spatial:Segment options
-par.GM        = [1 0 1 0]; % warped_space_Unmodulated(wp*) / warped_space_modulated(mwp*) / native_space(p*) / native_space_dartel_import(rp*)
-par.WM        = [1 0 1 0];
-par.CSF       = [1 0 1 0];
+par.GM        = [1 0 1 1]; % warped_space_Unmodulated(wp*) / warped_space_modulated(mwp*) / native_space(p*) / native_space_dartel_import(rp*)
+par.WM        = [1 0 1 1];
+par.CSF       = [1 0 1 1];
 par.TPMC      = [0 0 0 0];
 
 par.bias      = [1 1 0] ;  % native normalize dartel     [0 1]; % bias field / bias corrected image
@@ -477,14 +481,38 @@ else
 end
 par.type    = 'estimate_and_write';
 
-ref = e.getSerie('run');
+ref = e(28).getSerie('run');
 ref = ref(:,1).getVolume('wbet');
 e.getSerie('anat').addVolume('^wp2','wp2',1);
 e.getSerie('anat').addVolume('^wp3','wp3',1);
-src = e.getSerie('anat').getVolume('^wp2');
-oth = e.getSerie('anat').getVolume('^wp3');
+src = e(28).getSerie('anat').getVolume('^wp2');
+oth = e(28).getSerie('anat').getVolume('^wp3');
 
 job_coregister(src, ref, oth, par);
+
+% %% coregister WM & CSF resliced on voxel size 2.5 on functional
+% (warped_mean_mask) not needed if CAT12 does its job and creates the rwp2
+% & rwp3 files
+% % used for TAPAS: PhysIO
+% 
+% clear par
+% if CLUSTER
+%     par.run = 0;
+%     par.sge = 1;
+% else
+%     par.run = 1;
+%     par.sge = 0;
+% end
+% par.type    = 'estimate_and_write';
+% 
+% ref = e.getSerie('run');
+% ref = ref(:,1).getVolume('wbet');
+% e.getSerie('anat').addVolume('^wp2.*reslice','wp2_reslice',1);
+% e.getSerie('anat').addVolume('^wp3.*reslice','wp3_reslice',1);
+% src = e.getSerie('anat').getVolume('^wp2_reslice');
+% oth = e.getSerie('anat').getVolume('^wp3_reslice');
+% 
+% job_coregister(src, ref, oth, par);
 
 %% Check & Save
 e.explore

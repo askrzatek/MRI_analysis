@@ -81,6 +81,9 @@ e.getSerie('anat').addVolume('^wp0','wp0',1);
 e.getSerie('anat').addVolume('^wp2','wp2',1);
 e.getSerie('anat').addVolume('^wp3','wp3',1);
 
+e.getSerie('anat').addVolume('^rwp2','rwp2',1);
+e.getSerie('anat').addVolume('^rwp3','rwp3',1);
+
 %% 
 save ('e','e')
 %%
@@ -99,8 +102,8 @@ load e
 
 %% ts + TAPAS model
 
-% Activation
-%fvol = e.getSerie('tedana_ACTIVATION').getVolume('^wts').toJob(0);
+% % Activation
+% fvol = e.getSerie('tedana_ACTIVATION').getVolume('^wts').toJob(0);
 
 % Resting state
 fvol = e.getSerie('tedana_RS').getVolume('^wts').toJob(0);
@@ -110,7 +113,7 @@ fvol = e.getSerie('tedana_RS').getVolume('^wts').toJob(0);
 %% filter images
 avol = e.getSerie('anat').getVolume('wp0');
 %avol.path % for verification
-ROIvol = e.getSerie('anat').getVolume('^wp[2,3]');
+ROIvol = e.getSerie('anat').getVolume('^rwp[2,3]');
 
 % Activation params
 % par.outdir = {e.getSerie('tedana_ACTIVATION').path}
@@ -176,10 +179,10 @@ par.physio = 0;
 par.rp = 1;
 par.noiseROI = 1;
 par.TR = 1.600;
-rp_threshold = 1;
+par.rp_threshold = 1;
 %par.rp_threshold =  %plus bas mieux c'est
-%par.outdir = outcell(33:64); % Activation
-par.outdir = outcell(1:30); % Resting state
+%par.outdir = outcell(32:62); % Activation
+par.outdir = outcell(1:31); % Resting state
 
 par.redo = 0;
 par.display = 0;
@@ -199,7 +202,7 @@ job_physio_tapas( par )
 %   rHead               head radius in mm (default: 50 mm)
 %
 
-PSNames = {'P001_NB_S1' 'P002_BM_S1' 'P001_NB_S2' 'P002_BM_S2' 'P003_SM_S1' 'P003_SM_S2' 'P007_SD_S1' 'P008_JR_S1' 'P007_SD_S2' 'P008_JR_S2' 'P023_LJ_S1' 'P025_CA_S1' 'P027_OR_S1' 'P028_PC_S1' 'P025_CA_S2' 'P023_LJ_S2' 'P027_OR_S2' 'P028_PC_S2' 'P033_DD_S1' 'P033_DD_S2' 'P039_KM_S1' 'P040_RE_S1' 'P042_RS_S1' 'P043_PD_S1' 'P039_KM_S2' 'P044_CK_S1' 'P043_PD_S2' 'P046_HJ_S1' 'P044_CK_S2'};
+PSNames = {'P001_NB_S1' 'P002_BM_S1' 'P001_NB_S2' 'P002_BM_S2' 'P003_SM_S1' 'P003_SM_S2' 'P007_SD_S1' 'P008_JR_S1' 'P007_SD_S2' 'P008_JR_S2' 'P023_LJ_S1' 'P025_CA_S1' 'P027_OR_S1' 'P028_PC_S1' 'P025_CA_S2' 'P023_LJ_S2' 'P027_OR_S2' 'P028_PC_S2' 'P033_DD_S1' 'P033_DD_S2' 'P039_KM_S1' 'P040_RE_S1' 'P042_RS_S1' 'P043_PD_S1' 'P039_KM_S2' 'P044_CK_S1' 'P043_PD_S2' 'P046_HJ_S1' 'P044_CK_S2' 'P047_BF_S1' 'P048_SB_S1' 'P047_BF_S2' 'P048_SB_S2'};
 nsupVols_tab = [];
 
 for r = 1 : length(rp)
