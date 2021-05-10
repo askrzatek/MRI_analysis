@@ -8,16 +8,17 @@ cd      /home/anna.skrzatek/data
 
 %main_dir = fullfile(pwd,'nifti');
 
-stim_dir = fullfile(pwd,'/nifti_test/behav_test');
-main_dir = fullfile(pwd,'/nifti_test/ben');
+% stim_dir = fullfile(pwd,'/nifti_test/behav_test');
+% main_dir = fullfile(pwd,'/nifti_test/ben');
 
-% stim_dir = fullfile(pwd,'/behav');
-% main_dir = fullfile(pwd,'/nifti_test');
+stim_dir = fullfile(pwd,'/behav');
+main_dir = fullfile(pwd,'/nifti_test');
 
 %model_name = 'model_meica';
 %model_name = 'model_tedana';
 %model_name = {'model_tedana', 'model_ts_tapas'};
-model_name = {'smodel_tedana','smodel_ts_tapas'};%, 'smodel_dn_tapas'};
+%model_name = {'smodel_tedana','smodel_ts_tapas'};%, 'smodel_dn_tapas'};
+model_name  = {'rsmodel_ts_tapas'};
 
 %% fetch dirs
 cd (main_dir)
@@ -36,7 +37,7 @@ par.verbose = 2;
 
 %model_outdir1 = e.mkdir(model_name);
 model_outdir1 = e.mkdir(model_name{1});
-model_outdir2 = e.mkdir(model_name{2});
+%model_outdir2 = e.mkdir(model_name{2});
 %model_outdir3 = e.mkdir(model_name{3});
 
 
@@ -45,7 +46,7 @@ model_outdir2 = e.mkdir(model_name{2});
 e.getSerie('run_ACTIVATION').addStim(stim_dir, 'MRI_run\d{2}_SPM.mat', 'run', 1 )
 %[ec_stim, ei_stim] = e.removeIncomplete;
 stim_files = e.getSerie('run_ACTIVATION').getStim.toJob(0);
-e.getSerie('run_ACTIVATION').addVolume('.*mask.nii','mask',1)
+e.getSerie('run_ACTIVATION').addVolume('^w.*mask.nii','mask',1)
 
 % e.explore
 
@@ -55,22 +56,23 @@ par.subdir        = 'tedana009a1_vtd';
 par.sge = 0;
 par.run = 1;
 
-par.warp_file_reg = '^wdn';
-job_symbolic_child_to_parent(dir_func, par);
-
-par.warp_file_reg = '^s5wts';
-job_symbolic_child_to_parent(dir_func, par);
-
-par.warp_file_reg = '^s5wdn';
-job_symbolic_child_to_parent(dir_func, par);
+% par.warp_file_reg = '^wdn';
+% job_symbolic_child_to_parent(dir_func, par);
+% 
+% par.warp_file_reg = '^s5wts';
+% job_symbolic_child_to_parent(dir_func, par);
+% 
+% par.warp_file_reg = '^s5wdn';
+% job_symbolic_child_to_parent(dir_func, par);
 
 par.warp_file_reg = '^s6wts';
 job_symbolic_child_to_parent(dir_func, par);
 
-par.warp_file_reg = '^s6wdn';
-job_symbolic_child_to_parent(dir_func, par);
+% par.warp_file_reg = '^s6wdn';
+% job_symbolic_child_to_parent(dir_func, par);
 
 %% make a symbolic link of rp_spm.txt and of multiple_regressors to dir_func
+
 par.subdir = 'wts';
 par.regfile_regex = 'multiple_regressors.txt';
 for i= 1:length(e)
@@ -86,9 +88,14 @@ for i= 1:length(e)
     par.run = 1;
     par.jobname = sprintf('job_symbolic_link');
     %par.jobname = sprintf('%s_%s_%s', 'job_symbolic_link', wd(end-46:end-16), par.subdir);
-    [job_session(i)] = r_movefile(A_src, A_dst, 'linkn', par);
-    job = [job_session];
-    
+
+    %% reste à tester    
+    if ~exist(fullfile(wd, regfile_out))
+        [job_session(i)] = r_movefile(A_src, A_dst, 'linkn', par);
+        job = [job_session];
+    else
+        clear par
+    end
 end
 %job = do_cmd_sge(job, par);
 
@@ -109,15 +116,15 @@ par.rp = 1;
 
 addpath /home/anna.skrzatek/matvol/SPM/firstlevel/
 
-par.file_reg = '^s6wdn.*nii';
-par.rp_regex = 'rp.*txt';
-job1 = job_first_level_specify_xnat(dir_func, model_outdir1, stim_files, par);
+% par.file_reg = '^s6wdn.*nii';
+% par.rp_regex = 'rp.*txt';
+% job1 = job_first_level_specify_xnat(dir_func, model_outdir1, stim_files, par);
 
 %% ts TAPAS
 %par.rp = 1;
 par.file_reg = '^s6wts.*nii';
 par.rp_regex = 'wts_multiple_regressors.txt';
-job2 = job_first_level_specify_xnat(dir_func, model_outdir2, stim_files, par);
+job1 = job_first_level_specify_xnat(dir_func, model_outdir1, stim_files, par);
 
 % %% tedana + TAPAS
 % 
@@ -126,12 +133,12 @@ job2 = job_first_level_specify_xnat(dir_func, model_outdir2, stim_files, par);
 % par.rp_regex = 'wdn_multiple_regressors.txt';
 % job3 = job_first_level_specify(dir_func, model_outdir3, stim_files, par);
 
-jobs = [ job1 job2 ]; %job3 ];
+jobs = job1 ; %job2 ]; %job3 ];
 
 par.sge = 1;
 par.run = 0;
 par.display = 0;
-par.jobname = 'spm_glm_def';
+par.jobname = 'spm_single_glm_def';
 
 job_ending_rountines(jobs,[],par);
 
@@ -140,7 +147,7 @@ return
 %% Estimate
 
 e.addModel(model_name{1},model_name{1});
-e.addModel(model_name{2},model_name{2});
+%e.addModel(model_name{2},model_name{2});
 %e.addModel(model_name{3},model_name{3});
 %e.addModel('^model_tedana','model_tedana');
 
@@ -152,8 +159,9 @@ clear par
 par.run = 0;
 par.sge = 1;
 par.display = 0;
-par.jobname = 'spm_glm_est'
-fspm = e.getModel(cellstr2regex({model_name{1}, model_name{2}},1)).removeEmpty.toJob;
+par.jobname = 'spm_single_glm_est'
+%fspm = e.getModel(cellstr2regex({model_name{1}, model_name{2}},1)).removeEmpty.toJob;
+fspm = e.getModel(model_name{1}).removeEmpty.toJob; %% à tester
 
 job_first_level_estimate(fspm,par);
 
@@ -280,7 +288,7 @@ clear par
 par.sge = 0;
 par.run = 1;
 par.display = 0;
-par.jobname = 'spm_glm_con';
+par.jobname = 'spm_single_glm_con';
 
 % par.sessrep = 'both';
 par.sessrep = 'none';
@@ -288,7 +296,8 @@ par.sessrep = 'none';
 par.delete_previous = 1;
 par.report          = 0;
 
-fspm = e.getModel(cellstr2regex({model_name{1}, model_name{2}},1)).removeEmpty.toJob;
+%fspm = e.getModel(cellstr2regex({model_name{1}, model_name{2}},1)).removeEmpty.toJob;
+fspm = e.getModel(model_name{1}).removeEmpty.toJob; % à tester
 
 job_first_level_contrast(fspm,contrast,par);
 

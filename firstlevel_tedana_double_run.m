@@ -21,12 +21,12 @@ main_dir = fullfile(pwd,'/nifti_test');
 %model_name = 'model_meica';
 %model_name = 'model_tedana';
 %model_name = {'model_tedana', 'model_ts_tapas'};
-model_name = {'firstlevel_sts_tapas_doublerun_jan21'};%, 'smodel_ts_tapas', 'smodel_dn_tapas'};
+model_name = {'firstlevel_sts_tapas_doublerun_resliced'};%, 'smodel_ts_tapas', 'smodel_dn_tapas'};
 
 %% fetch dirs
 cd (main_dir)
 
-patient_regex = {'PARKGAMEII.*NB.*_a','PARKGAMEII.*BM.*_a','PARKGAMEII.*SM.*_c','PARKGAMEII.*SD.*_a','PARKGAMEII.*JR.*_a','PARKGAMEII.*LJ.*_c','PARKGAMEII.*CA.*_a','PARKGAMEII.*PC.*_c','PARKGAMEII.*DD.*_c','PARKGAMEII.*KM.*_a','PARKGAMEII.*PD.*_a','PARKGAMEII.*CK.*_c','PARKGAMEII.*SB.*_a'};
+patient_regex = {'PARKGAMEII.*NB.*_a','PARKGAMEII.*BM.*_a','PARKGAMEII.*SM.*_c','PARKGAMEII.*SD.*_a','PARKGAMEII.*JR.*_a','PARKGAMEII.*LJ.*_c','PARKGAMEII.*CA.*_a','PARKGAMEII.*PC.*_c','PARKGAMEII.*DD.*_c','PARKGAMEII.*KM.*_a','PARKGAMEII.*PD.*_a','PARKGAMEII.*CK.*_c','PARKGAMEII.*BF.*_c','PARKGAMEII.*SB.*_a'};
 for ip = 1 : length(patient_regex)
     clear esuj
     esuj = exam(main_dir,patient_regex{ip});
@@ -64,20 +64,20 @@ par.subdir        = 'tedana009a1_vtd';
 par.sge = 0;
 par.run = 1;
 
-par.warp_file_reg = '^wdn';
-job_symbolic_child_to_parent(dir_func, par);
+% par.warp_file_reg = '^wdn';
+% job_symbolic_child_to_parent(dir_func, par);
 
-par.warp_file_reg = '^s5wts';
-job_symbolic_child_to_parent(dir_func, par);
+%par.warp_file_reg = '^s5wts';
+%job_symbolic_child_to_parent(dir_func, par);
 
-par.warp_file_reg = '^s5wdn';
-job_symbolic_child_to_parent(dir_func, par);
+%par.warp_file_reg = '^s5wdn';
+%job_symbolic_child_to_parent(dir_func, par);
 
 par.warp_file_reg = '^s6wts';
-job_symbolic_child_to_parent(dir_func, par);
+job_symbolic_child_to_parent(dir_func_all, par);
 
-par.warp_file_reg = '^s6wdn';
-job_symbolic_child_to_parent(dir_func, par);
+%par.warp_file_reg = '^s6wdn';
+%job_symbolic_child_to_parent(dir_func, par);
 
 %% make a symbolic link of rp_spm.txt and of multiple_regressors to dir_func
 par.subdir = 'wts';
@@ -107,7 +107,7 @@ double_model_dir = get_subdir_regex(main_dir, model_name{1});
 
 %could also use the patient_regex
 %patient_list = patient_regex;
-patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_048_SB_a'};
+patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a'};
 
 for ipatient = 1: length(patient_list)
     mkdir(double_model_dir{1}, patient_list{ipatient});
@@ -123,7 +123,7 @@ par.display = 0;
 par.mask_thr = 0.1;
 %par.mask_thr = 0.07;
 par.mask = 1; % if we want to use a personalised mask
-par.mask_path = {'/home/anna.skrzatek/data/nifti_test/wmean_mask.nii'}; % specify if we want to use the mean mask, otherwise blank to get the individual warped mask
+%par.mask_path = {'/home/anna.skrzatek/data/nifti_test/wmean_mask.nii'}; % specify if we want to use the mean mask, otherwise blank to get the individual warped mask
 par.mask_path = {''};
 par.TR = 1.6;
 par.rp = 1;
