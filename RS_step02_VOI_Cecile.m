@@ -49,6 +49,10 @@ par.jobname = 'spm_firstlevel_VOI_resliced_double_wbet';
 dirROI  = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROI_pariet_mot_premot_cereb_BG_PPN';
 
 fileROI = cellstr(char(gfile(dirROI,'.*'))); %fileROI = remove_regex(fileROI,'T1');
+
+%pccmodeldir = get_subdir_regex(subj_dir,'.*RS','model','model_2');
+%fileROI = cellstr(char(gfile(pccmodeldir,'.*PCC.*.mat')));
+
 char(fileROI)
 
 %% reslice fileROI to have the same voxel size (2.5) as the func img
@@ -154,14 +158,14 @@ for iSubj = 1 : nSubj
            
             stat_dir = get_parent_path( model_dir{iSubj}(iRun) );
            
-            jobs{iSubj,iROI,iRun}.spm.stats.fmri_spec.dir = fullfile( stat_dir, sprintf('Modele_VOI__%s',roi_name) );%VOI__rCerebellum_6_Left__run1_1
+            jobs{iSubj,iROI,iRun}.spm.stats.fmri_spec.dir = fullfile( stat_dir, sprintf('Modele_VOI__%s', roi_name) ); %'PCC')); %VOI__rCerebellum_6_Left__run1_1
             jobs{iSubj,iROI,iRun}.spm.stats.fmri_spec.timing.units = 'secs';
             jobs{iSubj,iROI,iRun}.spm.stats.fmri_spec.timing.RT = 1.6;
             jobs{iSubj,iROI,iRun}.spm.stats.fmri_spec.timing.fmri_t = 16;
             jobs{iSubj,iROI,iRun}.spm.stats.fmri_spec.timing.fmri_t0 = 8;
            
             % VOI
-            voi_file = fullfile(model_dir{iSubj}{iRun},sprintf('VOI_%s_1.mat',roi_name));
+            voi_file = fullfile(model_dir{iSubj}{iRun},sprintf('VOI_%s_1.mat', roi_name)); %'PCC')); %
             voi = load(voi_file);
             jobs{iSubj,iROI,iRun}.spm.stats.fmri_spec.sess.regress(1).name = 'Y';
             jobs{iSubj,iROI,iRun}.spm.stats.fmri_spec.sess.regress(1).val = voi.Y;
