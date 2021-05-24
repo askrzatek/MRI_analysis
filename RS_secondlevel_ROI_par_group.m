@@ -142,3 +142,30 @@ for iout = 1 : length(outdirs)
         mask{iroi} = cellstr(fullfile(outdirs{iout}{iroi},'mask.nii'));
     end
 end
+
+cd (main_dir)
+
+StatD = exam(stat_dir,'deltas');
+Sessions    = {'V2_V1'}%
+
+n = 1;
+for iC = 1 : length(Conditions)
+    for iS = 1 : length(Sessions)
+        StatD.mkdir(sprintf('%s_%s',Conditions{iC},Sessions{iS}));
+        StatD.addSerie(sprintf('^%s_%s$',Conditions{iC},Sessions{iS}),sprintf('%s_%s',Conditions{iC},Sessions{iS}));
+        n = n + 1;
+        
+    end
+end
+
+outdirs = StatD.getSerie('.*') .toJob; % 7 x 1 x 108 cells
+groups  = {gRS_a, gRS_c};
+
+addpath /home/anna.skrzatek/MRI_analysis/
+
+par.run = 0;
+par.sge = 1;
+par.jobname = 'job_RS_secondlevel_auto';
+
+secondlevel_RS_matlabbatch(groups,outdirs,par)
+

@@ -28,7 +28,14 @@ for igroup = 1 : length(groups)
         %                                                           };
         jobs{ijob}.spm.stats.factorial_design.dir = outdirs{igroup}(icon);
         jobs{ijob}.spm.stats.factorial_design.des.t1.scans = spm_select('expand',groups{igroup}{icon});
-        jobs{ijob}.spm.stats.factorial_design.cov = struct('c', {}, 'cname', {}, 'iCFI', {}, 'iCC', {});
+        jobs{ijob}.spm.stats.factorial_design.cov(1).c = '<UNDEFINED>';
+        matlabbatch{1}.spm.stats.factorial_design.cov(1).cname = '<UNDEFINED>';
+        matlabbatch{1}.spm.stats.factorial_design.cov(1).iCFI = 1;
+        matlabbatch{1}.spm.stats.factorial_design.cov(1).iCC = 1;
+        matlabbatch{1}.spm.stats.factorial_design.cov(2).c = '<UNDEFINED>';
+        matlabbatch{1}.spm.stats.factorial_design.cov(2).cname = '<UNDEFINED>';
+        matlabbatch{1}.spm.stats.factorial_design.cov(2).iCFI = 1;
+        matlabbatch{1}.spm.stats.factorial_design.cov(2).iCC = 1;
         jobs{ijob}.spm.stats.factorial_design.multi_cov = struct('files', {}, 'iCFI', {}, 'iCC', {});
         jobs{ijob}.spm.stats.factorial_design.masking.tm.tm_none = 1;
         jobs{ijob}.spm.stats.factorial_design.masking.im = 1;
