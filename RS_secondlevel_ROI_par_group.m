@@ -62,8 +62,45 @@ for iC = 1 : length(Conditions)
         n = n + 1;
     end
 end
+
+
 outdirs = Stat.getSerie('.*') .toJob; % 7 x 1 x 108 cells
 groups  = {gRS_a, gRS_c};
+
+%% Regressors definition
+%% AGE
+covars{1,1} = [70
+74
+64
+76
+79
+61
+75
+66];
+
+covars{1,2} = [72
+68
+68
+72
+56
+57];
+
+%% GENDER
+covars{2,1} = [1
+1
+1
+2
+1
+1
+2
+2];
+
+covars{2,2} = [1
+2
+2
+2
+2
+1];
 
 addpath /home/anna.skrzatek/MRI_analysis/
 
@@ -71,7 +108,7 @@ par.run = 0;
 par.sge = 1;
 par.jobname = 'job_RS_secondlevel_auto';
 
-secondlevel_RS_matlabbatch(groups,outdirs,par)
+secondlevel_RS_matlabbatch(groups,outdirs,covars,par)
 
 %% models estimate
 
