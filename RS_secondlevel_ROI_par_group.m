@@ -180,29 +180,108 @@ for iout = 1 : length(outdirs)
     end
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% paired t-test models definition
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 cd (main_dir)
 
-StatD = exam(stat_dir,'deltas');
+% define outdirs
+
+StatDp = exam(stat_dir,'deltas','.*paired');
 Sessions    = {'V2_V1'}%
 
 n = 1;
 for iC = 1 : length(Conditions)
     for iS = 1 : length(Sessions)
-        StatD.mkdir(sprintf('%s_%s',Conditions{iC},Sessions{iS}));
-        StatD.addSerie(sprintf('^%s_%s$',Conditions{iC},Sessions{iS}),sprintf('%s_%s',Conditions{iC},Sessions{iS}));
+        StatDp.mkdir(sprintf('%s_%s',Conditions{iC},Sessions{iS}));
+        StatDp.addSerie(sprintf('^%s_%s$',Conditions{iC},Sessions{iS}),sprintf('%s_%s',Conditions{iC},Sessions{iS}));
         n = n + 1;
         
     end
 end
 
-outdirs = StatD.getSerie('.*') .toJob; % 7 x 1 x 108 cells
+outdirs = StatDp.getSerie('.*') .toJob; % 7 x 1 x 108 cells
+
+% define the volumes per group
 groups  = {gRS_a, gRS_c};
 
+% define models per group
 addpath /home/anna.skrzatek/MRI_analysis/
 
 par.run = 0;
 par.sge = 1;
-par.jobname = 'job_RS_secondlevel_auto';
+par.jobname = 'job_RS_paired_secondlevel_auto';
 
-secondlevel_RS_matlabbatch(groups,outdirs,par)
+secondlevel_paired_RS_matlabbatch(groups,outdirs,covars,par)
 
+%% models estimate
+clear par
+cd (main_dir)
+
+for iout = 1 : length(outdirs)
+    
+    fspm = addsuffixtofilenames(outdirs{iout}, 'SPM.mat');
+
+    par.run = 1;
+    %par.sge = 1;
+    par.sge_queu = 'normal,bigmem';
+    par.jobname  = 'spm_secondlevel_RS_est';
+    job_first_level_estimate(fspm,par)
+    
+end
+
+%% Contrast creation for each SPM.mat
+
+% t-statistics
+    V1_V2 = 1;
+    V2_V1 = -1;
+
+for iout = 1 : length(outdirs)
+    %fspm = addsuffixtofilenames(outdirs{iout},'SPM.mat');
+    modest = addsuffixtofilenames(outdirs{iout},'SPM.mat');
+    for iroi = 1 : length(modest)
+        parts = strsplit(char(modest(iroi)), '/');
+        roilabel = parts{end-1};   
+    
+        %% Contrast names
+        contrast_t.names = {
+            sprintf('Connectivity V1-V2 %s',roilabel)
+            sprintf('Connectivity V2-V1 %s',roilabel)
+            }';
+
+        %% Contrast values
+        contrast_t.values = {
+            V1_V2
+            V2_V1
+            }';
+
+        %% Contrast type
+        contrast_t.types = cat(1,repmat({'T'},[1 length(contrast_t.names)]));
+
+        contrast.names  = [contrast_t.names];
+        contrast.values = [contrast_t.values];
+        contrast.types  = [contrast_t.types];
+
+        %% Contrast : write
+        clear par
+
+        par.sge = 0;
+        par.run = 1;
+        par.display = 0;
+        par.jobname = sprintf('spm_write_%s_con',roilabel);
+
+        % par.sessrep = 'both';
+        par.sessrep = 'none';
+
+        par.delete_previous = 1;
+        par.report          = 0;
+
+        job_first_level_contrast(modest(iroi),contrast,par);
+        
+%         Stat(iout).getSerie(roilabel).addVolume('spmT_0001','main',1)
+        
+%         mainef = Stat(iout).getSerie(roilabel).getVolume('main') .toJob
+        
+        mask{iroi} = cellstr(fullfile(outdirs{iout}{iroi},'mask.nii'));
+    end
+end
