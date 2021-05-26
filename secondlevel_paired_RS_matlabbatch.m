@@ -1,4 +1,4 @@
-function matlabbatch = secondlevel_paired_RS_matlabbatch(groups,outdirs,par)
+function matlabbatch = secondlevel_paired_RS_matlabbatch(groups,outdirs,covars,par)
 %%
 
   skip = [];
@@ -19,21 +19,23 @@ for igroup = 1 : length(groups)
     for icon = 1 : length(groups{igroup})
 
         jobs{ijob}.spm.stats.factorial_design.dir = outdirs{igroup}(icon);
-        for ipatient = 1 : length(patients)
+        %nbcases = 2*length(patients);
+        nbcases = length(groups{igroup})
+        for ipatient = 1 : 2 : nbcases
 %             jobs{ijob}.spm.stats.factorial_design.des.pt.pair(ipatient).scans = {
 %                                                                           '/home/anna.skrzatek/data/nifti_test/firstlevel_RS/PARKGAMEII_001_NB_a/Caudate_L_V1/con_0001.nii,1'
 %                                                                           '/home/anna.skrzatek/data/nifti_test/firstlevel_RS/PARKGAMEII_001_NB_a/Caudate_L_V2/con_0001.nii,1'
 %                                                                           };
-            jobs{ijob}.spm.stats.factorial_design.des.pt.pair(ipatient).scans = spm_select('expand',groups{igroup}{icon}{ipatient});
+            jobs{ijob}.spm.stats.factorial_design.des.pt.pair(ipatient).scans = spm_select('expand',groups{igroup}{icon}(ipatient:ipatient+1));
         end
         jobs{ijob}.spm.stats.factorial_design.des.pt.gmsca = 0;
         jobs{ijob}.spm.stats.factorial_design.des.pt.ancova = 0;
-        jobs{ijob}.spm.stats.factorial_design.cov(1).c = '<UNDEFINED>';
-        jobs{ijob}.spm.stats.factorial_design.cov(1).cname = '<UNDEFINED>';
+        jobs{ijob}.spm.stats.factorial_design.cov(1).c = covars{1,igroup};
+        jobs{ijob}.spm.stats.factorial_design.cov(1).cname = 'Age';
         jobs{ijob}.spm.stats.factorial_design.cov(1).iCFI = 1;
         jobs{ijob}.spm.stats.factorial_design.cov(1).iCC = 1;
-        jobs{ijob}.spm.stats.factorial_design.cov(2).c = '<UNDEFINED>';
-        jobs{ijob}.spm.stats.factorial_design.cov(2).cname = '<UNDEFINED>';
+        jobs{ijob}.spm.stats.factorial_design.cov(2).c = covars{2,igroup};
+        jobs{ijob}.spm.stats.factorial_design.cov(2).cname = 'Gender';
         jobs{ijob}.spm.stats.factorial_design.cov(2).iCFI = 1;
         jobs{ijob}.spm.stats.factorial_design.cov(2).iCC = 1;
         jobs{ijob}.spm.stats.factorial_design.multi_cov = struct('files', {}, 'iCFI', {}, 'iCC', {});
