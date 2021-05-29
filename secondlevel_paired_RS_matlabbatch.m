@@ -16,17 +16,18 @@ par = complet_struct(par, defpar);
 %%
 ijob = 1;
 for igroup = 1 : length(groups)
-    for icon = 1 : length(groups{igroup})
+    iout = 1;
+    for icon = 1 : 2 : length(groups{igroup})-1
+        %icon
+        jobs{ijob}.spm.stats.factorial_design.dir = outdirs{igroup}(iout);
 
-        jobs{ijob}.spm.stats.factorial_design.dir = outdirs{igroup}(icon);
-        %nbcases = 2*length(patients);
-        nbcases = length(groups{igroup})
-        for ipatient = 1 : 2 : nbcases
+        for ipatient = 1 : length(groups{igroup}{icon})
 %             jobs{ijob}.spm.stats.factorial_design.des.pt.pair(ipatient).scans = {
 %                                                                           '/home/anna.skrzatek/data/nifti_test/firstlevel_RS/PARKGAMEII_001_NB_a/Caudate_L_V1/con_0001.nii,1'
 %                                                                           '/home/anna.skrzatek/data/nifti_test/firstlevel_RS/PARKGAMEII_001_NB_a/Caudate_L_V2/con_0001.nii,1'
 %                                                                           };
-            jobs{ijob}.spm.stats.factorial_design.des.pt.pair(ipatient).scans = spm_select('expand',groups{igroup}{icon}(ipatient:ipatient+1));
+            scans = [groups{igroup}{icon}(ipatient),groups{igroup}{icon+1}(ipatient)];
+            jobs{ijob}.spm.stats.factorial_design.des.pt.pair(ipatient).scans = spm_select('expand',scans(:));
         end
         jobs{ijob}.spm.stats.factorial_design.des.pt.gmsca = 0;
         jobs{ijob}.spm.stats.factorial_design.des.pt.ancova = 0;
@@ -38,6 +39,7 @@ for igroup = 1 : length(groups)
         jobs{ijob}.spm.stats.factorial_design.cov(2).cname = 'Gender';
         jobs{ijob}.spm.stats.factorial_design.cov(2).iCFI = 1;
         jobs{ijob}.spm.stats.factorial_design.cov(2).iCC = 1;
+%         jobs{ijob}.spm.stats.factorial_design.cov = struct('c', {}, 'cname', {}, 'iCFI', {}, 'iCC', {});
         jobs{ijob}.spm.stats.factorial_design.multi_cov = struct('files', {}, 'iCFI', {}, 'iCC', {});
         jobs{ijob}.spm.stats.factorial_design.masking.tm.tm_none = 1;
         jobs{ijob}.spm.stats.factorial_design.masking.im = 1;
@@ -49,7 +51,9 @@ for igroup = 1 : length(groups)
         spm('defaults','FMRI')
 
         ijob = ijob +1;
+        iout = iout +1;
     end
+    
 end
 
 [ jobs ] = job_ending_rountines( jobs, skip, par );

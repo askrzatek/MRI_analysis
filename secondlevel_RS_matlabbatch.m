@@ -1,4 +1,4 @@
-function matlabbatch = secondlevel_RS_matlabbatch(groups,outdirs,par)
+function matlabbatch = secondlevel_RS_matlabbatch(groups,outdirs,covars,par)
 %%
 
   skip = [];

@@ -251,7 +251,7 @@ targetUPDRSIII_Axial = [1
 %% Choice of fMRI conditions //scans, condition names 
 if ACTION
     Conditions  = {'IL','IR','RL','RR'};
-    Sessions    = {'V1','V2','V2-V1'};
+    Sessions    = {'V1','V2','V2_V1'};
 % input different groups distinction and paths for the cons we need
     fMRIObj = exam(InputfMRI,'firstlevel'); % check directory names
     fMRIObj.addSerie('PARK.*a$','a',8)
@@ -311,7 +311,7 @@ if RS
     
     ROIs = {'Caudate_L','Caudate_R','Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R','Cuneus_L','Cuneus_R','Insula_L','Insula_R','Pallidum_L','Pallidum_R','Parietal_Inf_L','Parietal_Inf_R','Parietal_Sup_L','Parietal_Sup_R','PCC','Postcentral_L','Postcentral_R','PPN_L','PPN_R','Precentral_L','Precentral_R','Precuneus_L','Precuneus_R','Putamen_L','Putamen_R','SMA_Ant_L','SMA_Ant_R','SMA_Post_L','SMA_Post_R','Thalamus_L','Thalamus_R','Vermis1_2','Vermis3','Vermis4_5','Vermis6','Vermis7','Vermis8','Vermis9','Vermis10'};
     Conditions  = ROIs;
-    Sessions    = {'V1','V2'}%,'V2-V1'};
+    Sessions    = {'V1','V2'}%,'V2_V1'};
     for iR = 1 : length(ROIs)
         for iS = 1 : length(Sessions)
             %mkdir(StatDir{:},char(sprintf('%s_%s',Conditions{iC},Sessions{iS})))
