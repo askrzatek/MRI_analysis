@@ -6,7 +6,6 @@
 
 clc
 clear all
-par.jobname = 'regression_model_spec'
 
 %% Initialise
 
@@ -56,40 +55,215 @@ covars{2} = [1
 
 %% Target regressors definition & their outdirs
 % define or create output directory
-% %RegDir = mkdir('resliced_multiple_regression')
+mkdir(main_dir,'resliced_multiple_regression')
+MultiRegDir = fullfile(main_dir,'resliced_multiple_regression')
+
 if ACTION
     RegDirC = fullfile(main_dir, '/resliced_ACT_clinic');
+    MultiRegDirC = fullfile(MultiRegDir, '/ACT_clinic');
     Clinic = {'AXIAL','GABS','UPDRSIII','UPDRSIII_AXIAL'};
     
     RegDirG = fullfile(main_dir, '/resliced_ACT_gait/Spontaneous');
+    MultiRegDirG = fullfile(MultiRegDir, '/ACT_gait/Spontaneous');
     Gait  = {'APA_AP','DA','Step_Size'};
     %Gait_up  = {'Rapid','Spontaneous'}; % the Rapid gait condition is one subject shorter - needs a separate processing
 end
 
 if RS
     RegDirC = fullfile(main_dir, '/resliced_RS_clinic');
+    MultiRegDirC = fullfile(MultiRegDir, '/RS_clinic');
     Clinic = {'AXIAL','GABS','UPDRSIII','UPDRSIII_AXIAL'};
     
     RegDirG = fullfile(main_dir, '/resliced_RS_gait/Spontaneous');
+    MultiRegDirG = fullfile(MultiRegDir, '/RS_gait/Spontaneous');
     Gait  = {'APA_AP','DA','Step_Size'};
     %Gait_up  = {'Rapid','Spontaneous'}; % the Rapid gait condition is one subject shorter - needs a separate processing
 end
 
 RegDir = horzcat({RegDirG}, {RegDirC});
+MultiRegDir = horzcat({MultiRegDirG}, {MultiRegDirC});
 model = horzcat({Gait},{Clinic});
 for imodel = 1:2
     targetmodel = model{imodel};
     for ivar = 1 : length(targetmodel)
        mkdir(RegDir{imodel},sprintf('%s',targetmodel{ivar})); % universal creation of directories depending on the chosen model
+       mkdir(MultiRegDir{imodel},sprintf('%s',targetmodel{ivar}));
         % StatDir{ivar} = fullfile(RegDir,Gait{ivar});
         StatObjG{imodel}{ivar} = exam(RegDir{imodel}, sprintf('^[r,s]%s',targetmodel{ivar})); % the Spontaneous gait condition is one subject shorter - needs a separate processing
         StatObjC{imodel}{ivar} = exam(RegDir{imodel},sprintf('^%s$',targetmodel{ivar})); % we have two of them containing UPDRSIII & AXIAL
+        MultiStatObjG{imodel}{ivar} = exam(MultiRegDir{imodel}, sprintf('^%s',targetmodel{ivar})); % the Spontaneous gait condition is one subject shorter - needs a separate processing
+        MultiStatObjC{imodel}{ivar} = exam(MultiRegDir{imodel},sprintf('^%s$',targetmodel{ivar})); % we have two of them containing UPDRSIII & AXIAL
     end
 end
 
 Stat = StatObjG{1}{1} + StatObjG{1}{2} + StatObjG{1}{3} + StatObjC{2}{1} + StatObjC{2}{2} + StatObjC{2}{3} + StatObjC{2}{4};
 Stat.explore
 
+MultiStat = MultiStatObjG{1}{1} + MultiStatObjG{1}{2} + MultiStatObjG{1}{3} + MultiStatObjC{2}{1} + MultiStatObjC{2}{2} + MultiStatObjC{2}{3} + MultiStatObjC{2}{4};
+MultiStat.explore
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% V1 regressors
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Spontan APA_AP
+targetsAPA1 = [34.7171835889
+20.8184436256
+14.0398756669
+26.6625447276
+30.8778153637
+34.7289858365
+36.4238611957
+30.6084803157
+37.3914711347
+33.3035609785
+41.7655772122
+26.2586959347
+32.1145722308
+35.176597489];
+
+%% Spontan DA
+targetsDA1 = [0.229615923
+0.2486013264
+0.2995684834
+0.2920857032
+0.2572407702
+0.2558116756
+0.1843411258
+0.2517826825
+0.1624504829
+0.2447760219
+0.2448816538
+0.2531833616
+0.2184634975
+0.1773839842];
+        
+%% Spontan Step_Size
+targetsSS1 = [257.3421060198
+461.4812761193
+249.806860919
+388.3478308826
+163.3475358607
+275.7546680306
+315.6876356933
+371.2412257681
+230.2511033831
+302.5132704199
+262.8219167263
+340.6669320703
+421.525704218
+447.2221013178];        
+
+%% Rapid APA_AP
+targetrAPA1 = [56.1860003179
+42.202244009
+19.9279281562
+38.3572741643
+43.1886233663
+63.3029794047
+57.0992020159
+61.9964561812
+42.2617161059
+53.1842418093
+51.3589704894
+61.1835358307
+51.1603131288];
+%% Rapid DA
+targetrDA1 = [0.1781937653
+0.1892911011
+0.2379586858
+0.2200210944
+0.1808432371
+0.1457373272
+0.2024911505
+0.1217863129
+0.2044142615
+0.1992642898
+0.1682406621
+0.1644736842
+0.1373089983];
+        
+%% Rapid Step_Size
+targetrSS1 = [385.33658393
+400.9512381886
+326.7006392201
+428.223371688
+398.4146093581
+502.8718930147
+484.1753627556
+200.2581921664
+424.4445720736
+407.5565252707
+513.2893254134
+507.5458941188
+517.2496431319];        
+
+%% AXIAL
+targetAxial1 = [2
+4
+7
+7
+10
+4
+1
+3
+3
+4
+8
+7
+3
+2];
+           
+%% GABS
+targetGabs1 =  [20
+28
+31
+33
+43
+28
+19
+29
+19
+18
+32
+26
+14
+18];   
+
+%% UPDRS III
+targetUPDRS1 = [17
+22
+28
+25
+36
+13
+20
+15
+23
+33
+36
+50
+20
+31];        
+           
+%% UPDRSIII-AXIAL
+targetUPDRSIII_Axial1 = [15
+18
+21
+18
+26
+9
+19
+12
+20
+29
+28
+43
+17
+29];
+          
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% V2 - V1 regressors
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Spontan APA_AP
 targetsAPA= [23.1555713831
             1.40458578
@@ -269,10 +443,10 @@ if ACTION
     fMRIObj.getSerie('a').addVolume('con.*19','IR_V1')
     fMRIObj.getSerie('a').addVolume('con.*20','IR_V2')
     
-    fMRIObj.getSerie('a').addVolume('con.*21','RR_V2-V1')
-    fMRIObj.getSerie('a').addVolume('con.*22','IR_V2-V1')
-    fMRIObj.getSerie('a').addVolume('con.*23','RL_V2-V1')
-    fMRIObj.getSerie('a').addVolume('con.*24','IL_V2-V1')
+    fMRIObj.getSerie('a').addVolume('con.*21','RR_V2_V1')
+    fMRIObj.getSerie('a').addVolume('con.*22','IR_V2_V1')
+    fMRIObj.getSerie('a').addVolume('con.*23','RL_V2_V1')
+    fMRIObj.getSerie('a').addVolume('con.*24','IL_V2_V1')
     
 %group C
     fMRIObj.getSerie('c').addVolume('con.*13','RL_V1')
@@ -285,10 +459,10 @@ if ACTION
     fMRIObj.getSerie('c').addVolume('con.*19','IR_V1')
     fMRIObj.getSerie('c').addVolume('con.*20','IR_V2')
     
-    fMRIObj.getSerie('c').addVolume('con.*21','RR_V2-V1')
-    fMRIObj.getSerie('c').addVolume('con.*22','IR_V2-V1')
-    fMRIObj.getSerie('c').addVolume('con.*23','RL_V2-V1')
-    fMRIObj.getSerie('c').addVolume('con.*24','IL_V2-V1')
+    fMRIObj.getSerie('c').addVolume('con.*21','RR_V2_V1')
+    fMRIObj.getSerie('c').addVolume('con.*22','IR_V2_V1')
+    fMRIObj.getSerie('c').addVolume('con.*23','RL_V2_V1')
+    fMRIObj.getSerie('c').addVolume('con.*24','IL_V2_V1')
     
 end
 
@@ -339,7 +513,23 @@ end
 
 %% this part will probably become in common with the RS processing
 n = 1;
+c = 1;
 for iC = 1 : length(Conditions)
+    MultiStat.mkdir(sprintf('%s',Conditions{iC}));
+    MultiStat.addSerie(sprintf('^%s$',Conditions{iC}),sprintf('%s',Conditions{iC}));
+    if ACTION
+        multicons_a{c} = fMRIObj.getSerie('a').getVolume(sprintf('^%s_V1$',Conditions{iC})) %.toJob;
+        multigcons_a{c} = cellstr(multicons_a{c}(:) .toJob)
+        multicons_c{c} = fMRIObj.getSerie('c').getVolume(sprintf('^%s_V1$',Conditions{iC})) %.toJob;
+        multigcons_c{c} = cellstr(multicons_c{c}(:) .toJob)
+    end
+    if RS
+        RS_a{c}   = RSObj_a.getSerie(sprintf('%s_V1',Conditions{iC})).getVolume(sprintf('%s_V1',Conditions{iC})) %.toJob;
+        gRS_a{c} = cellstr(RS_a{c}(:) .toJob)            
+        RS_c{c}  = RSObj_c.getSerie(sprintf('%s_V1',Conditions{iC})).getVolume(sprintf('%s_V1',Conditions{iC})) %.toJob;
+        gRS_c{c} = cellstr(RS_c{c}(:) .toJob)
+    end
+    c = c + 1;
     for iS = 1 : length(Sessions)
         %mkdir(StatDir{:},char(sprintf('%s_%s',Conditions{iC},Sessions{iS})))
         Stat.mkdir(sprintf('%s_%s',Conditions{iC},Sessions{iS}));
@@ -366,9 +556,11 @@ for iC = 1 : length(Conditions)
 end
 if ACTION
     outdirs = Stat.getSerie('[R,I]') .toJob; % 7 x 1 x 12 cells
+    multioutdirs = MultiStat.getSerie('[R,I]') .toJob;
 end
 if RS
     outdirs = Stat.getSerie('.*') .toJob; % 7 x 1 x 108 cells
+    multioutdirs = MultiStat.getSerie('.*') .toJob;
 end
 
 addpath /home/anna.skrzatek/MRI_analysis/
@@ -385,11 +577,27 @@ if ACTION
     target_regressors.name  = {Stat.name};
     target_regressors.value = {targetsAPA,targetsDA,targetsSS, targetAxial,targetGabs,targetUPDRS,targetUPDRSIII_Axial}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
 %     target_regressors.value = {targetrAPA,targetrDA,targetrSS};
-    cellstr(cons_a{1}.path))
+    %cellstr(cons_a{1}.path)
     %cons_c
     
     regression_model_spec(outdirs, gcons_a, gcons_c, covars, target_regressors, par)
+    
+%% Multiregression V1 all in    
+    
+    par.run = 0;
+    par.sge = 1;
+    par.jobname = 'ACT_multireg_model_spec';
+    par.nb_cond = length(multioutdirs);
+    par.nb_cons = length(multioutdirs{1});
+    target_regressors.name  = {MultiStat.name};
+    target_regressors.value = {targetsAPA1,targetsDA1,targetsSS1, targetAxial1,targetGabs1,targetUPDRS1,targetUPDRSIII_Axial1}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
 
+    %cellstr(multicons_a{1}.path)
+    %cons_c
+    
+    multiregression_model_spec(multioutdirs, multigcons_a, multigcons_c, covars, target_regressors, par)
+    
+    
  
 end
 

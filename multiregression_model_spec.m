@@ -36,10 +36,10 @@ for i = 1 : par.nb_cond % a loop for each target regressor
 
         %%
         jobs{ijob}.spm.stats.factorial_design.dir = outdir{i}(iout);
-        cons{1,:} = cons_a;
-        cons{2,:} = cons_c;
+        cons{iout} = [cons_a{1,iout};cons_c{1,iout}];
+        %cons{2,iout} = cons_c{iout};
         
-        jobs{ijob}.spm.stats.factorial_design.des.mreg.scans = spm_select('expand',cons{:,{iout}});
+        jobs{ijob}.spm.stats.factorial_design.des.mreg.scans = spm_select('expand',cons{iout});
         %%
         %%
         jobs{ijob}.spm.stats.factorial_design.des.mreg.mcov.c = target_regressor.value{i};
@@ -48,13 +48,13 @@ for i = 1 : par.nb_cond % a loop for each target regressor
         jobs{ijob}.spm.stats.factorial_design.des.mreg.mcov.iCC = 1;
         jobs{ijob}.spm.stats.factorial_design.des.mreg.incint = 1;
         %%
-        jobs{ijob}.spm.stats.factorial_design.cov(1).c = covars{1,:};
+        jobs{ijob}.spm.stats.factorial_design.cov(1).c = covars{1};
         %%
         jobs{ijob}.spm.stats.factorial_design.cov(1).cname = 'Age';
         jobs{ijob}.spm.stats.factorial_design.cov(1).iCFI = 1;
         jobs{ijob}.spm.stats.factorial_design.cov(1).iCC = 1;
         %%
-        jobs{ijob}.spm.stats.factorial_design.cov(2).c = covars{2,:};
+        jobs{ijob}.spm.stats.factorial_design.cov(2).c = covars{2};
         %%
         jobs{ijob}.spm.stats.factorial_design.cov(2).cname = 'Gender';
         jobs{ijob}.spm.stats.factorial_design.cov(2).iCFI = 1;
