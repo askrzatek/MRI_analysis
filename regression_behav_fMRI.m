@@ -524,10 +524,10 @@ for iC = 1 : length(Conditions)
         multigcons_c{c} = cellstr(multicons_c{c}(:) .toJob)
     end
     if RS
-        RS_a{c}   = RSObj_a.getSerie(sprintf('%s_V1',Conditions{iC})).getVolume(sprintf('%s_V1',Conditions{iC})) %.toJob;
-        gRS_a{c} = cellstr(RS_a{c}(:) .toJob)            
-        RS_c{c}  = RSObj_c.getSerie(sprintf('%s_V1',Conditions{iC})).getVolume(sprintf('%s_V1',Conditions{iC})) %.toJob;
-        gRS_c{c} = cellstr(RS_c{c}(:) .toJob)
+        multiRS_a{c}   = RSObj_a.getSerie(sprintf('%s_V1$',Conditions{iC})).getVolume(sprintf('^%s_V1$',Conditions{iC})) %.toJob;
+        multigRS_a{c} = cellstr(multiRS_a{c}(:) .toJob)            
+        multiRS_c{c}  = RSObj_c.getSerie(sprintf('%s_V1$',Conditions{iC})).getVolume(sprintf('^%s_V1$',Conditions{iC})) %.toJob;
+        multigRS_c{c} = cellstr(multiRS_c{c}(:) .toJob)
     end
     c = c + 1;
     for iS = 1 : length(Sessions)
@@ -617,6 +617,21 @@ if RS
 
     regression_model_spec(outdirs, gRS_a, gRS_c, covars, target_regressors, par)
     
+    %% Multiregression V1 all in    
+    
+    par.run = 0;
+    par.sge = 1;
+    par.jobname = 'RS_multireg_model_spec';
+    par.nb_cond = length(multioutdirs);
+    par.nb_cons = length(multioutdirs{1});
+    target_regressors.name  = {MultiStat.name};
+    target_regressors.value = {targetsAPA1,targetsDA1,targetsSS1, targetAxial1,targetGabs1,targetUPDRS1,targetUPDRSIII_Axial1}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
+
+    %cellstr(multicons_a{1}.path)
+    %cons_c
+    
+    multiregression_model_spec(multioutdirs, multigRS_a, multigRS_c, covars, target_regressors, par)
+
 
 %%
  
@@ -628,12 +643,16 @@ cd (main_dir)
 
 for iout = 1 : length(outdirs)
     fspm = addsuffixtofilenames(outdirs{iout}, 'SPM.mat');
+    multifspm = addsuffixtofilenames(multioutdirs{iout}, 'SPM.mat');
 
     par.run = 1;
     %par.sge = 1;
     par.sge_queu = 'normal,bigmem';
     par.jobname  = sprintf('spm_reg_model_est_%s',target_regressors.name{iout});
     job_first_level_estimate(fspm,par)
+
+    par.jobname  = sprintf('spm_multireg_model_est_%s',target_regressors.name{iout});
+    job_first_level_estimate(multifspm,par)
 end
 
 %% Contrast creation for each SPM.mat
@@ -701,6 +720,69 @@ for iout = 1 : length(outdirs)
 % %       V = SPM.xVol.S;
 % %       [pTFCE_Z, pTFCE_p] = pTFCE(char(mainef),mask, rD, V)
 % %       [pTFCE_Z, pTFCE_p] = pTFCE(char(diffef),mask, rD, V)
+        
+    end
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Multiregression
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Contrast creation for each SPM.mat
+% F-statistics
+    Correlation = [1 1 0 0] ;
+
+for iout = 1 : length(multioutdirs)
+    modest = addsuffixtofilenames(multioutdirs{iout},'SPM.mat');
+    for iroi = 1 : length(modest)
+        parts = strsplit(char(modest(iroi)), '/');
+        roilabel = parts{end-1};   
+    
+        %% Contrast names
+        contrast_T.names = {
+            sprintf('Correlation_%s_on_%s',target_regressors.name{iout},roilabel)}';
+
+        %% Contrast values
+        contrast_T.values = {
+            Correlation}';
+
+        %% Contrast type
+        contrast_T.types = cat(1,repmat({'T'},[1 length(contrast_T.names)]));
+
+        contrast.names  = [contrast_T.names];
+        contrast.values = [contrast_T.values];
+        contrast.types  = [contrast_T.types];
+
+        %% Contrast : write
+        clear par
+
+        par.sge = 0;
+        par.run = 1;
+        par.display = 0;
+        par.jobname = sprintf('spm_write_%s_%s_con',target_regressors.name{iout},roilabel);
+
+        % par.sessrep = 'both';
+        par.sessrep = 'none';
+
+        par.delete_previous = 1;
+        par.report          = 0;
+
+        job_first_level_contrast(modest(iroi),contrast,par);
+        
+        Stat(iout).getSerie(roilabel).addVolume('spmT_0001','corel',1)
+        corelef = Stat(iout).getSerie(roilabel).getVolume('corel') .toJob
+        mask{iroi} = cellstr(fullfile(outdirs{iout}{iroi},'mask.nii'));
+        
+        %% pTFCE toolbox for all con_001 & con_002 in our outdirs
+        addpath /network/lustre/iss01/cenir/software/irm/spm12/toolbox/pTFCE/
+        
+%         [mpTFCE_Z, mpTFCE_p] = pTFCE_adapt(modest{iroi}, char(corelef))
+%         still testing : error Assignment has fewer non-singleton rhs dimensions than non-singleton subscripts Error in pTFCE (line 179) PVC(:,:,:,hi)=pvc;
+
+% %       [pTFCE_Z, pTFCE_p] = pTFCE(imgZ,mask, Rd, V, Nh, Zest, C, verbose)        
+% %       load (char(modest{iroi}))
+% %       rD = SPM.xVol.R(4);
+% %       V = SPM.xVol.S;
+% %       [pTFCE_Z, pTFCE_p] = pTFCE(char(corelef),mask, rD, V)
         
     end
 end
