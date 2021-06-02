@@ -8,6 +8,7 @@ parts = strsplit(SPMpath, '/');
 SPMparent = sprintf('/%s/%s/%s/%s/%s/%s/%s/%s/%s/%s/%s/%s/%s/',parts{2:end-1});
 mask = fullfile(SPMparent,'mask.nii');
 
-[pTFCE_Z, pTFCE_p] = pTFCE(con, mask, rD, V);
+imgZ = niftiread(con);
+[pTFCE_Z, pTFCE_p] = pTFCE(imgZ, mask, rD, V);
 
 end
