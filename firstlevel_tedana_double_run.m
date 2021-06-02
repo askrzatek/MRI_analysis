@@ -104,6 +104,8 @@ end
 
 mkdir(main_dir, model_name{1});
 double_model_dir = get_subdir_regex(main_dir, model_name{1});
+%double_model_dir = get_subdir_regex(main_dir, 'firstlevel_RS');
+
 
 %could also use the patient_regex
 %patient_list = patient_regex;
@@ -237,10 +239,16 @@ if par.sessrep == 'none'
             'IMAGINARY_Right - Rest_S2'
 
             %Add the S1 vs S2 contrasts
-            'REAL_Right_S2 - S1'
-            'IMAGINARY_Right_S2 - S1'
-            'REAL_Left_S2 - S1'
-            'IMAGINARY_Left_S2 - S1'
+            'REAL_Right_S2 > S1'
+            'IMAGINARY_Right_S2 > S1'
+            'REAL_Left_S2 > S1'
+            'IMAGINARY_Left_S2 > S1'
+            
+            'REAL_Right_S1 > S2'
+            'IMAGINARY_Right_S1 > S2'
+            'REAL_Left_S1 > S2'
+            'IMAGINARY_Left_S1 > S2'
+            
 
             %% complementary individual contrasts
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -289,6 +297,11 @@ if par.sessrep == 'none'
             IMAGINARY_Right_S2 - IMAGINARY_Right_S1
             REAL_Left_S2 - REAL_Left_S1
             IMAGINARY_Left_S2 - IMAGINARY_Left_S1
+            
+            REAL_Right_S1 - REAL_Right_S2
+            IMAGINARY_Right_S1 - IMAGINARY_Right_S2
+            REAL_Left_S1 - REAL_Left_S2
+            IMAGINARY_Left_S1 - IMAGINARY_Left_S2
 
             %% complementary individual contrasts
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
