@@ -12,8 +12,8 @@ clear all
 main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
 cd (main_dir)
 
-ACTION = 1;
-RS = 0;
+ACTION = 0;
+RS = 1;
 
 % define input directory
 InputfMRI = fullfile(main_dir,'/doublerun_sts_tapas_resliced');
@@ -524,9 +524,9 @@ for iC = 1 : length(Conditions)
         multigcons_c{c} = cellstr(multicons_c{c}(:) .toJob)
     end
     if RS
-        multiRS_a{c}   = RSObj_a.getSerie(sprintf('%s_V1$',Conditions{iC})).getVolume(sprintf('^%s_V1$',Conditions{iC})) %.toJob;
+        multiRS_a{c}   = RSObj_a.getSerie(sprintf('%s_V1',Conditions{iC})).getVolume(sprintf('^%s_V1$',Conditions{iC})) %.toJob;
         multigRS_a{c} = cellstr(multiRS_a{c}(:) .toJob)            
-        multiRS_c{c}  = RSObj_c.getSerie(sprintf('%s_V1$',Conditions{iC})).getVolume(sprintf('^%s_V1$',Conditions{iC})) %.toJob;
+        multiRS_c{c}  = RSObj_c.getSerie(sprintf('%s_V1',Conditions{iC})).getVolume(sprintf('^%s_V1$',Conditions{iC})) %.toJob;
         multigRS_c{c} = cellstr(multiRS_c{c}(:) .toJob)
     end
     c = c + 1;
@@ -632,7 +632,6 @@ if RS
     
     multiregression_model_spec(multioutdirs, multigRS_a, multigRS_c, covars, target_regressors, par)
 
-
 %%
  
 end
@@ -648,6 +647,7 @@ for iout = 1 : length(outdirs)
     par.run = 1;
     %par.sge = 1;
     par.sge_queu = 'normal,bigmem';
+    
     par.jobname  = sprintf('spm_reg_model_est_%s',target_regressors.name{iout});
     job_first_level_estimate(fspm,par)
 
@@ -708,19 +708,12 @@ for iout = 1 : length(outdirs)
         mask{iroi} = cellstr(fullfile(outdirs{iout}{iroi},'mask.nii'));
         
         %% pTFCE toolbox for all con_001 & con_002 in our outdirs
+%% % sadly we still don't know how to transform variable to img - computation works, but no file is created
         addpath /network/lustre/iss01/cenir/software/irm/spm12/toolbox/pTFCE/
         
-%         [mpTFCE_Z, mpTFCE_p] = pTFCE_adapt(modest{iroi}, char(mainef))
-%         [dpTFCE_Z, dpTFCE_p] = pTFCE_adapt(modest{iroi}, char(diffef))
-%         still testing : error Assignment has fewer non-singleton rhs dimensions than non-singleton subscripts Error in pTFCE (line 179) PVC(:,:,:,hi)=pvc;
-
-% %       [pTFCE_Z, pTFCE_p] = pTFCE(imgZ,mask, Rd, V, Nh, Zest, C, verbose)        
-% %       load (char(modest{iroi}))
-% %       rD = SPM.xVol.R(4);
-% %       V = SPM.xVol.S;
-% %       [pTFCE_Z, pTFCE_p] = pTFCE(char(mainef),mask, rD, V)
-% %       [pTFCE_Z, pTFCE_p] = pTFCE(char(diffef),mask, rD, V)
-        
+        [MpTFCE_Z, MpTFCE_p] = pTFCE_adapt(modest{iroi}, char(mainef));
+        [DpTFCE_Z, DpTFCE_p] = pTFCE_adapt(modest{iroi}, char(diffef));
+ 
     end
 end
 
@@ -729,7 +722,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Contrast creation for each SPM.mat
 % F-statistics
-    Correlation = [1 1 0 0] ;
+    PosCorrelation = [0 0 0 1] ;
+    NegCorrelation = [0 0 0 -1] ;
 
 for iout = 1 : length(multioutdirs)
     modest = addsuffixtofilenames(multioutdirs{iout},'SPM.mat');
@@ -739,11 +733,13 @@ for iout = 1 : length(multioutdirs)
     
         %% Contrast names
         contrast_T.names = {
-            sprintf('Correlation_%s_on_%s',target_regressors.name{iout},roilabel)}';
+            sprintf('Pos correlation_%s_on_%s',target_regressors.name{iout},roilabel)
+            sprintf('Neg correlation_%s_on_%s',target_regressors.name{iout},roilabel)}';
 
         %% Contrast values
         contrast_T.values = {
-            Correlation}';
+            PosCorrelation
+            NegCorrelation}';
 
         %% Contrast type
         contrast_T.types = cat(1,repmat({'T'},[1 length(contrast_T.names)]));
@@ -768,21 +764,19 @@ for iout = 1 : length(multioutdirs)
 
         job_first_level_contrast(modest(iroi),contrast,par);
         
-        Stat(iout).getSerie(roilabel).addVolume('spmT_0001','corel',1)
-        corelef = Stat(iout).getSerie(roilabel).getVolume('corel') .toJob
-        mask{iroi} = cellstr(fullfile(outdirs{iout}{iroi},'mask.nii'));
+        MultiStat(iout).getSerie(roilabel).addVolume('spmT_0001','positive',1)
+        MultiStat(iout).getSerie(roilabel).addVolume('spmT_0002','negative',1)
+        poscorel = MultiStat(iout).getSerie(roilabel).getVolume('positive') .toJob
+        negcorel = MultiStat(iout).getSerie(roilabel).getVolume('negative') .toJob
+        %mask{iroi} = cellstr(fullfile(multioutdirs{iout}{iroi},'mask.nii'));
         
         %% pTFCE toolbox for all con_001 & con_002 in our outdirs
+%% % sadly we still don't know how to transform variable to img - computation works, but no file is created
+
         addpath /network/lustre/iss01/cenir/software/irm/spm12/toolbox/pTFCE/
         
-%         [mpTFCE_Z, mpTFCE_p] = pTFCE_adapt(modest{iroi}, char(corelef))
-%         still testing : error Assignment has fewer non-singleton rhs dimensions than non-singleton subscripts Error in pTFCE (line 179) PVC(:,:,:,hi)=pvc;
-
-% %       [pTFCE_Z, pTFCE_p] = pTFCE(imgZ,mask, Rd, V, Nh, Zest, C, verbose)        
-% %       load (char(modest{iroi}))
-% %       rD = SPM.xVol.R(4);
-% %       V = SPM.xVol.S;
-% %       [pTFCE_Z, pTFCE_p] = pTFCE(char(corelef),mask, rD, V)
+        [PpTFCE_Z, PpTFCE_p] = pTFCE_adapt(modest{iroi}, char(poscorel));
+        [NpTFCE_Z, NpTFCE_p] = pTFCE_adapt(modest{iroi}, char(negcorel));
         
     end
 end
