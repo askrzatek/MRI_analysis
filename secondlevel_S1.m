@@ -159,7 +159,7 @@ model_contrast = {contrast_2x2_LxT};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% fetch dirs for SPM
 %% Load files from multiple folders
-main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti');
+main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
 
 %e_PARKGAME = exam(main_dir,'PARKGAME');
 %e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
@@ -169,7 +169,7 @@ main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek
 %e = {e_REMINARY_S1};
 %dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_REM_S1');
 
-e_PARKGAME_S1 = exam(main_dir,'PARKGAME.*1'); % taking into account all S1 patients
+e_PARKGAME_S1 = exam(main_dir,'PARKGAME.*V1_[a,c]$'); % taking into account all S1 patients
 
 e = {e_PARKGAME_S1};
 dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_PARK_S1');
@@ -182,7 +182,8 @@ if done ==1
     for i = 1:length(e)
         %e{i}.explore
         %'REMINARY_\w{2}_.*1$'
-        e{i}.addSerie('model_tedana$','contrasts',1)
+%        e{i}.addSerie('model_tedana$','contrasts',1)
+        e{i}.addSerie('rsmodel_ts_tapas$','contrasts',1)
 
         e{i}.getSerie('contrasts').addVolume('^scon_0008','REAL_L',1)
         e{i}.getSerie('contrasts').addVolume('^scon_0010','IMA_L',1)
@@ -200,7 +201,8 @@ else
     for i = 1:length(e)
         %e{i}.explore
         %'REMINARY_\w{2}_.*1$'
-        e{i}.addSerie('model_tedana$','contrasts',1)
+%        e{i}.addSerie('model_tedana$','contrasts',1)
+        e{i}.addSerie('rsmodel_ts_tapas','contrasts',1)
 
         e{i}.getSerie('contrasts').addVolume('^con_0008','REAL_L',1)
         e{i}.getSerie('contrasts').addVolume('^con_0010','IMA_L',1)
