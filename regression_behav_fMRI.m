@@ -12,8 +12,8 @@ clear all
 main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
 cd (main_dir)
 
-ACTION = 0;
-RS = 1;
+ACTION = 1;
+RS = 0;
 
 % define input directory
 InputfMRI = fullfile(main_dir,'/doublerun_sts_tapas_resliced');
@@ -425,7 +425,7 @@ targetUPDRSIII_Axial = [1
 %% Choice of fMRI conditions //scans, condition names 
 if ACTION
     Conditions  = {'IL','IR','RL','RR'};
-    Sessions    = {'V1','V2','V2_V1'};
+    Sessions    = {'V1','V2','V2_V1','V1_V2'};
 % input different groups distinction and paths for the cons we need
     fMRIObj = exam(InputfMRI,'firstlevel'); % check directory names
     fMRIObj.addSerie('PARK.*a$','a',8)
@@ -447,7 +447,12 @@ if ACTION
     fMRIObj.getSerie('a').addVolume('con.*22','IR_V2_V1')
     fMRIObj.getSerie('a').addVolume('con.*23','RL_V2_V1')
     fMRIObj.getSerie('a').addVolume('con.*24','IL_V2_V1')
-    
+
+    fMRIObj.getSerie('a').addVolume('con.*25','RR_V1_V2')
+    fMRIObj.getSerie('a').addVolume('con.*26','IR_V1_V2')
+    fMRIObj.getSerie('a').addVolume('con.*27','RL_V1_V2')
+    fMRIObj.getSerie('a').addVolume('con.*28','IL_V1_V2')
+
 %group C
     fMRIObj.getSerie('c').addVolume('con.*13','RL_V1')
     fMRIObj.getSerie('c').addVolume('con.*14','RL_V2')
@@ -463,6 +468,11 @@ if ACTION
     fMRIObj.getSerie('c').addVolume('con.*22','IR_V2_V1')
     fMRIObj.getSerie('c').addVolume('con.*23','RL_V2_V1')
     fMRIObj.getSerie('c').addVolume('con.*24','IL_V2_V1')
+    
+    fMRIObj.getSerie('c').addVolume('con.*25','RR_V1_V2')
+    fMRIObj.getSerie('c').addVolume('con.*26','IR_V1_V2')
+    fMRIObj.getSerie('c').addVolume('con.*27','RL_V1_V2')
+    fMRIObj.getSerie('c').addVolume('con.*28','IL_V1_V2')
     
 end
 
@@ -483,7 +493,8 @@ if RS
     RSObj_a = exam(InputRS,'PARK.*a$');
     RSObj_c = exam(InputRS,'PARK.*[c,DD]$');
     
-    ROIs = {'Caudate_L','Caudate_R','Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R','Cuneus_L','Cuneus_R','Insula_L','Insula_R','Pallidum_L','Pallidum_R','Parietal_Inf_L','Parietal_Inf_R','Parietal_Sup_L','Parietal_Sup_R','PCC','Postcentral_L','Postcentral_R','PPN_L','PPN_R','Precentral_L','Precentral_R','Precuneus_L','Precuneus_R','Putamen_L','Putamen_R','SMA_Ant_L','SMA_Ant_R','SMA_Post_L','SMA_Post_R','Thalamus_L','Thalamus_R','Vermis1_2','Vermis3','Vermis4_5','Vermis6','Vermis7','Vermis8','Vermis9','Vermis10'};
+%     ROIs = {'Caudate_L','Caudate_R','Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R','Cuneus_L','Cuneus_R','Insula_L','Insula_R','Pallidum_L','Pallidum_R','Parietal_Inf_L','Parietal_Inf_R','Parietal_Sup_L','Parietal_Sup_R','PCC','Postcentral_L','Postcentral_R','PPN_L','PPN_R','Precentral_L','Precentral_R','Precuneus_L','Precuneus_R','Putamen_L','Putamen_R','SMA_Ant_L','SMA_Ant_R','SMA_Post_L','SMA_Post_R','Thalamus_L','Thalamus_R','Vermis1_2','Vermis3','Vermis4_5','Vermis6','Vermis7','Vermis8','Vermis9','Vermis10'};
+    ROIs = {'SMA_face_L','SMA_face_R','SMA_foot_L','SMA_foot_R','SMA_hand_L','SMA_hand_R'};
     Conditions  = ROIs;
     Sessions    = {'V1','V2'}%,'V2_V1'};
     for iR = 1 : length(ROIs)
