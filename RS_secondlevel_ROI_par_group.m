@@ -8,9 +8,9 @@ stat_dir = fullfile(main_dir,'resliced_secondlevel_RS');
 
 cd (main_dir)
 
-Stat = exam(stat_dir,'PARK');
+Stat = exam(stat_dir,'PARK'); % 'PARK_V1');
 
-InputRS   = fullfile(main_dir,'firstlevel_RS'); % newly created - PCC models missing
+InputRS   = fullfile(main_dir,'firstlevel_RS'); % newly created - SMA hand/foot/face models missing
 
 patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a'};
 
@@ -21,8 +21,11 @@ patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c
     
 RSObj_a = exam(InputRS,'PARK.*a$');
 RSObj_c = exam(InputRS,'PARK.*[c,DD]$');
+RS_all = exam( InputRS,'PARK.*a$') + exam(InputRS,'PARK.*[c,DD]$');
 
-ROIs = {'Caudate_L','Caudate_R','Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R','Cuneus_L','Cuneus_R','Insula_L','Insula_R','Pallidum_L','Pallidum_R','Parietal_Inf_L','Parietal_Inf_R','Parietal_Sup_L','Parietal_Sup_R','PCC','Postcentral_L','Postcentral_R','PPN_L','PPN_R','Precentral_L','Precentral_R','Precuneus_L','Precuneus_R','Putamen_L','Putamen_R','SMA_Ant_L','SMA_Ant_R','SMA_Post_L','SMA_Post_R','Thalamus_L','Thalamus_R','Vermis1_2','Vermis3','Vermis4_5','Vermis6','Vermis7','Vermis8','Vermis9','Vermis10'};
+ROIs = {'Caudate_L','Caudate_R','Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R','Cuneus_L','Cuneus_R','Insula_L','Insula_R','Pallidum_L','Pallidum_R','Parietal_Inf_L','Parietal_Inf_R','Parietal_Sup_L','Parietal_Sup_R','PCC','Postcentral_L','Postcentral_R','PPN_L','PPN_R','Precentral_L','Precentral_R','Precuneus_L','Precuneus_R','Putamen_L','Putamen_R','SMA_Ant_L','SMA_Ant_R','SMA_Face_L','SMA_Face_R','SMA_Foot_L','SMA_Foot_R','SMA_Hand_L','SMA_Hand_R','SMA_Post_L','SMA_Post_R','Thalamus_L','Thalamus_R','Vermis1_2','Vermis3','Vermis4_5','Vermis6','Vermis7','Vermis8','Vermis9','Vermis10'};
+%ROIs = {'SMA_Ant_L','SMA_Ant_R','SMA_Face_L','SMA_Face_R','SMA_Foot_L','SMA_Foot_R','SMA_Hand_L','SMA_Hand_R','SMA_Post_L','SMA_Post_R'};
+%ROIs = {'Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R'};
 Conditions  = ROIs;
 Sessions    = {'V1','V2'}%,'V2-V1'};
 
@@ -40,8 +43,15 @@ for iR = 1 : length(ROIs)
 
         % GROUP C add volumes for each contrast - each individual
         RSObj_c.getSerie(sprintf('%s_%s',ROIs{iR},Sessions{iS})).addVolume('con.*01',sprintf('%s_%s',ROIs{iR},Sessions{iS}))
+        
     end
+    % FIRSTLEVEL for ALL PARKs add volumes for each ROI's contrast
+     
+     RS_all.addSerie(sprintf('%s_V1$',ROIs{iR}),sprintf('%s_V1',ROIs{iR}),1);
+     RS_all.getSerie(sprintf('%s_V1$',ROIs{iR})).addVolume('con.*01',sprintf('%s_V1_con$',ROIs{iR}))
 end
+
+clear RS_allcell gRS_all
 
 n = 1;
 for iC = 1 : length(Conditions)
@@ -59,13 +69,17 @@ for iC = 1 : length(Conditions)
         gRS_a{n} = cellstr(RS_a{n}(:) .toJob)            
         RS_c{n}  = RSObj_c.getSerie(sprintf('%s_%s',Conditions{iC},Sessions{iS})).getVolume(sprintf('%s_%s',Conditions{iC},Sessions{iS})) %.toJob;
         gRS_c{n} = cellstr(RS_c{n}(:) .toJob)
+        
         n = n + 1;
     end
+    RS_allcell{iC} = RS_all.getSerie(sprintf('%s_V1',Conditions{iC})).getVolume(sprintf('%s_V1',Conditions{iC})) %.toJob;
+    gRS_all{iC} = cellstr(RS_allcell{iC}(:) .toJob)        
 end
 
 
-outdirs = Stat.getSerie('.*') .toJob; % 7 x 1 x 108 cells
+outdirs = Stat.getSerie('Cereb.*V1') .toJob; % 7 x 1 x 108 cells
 groups  = {gRS_a, gRS_c};
+group_V1 = gRS_all;
 
 %% Regressors definition
 %% AGE
@@ -102,7 +116,7 @@ covars{2,2} = [1
 2
 1];
 
-%%
+%% per group
 addpath /home/anna.skrzatek/MRI_analysis/
 
 par.run = 0;
@@ -110,6 +124,19 @@ par.sge = 1;
 par.jobname = 'job_RS_secondlevel_auto';
 
 secondlevel_RS_matlabbatch(groups,outdirs,covars,par)
+
+%% V1 session only
+addpath /home/anna.skrzatek/MRI_analysis/
+
+par.run = 0;
+par.sge = 1;
+par.jobname = 'job_RS_V1_secondlevel_Cereb_auto';
+
+covars_V1{1,1} = vertcat(covars{1,1},covars{1,2});
+covars_V1{2,1} = vertcat(covars{2,1},covars{2,2});
+groups_combined = {group_V1};
+
+secondlevel_RS_matlabbatch(groups_combined,outdirs(1),covars_V1,par)
 
 %% models estimate
 
