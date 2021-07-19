@@ -73,9 +73,10 @@ job_symbolic_child_to_parent(dir_func, par);
 
 %% make a symbolic link of rp_spm.txt and of multiple_regressors to dir_func
 
-par.subdir = 'wts';
-par.regfile_regex = 'multiple_regressors.txt';
+
 for i= 1:length(e)
+    par.subdir = 'wts';
+    par.regfile_regex = 'multiple_regressors.txt';
     wd = e(i).getSerie('run_ACTIVATION').path;
     reg_dir = char(get_subdir_regex(wd, par.subdir));
     A_src = fullfile(reg_dir, par.regfile_regex);
