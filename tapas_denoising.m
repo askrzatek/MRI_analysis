@@ -12,8 +12,9 @@ cd (main_dir)
 
 e_PARKGAME = exam(main_dir,'PARKGAME.*[a,c]$');
 %e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
+e_PARKGAME_exclu = exam(main_dir,'PARKGAME.*exclu$');
 
-e = e_PARKGAME; %+ e_REMINARY; % (3:length(e_PARKGAME)); % choose specific
+e = e_PARKGAME ;%+ e_PARKGAME_exclu; %+ e_REMINARY; % (3:length(e_PARKGAME)); % choose specific
 
 %% Add series
 
@@ -103,7 +104,7 @@ load e
 %% ts + TAPAS model
 
 % % Activation
-% fvol = e.getSerie('tedana_ACTIVATION').getVolume('^wts').toJob(0);
+%fvol = e.getSerie('tedana_ACTIVATION').getVolume('^wts').toJob(0);
 
 % Resting state
 fvol = e.getSerie('tedana_RS').getVolume('^wts').toJob(0);
@@ -116,16 +117,16 @@ avol = e.getSerie('anat').getVolume('wp0');
 ROIvol = e.getSerie('anat').getVolume('^rwp[2,3]');
 
 % Activation params
-% par.outdir = {e.getSerie('tedana_ACTIVATION').path}
+% par.outdir = {e.getSerie('tedana_ACTIVATION').path};
 % outcell = e.getSerie('run_ACT').mkdir('wts');
 %%outcell = {e.getSerie('tedana_ACTIVATION').path} % old version
 
 % Resting State params
-% par.outdir = {e.getSerie('tedana_RS').path}
+% par.outdir = {e.getSerie('tedana_RS').path};
 % outcell = e.getSerie('run_RS').mkdir('wts');
 
 % General tedana wts dir paths (Activation + Resting State)
-par.outdir = {e.getSerie('tedana').path}
+par.outdir = {e.getSerie('tedana').path};
 outcell = e.getSerie('run').mkdir('wts');
 
 %% charge and transform afni displacement parameters
@@ -133,7 +134,7 @@ outcell = e.getSerie('run').mkdir('wts');
 % % Activation
 % e.addSerie('ACTIVATION','afni','afni_ACT',1)
 % e.getSerie('afni_ACT').addVolume('dfile_rall','rp1D',1)
-% 
+
 % dfile = {e.getSerie('afni_ACT').getVolume('rp').path}
 % output_d = {e.getSerie('run_ACT').path}
 % job_rp_afni2spm(dfile,output_d)
@@ -181,13 +182,15 @@ par.noiseROI = 1;
 par.TR = 1.600;
 par.rp_threshold = 1;
 %par.rp_threshold =  %plus bas mieux c'est
-%par.outdir = outcell(32:62); % Activation
-par.outdir = outcell(1:31); % Resting state
+% par.outdir = outcell(36:70); % Activation
+par.outdir = outcell(1:35); % Resting state
+%par.outdir = outcell(1:7); % Activation exclu
+%par.outdir = outcell(8:14); % Resting state exclu
 
 par.redo = 0;
 par.display = 0;
 par.run = 1;
-% par.job_name = 'tapas_get_rp_ACT'; % Activation
+%par.job_name = 'tapas_get_rp_ACT'; % Activation
 par.job_name = 'tapas_get_rp_RS'; % Resting state
 
 job_physio_tapas( par )
@@ -202,13 +205,16 @@ job_physio_tapas( par )
 %   rHead               head radius in mm (default: 50 mm)
 %
 
-PSNames = {'P001_NB_S1' 'P002_BM_S1' 'P001_NB_S2' 'P002_BM_S2' 'P003_SM_S1' 'P003_SM_S2' 'P007_SD_S1' 'P008_JR_S1' 'P007_SD_S2' 'P008_JR_S2' 'P023_LJ_S1' 'P025_CA_S1' 'P027_OR_S1' 'P028_PC_S1' 'P025_CA_S2' 'P023_LJ_S2' 'P027_OR_S2' 'P028_PC_S2' 'P033_DD_S1' 'P033_DD_S2' 'P039_KM_S1' 'P040_RE_S1' 'P042_RS_S1' 'P043_PD_S1' 'P039_KM_S2' 'P044_CK_S1' 'P043_PD_S2' 'P046_HJ_S1' 'P044_CK_S2' 'P047_BF_S1' 'P048_SB_S1' 'P047_BF_S2' 'P048_SB_S2'};
+%PSNames = {'P001_NB_S1' 'P002_BM_S1' 'P001_NB_S2' 'P002_BM_S2' 'P003_SM_S1' 'P003_SM_S2' 'P007_SD_S1' 'P008_JR_S1' 'P007_SD_S2' 'P008_JR_S2' 'P023_LJ_S1' 'P025_CA_S1' 'P028_PC_S1' 'P025_CA_S2' 'P023_LJ_S2' 'P028_PC_S2' 'P033_DD_S1' 'P033_DD_S2' 'P039_KM_S1' 'P040_RE_S1' 'P042_RS_S1' 'P043_PD_S1' 'P039_KM_S2' 'P044_CK_S1' 'P043_PD_S2' 'P046_HJ_S1' 'P044_CK_S2' 'P047_BF_S1' 'P048_SB_S1' 'P047_BF_S2' 'P048_SB_S2' 'P052_HJ_S1' 'P053_LM_S1' 'P052_HJ_S2' 'P053_LM_S2'};
+%PSNames = {'P009_HJ_S1' 'P013_RP_S1' 'P009_HJ_S2' 'P013_RP_S2' 'P027_OR_S1' 'P027_OR_S2' 'P046_HJ_S2'}; % excluded
+PSNames = {'P001_NB_S1' 'P002_BM_S1' 'P001_NB_S2' 'P002_BM_S2' 'P003_SM_S1' 'P003_SM_S2' 'P007_SD_S1' 'P008_JR_S1' 'P007_SD_S2' 'P008_JR_S2' 'P023_LJ_S1' 'P025_CA_S1' 'P028_PC_S1' 'P025_CA_S2' 'P023_LJ_S2' 'P028_PC_S2' 'P033_DD_S1' 'P033_DD_S2' 'P039_KM_S1' 'P040_RE_S1' 'P042_RS_S1' 'P043_PD_S1' 'P039_KM_S2' 'P044_CK_S1' 'P043_PD_S2' 'P046_HJ_S1' 'P044_CK_S2' 'P047_BF_S1' 'P048_SB_S1' 'P047_BF_S2' 'P048_SB_S2' 'P052_HJ_S1' 'P053_LM_S1' 'P052_HJ_S2' 'P009_HJ_S1' 'P013_RP_S1' 'P009_HJ_S2' 'P013_RP_S2' 'P027_OR_S1' 'P027_OR_S2' 'P046_HJ_S2' 'P053_LM_S2'}; % all included + excluded (34:42)
+
 nsupVols_tab = [];
 
 for r = 1 : length(rp)
     R = load (rp{r});
     rHead = 50;
-    protocol = string(outcell{r}(52:55));
+    protocol = string(outcell{r}(48:51));
 %     if r > 29
 %         init = string(outcell{r}(end-25:end-24));
 %         session = string(outcell{r}(end-21:end-20));
@@ -250,22 +256,22 @@ for r = 1 : length(rp)
     
     figure
     FDt = bar(FDthresh, nsupVols);
-    title(['ACT FD: ', lab(r)], 'Interpreter', 'none')
-    ylim([0, 630])
-    yticks([0:15:630])
-%     title(['RS FD: ', lab(r)], 'Interpreter', 'none')
-%     ylim([0, 300])
-%     yticks([0:5:300])
+%     title(['ACT FD: ', lab(r)], 'Interpreter', 'none')
+%     ylim([0, 630])
+%     yticks([0:15:630])
+    title(['RS FD: ', lab(r)], 'Interpreter', 'none')
+    ylim([0, 300])
+    yticks([0:5:300])
     grid on
     
     
     figure
     t = string(PSNames{r});
     brutplot = plot(quality_measures.FD);
-    title(['ACT FD data by scan: ', t],'Interpreter','none')
-    xlim([-20,650])
-%     title(['RS FD data by scan: ', t],'Interpreter','none')
-%     xlim([-20,320])
+%     title(['ACT FD data by scan: ', t],'Interpreter','none')
+%     xlim([-20,650])
+    title(['RS FD data by scan: ', t],'Interpreter','none')
+    xlim([-20,320])
     %ylim([0,9])
 end
 %% sort principal subject data
@@ -282,8 +288,8 @@ sorted_nsupVols_tab_id = nsupVols_tab_id(sorted_index,:);
 %% Creating the txt table
 
 [r,l] = size(sorted_nsupVols_tab_id);
-nfid = fopen('nb_vols_ACT_PARK_FD.txt','w'); % ACT
-%nfid = fopen('nb_vols_RS_PARK_FD.txt','w'); % RS
+% nfid = fopen('nb_vols_ACT_PARK_FD_all.txt','w'); % ACT
+nfid = fopen('nb_vols_RS_PARK_FD_all.txt','w'); % RS
 formatSpec = '%s;%s;%s;%s;%s\n';
 
 tabidx = {'ID', 'FD > 0.2', 'FD > 0.5' 'FD > 1', 'FD > 2.5'};
@@ -302,20 +308,107 @@ xFD = FDthresh;
 yFD = [nsupVols_tab(:,1).'; nsupVols_tab(:,2).'; nsupVols_tab(:,3).'; nsupVols_tab(:,4).'];
 syFD = [snsupVols_tab(:,1).'; snsupVols_tab(:,2).'; snsupVols_tab(:,3).'; snsupVols_tab(:,4).'];
 
+%% graphic colormap creation
+colormap1 = 'colorcube';
+cmap1 = eval([colormap1 '(256)']);
+colormap2 = 'hot';
+cmap2 = eval([colormap2 '(256)']);
+cmax = 2*length(yFD);
+colrange = [1 cmax];
+
+clear ycolor
+for i = 1 : 42
+    difi = (i+1);
+    ycolor(i) = round((difi/cmax) .* 255)+1;
+end
+rgbin = cmap1(ycolor,:);
+rgbout = cmap2(ycolor,:);
+
 %%
+
 figure
+
+%unsorted
+bpFDsub = bar(xFD, yFD, 'grouped', 'FaceColor', 'flat');
+frgbin = flip(rgbin,1);
+frgbout = flip(rgbout,1);
+
+for k = 1 : 34
+    bpFDsub(k).CData = frgbin(k+8,:);
+end
+for k = 35 : 42
+    bpFDsub(k).CData = rgbout(k-10,:);
+end
+%set(bpFDsub(35:42), 'FaceColor', 'r');
+bpFDsub(35).CData = [0.6 0.1 0.1];
+bpFDsub(36).CData = [0.7 0.3 0.2];
+bpFDsub(37).CData = [0.8 0.1 0.1];
+bpFDsub(38).CData = [0.9 0.1 0.1];
+bpFDsub(39).CData = [1 0.2 0.1];
+bpFDsub(40).CData = [1 0.3 0.1];
+bpFDsub(41).CData = [1 0.4 0.1];
+bpFDsub(42).CData = [1 0.4 0.4];
+
+% ylim([0,630])
+% yticks([0:15:630])
+% title('Distribution of ACT volumes per subject according to chosen FD threshold')
+ylim([0,300])
+yticks([0:5:300])
+title('Distribution of RS volumes per subject according to chosen FD threshold')
+
+grid on
+legend(lab,'Interpreter','none')
+
+%sorted
 bpFDsub = bar(xFD, syFD, 'grouped', 'FaceColor', 'flat');
 for k = 1:size(syFD,2)
     bpFDsub(k).CData = k+5;
 end
-ylim([0,630])
-yticks([0:15:630])
-title('Distribution of ACT volumes per subject according to chosen FD threshold')
-% ylim([0,300])
-% yticks([0:5:300])
-% title('Distribution of RS volumes per subject according to chosen FD threshold')
+% ylim([0,630])
+% yticks([0:15:630])
+% title('Distribution of ACT volumes per subject according to chosen FD threshold')
+ylim([0,300])
+yticks([0:5:300])
+title('Distribution of RS volumes per subject according to chosen FD threshold')
 grid on
 legend(sorted_lab,'Interpreter','none')
+
+
+%% Figures FD > 1 only
+
+figure
+
+%unsorted
+bpFDsub = bar(categorical(lab), yFD(3,:), 'grouped', 'FaceColor', 'flat');
+frgbin = flip(rgbin,1);
+frgbout = flip(rgbout,1);
+
+for k = 1 : 34
+    bpFDsub(k).CData = frgbin(k+8,:);
+end
+for k = 35 : 42
+    bpFDsub(k).CData = rgbout(k-10,:);
+end
+%set(bpFDsub(35:42), 'FaceColor', 'r');
+bpFDsub(35).CData = [0.6 0.1 0.1];
+bpFDsub(36).CData = [0.7 0.3 0.2];
+bpFDsub(37).CData = [0.8 0.1 0.1];
+bpFDsub(38).CData = [0.9 0.1 0.1];
+bpFDsub(39).CData = [1 0.2 0.1];
+bpFDsub(40).CData = [1 0.3 0.1];
+bpFDsub(41).CData = [1 0.4 0.1];
+bpFDsub(42).CData = [1 0.4 0.4];
+
+% ylim([0,630])
+% yticks([0:15:630])
+% title('Distribution of ACT volumes per subject according to chosen FD threshold')
+ylim([0,300])
+yticks([0:5:300])
+title('Distribution of RS volumes per subject according to chosen FD threshold')
+
+grid on
+legend(lab,'Interpreter','none')
+
 
 %% Quality measures display % maybe colors to add - categories per subject
 

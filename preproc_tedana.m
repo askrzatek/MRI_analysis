@@ -13,7 +13,7 @@ main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek
 e_PARKGAME = exam(main_dir,'PARKGAME.*._[a,c]$');
 e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
 
-%e_PARKGAME = exam(main_dir,'PARKGAME.*._waiting$');
+%e_PARKGAME = exam(main_dir,'PARKGAME.*._exclu$');
 e = e_PARKGAME; % (3:length(e_PARKGAME)); % choose specific
 %e = e_REMINARY;
 e.addSerie('ACTIVATION$','run_ACTIVATION',1)
@@ -103,7 +103,7 @@ else
     par.sge     = 0;
 end
 
-par.jobname  = 'zjob_afni_proc_multi_echo';
+par.jobname  = 'job_afni_proc_multi_echo';
 par.subdir   = 'afni';
 
 par.pct      = 0;
@@ -142,7 +142,8 @@ par.fake       = 0;
 par.redo       = 0;
 
 par.fsl_output_format = 'NIFTI_GZ';
-[job, fmask] = do_fsl_robust_mask_epi(fin(28), par);
+[job, fmask] = do_fsl_robust_mask_epi(fin, par);
+%[job, fmask] = do_fsl_robust_mask_epi({fin.gpath{:}}, par);
 
 % copy original gz & unzip
 e.gser('run').addVolume('^bet.*vtde1.nii.gz','bet',1);
@@ -380,7 +381,7 @@ job_apply_normalize(warp_field, img_rs, par);
 
 %% Normalize the Tmean used later for PhysIO Noise ROI
 par.auto_add_obj = 1;
-img = e.gser('run').removeEmpty.gvol('bet');
+img = e.gser('run_ACT').removeEmpty.gvol('bet');
 tmp_exam = [img.exam];
 y = tmp_exam.gser('anat').gvol('^y');
 
@@ -430,7 +431,7 @@ end
 par.auto_add_obj = 0;
 par.smooth       = [5 5 5];
 par.prefix       = 's5';
-par.jobname      = 'spm_smooth_4748_5';
+par.jobname      = 'spm_smooth_last_5';
 
 img = e.gser('tedana').gvol('^w').removeEmpty;
 
@@ -455,7 +456,7 @@ end
 par.auto_add_obj = 0;
 par.smooth       = [6 6 6];
 par.prefix       = 's6';
-par.jobname      = 'spm_smooth_4748_6';
+par.jobname      = 'spm_smooth_last_6';
 
 img = e.gser('tedana').gvol('^w').removeEmpty;
 
@@ -481,12 +482,12 @@ else
 end
 par.type    = 'estimate_and_write';
 
-ref = e(28).getSerie('run');
+ref = e.getSerie('run');
 ref = ref(:,1).getVolume('wbet');
 e.getSerie('anat').addVolume('^wp2','wp2',1);
 e.getSerie('anat').addVolume('^wp3','wp3',1);
-src = e(28).getSerie('anat').getVolume('^wp2');
-oth = e(28).getSerie('anat').getVolume('^wp3');
+src = e.getSerie('anat').getVolume('^wp2');
+oth = e.getSerie('anat').getVolume('^wp3');
 
 job_coregister(src, ref, oth, par);
 

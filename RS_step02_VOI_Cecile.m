@@ -76,8 +76,8 @@ contrast_PPI = {
 data_dir = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
 
 %list_subj = step00_subject_list();
-list_subj ={'PARKGAMEII_001_NB.*a$','PARKGAMEII_002_BM.*a$','PARKGAMEII_00[1,3]_SM.*c$','PARKGAMEII_007_SD.*a$','PARKGAMEII_008_JR.*a$','PARKGAMEII_023_LJ.*c$','PARKGAMEII_025_CA.*a$','PARKGAMEII_028_PC.*c$','PARKGAMEII_033_DD.*c$','PARKGAMEII_039_KM.*a$','PARKGAMEII_040_RE.*a$','PARKGAMEII_042_RS.*a$','PARKGAMEII_043_PD.*a$','PARKGAMEII_044_CK.*c$','PARKGAMEII_046_HJ.*c$','PARKGAMEII_047_BF.*c$','PARKGAMEII_048_SB.*a$'}; 
-
+list_subj ={'PARKGAMEII_001_NB.*a$','PARKGAMEII_002_BM.*a$','PARKGAMEII_00[1,3]_SM.*c$','PARKGAMEII_007_SD.*a$','PARKGAMEII_008_JR.*a$','PARKGAMEII_023_LJ.*c$','PARKGAMEII_025_CA.*a$','PARKGAMEII_028_PC.*c$','PARKGAMEII_033_DD.*c$','PARKGAMEII_039_KM.*a$','PARKGAMEII_040_RE.*a$','PARKGAMEII_042_RS.*a$','PARKGAMEII_043_PD.*a$','PARKGAMEII_044_CK.*c$','PARKGAMEII_046_HJ.*c$','PARKGAMEII_047_BF.*c$','PARKGAMEII_048_SB.*a$','PARKGAMEII_052_HJ.*a$','PARKGAMEII_053_LM.*c$'}; 
+%list_subj ={'PARKGAMEII_052_HJ.*a$','PARKGAMEII_053_LM.*c$'}
 subj_dir  = gdir(data_dir,cellstr2regex(list_subj));
 %subj_dir  = gdir(data_dir,{'072','074','075','076'}); % change
 
@@ -211,7 +211,7 @@ job_ending_rountines(jobs,[],par);
 % model_dir = gdir(subj_dir,'^P','RS$','LFF_BOX_glm');
 
 
-Modele_roi_dir = gdir(subj_dir,'RS$','model','^Modele_VOI'); % change ?
+Modele_roi_dir = gdir(subj_dir,'RS$','model','^Modele_VOI_'); % change ?
 SPM_roi_file = gfile(Modele_roi_dir,'SPM.mat');
 
 clear par
@@ -225,7 +225,7 @@ job_first_level_estimate(SPM_roi_file,par);
 clear par
 par.sge=1;
 par.sge_queu = 'normal,bigmem';
-par.jobname = 'spm_firstlevel_ROI_con_double_wbet';
+par.jobname = 'spm_firstlevel_ROI_con_double_wbet_pcc';
 
 
 PositiveEffectROI= [1 0];

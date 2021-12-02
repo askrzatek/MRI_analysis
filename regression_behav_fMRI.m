@@ -12,30 +12,31 @@ clear all
 main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
 cd (main_dir)
 
-ACTION = 1;
-RS = 0;
+ACTION = 0;
+RS = 1;
 
 % define input directory
-InputfMRI = fullfile(main_dir,'/doublerun_sts_tapas_resliced');
+InputfMRI = fullfile(main_dir,'/full_sts_tapas_doublerun_resliced');
 InputRS   = fullfile(main_dir,'firstlevel_RS');
 
 
 %% Regressors definition
 %% AGE
-covars{1} = [70
-74
-64
-76
-79
-61
-75
-66
-72
-68
-68
-72
-56
-57];
+covars{1} = [70 % 001_NB
+74 % 002_BM
+64 % 007_SD
+76 % 008_JR
+79 % 025_CA
+61 % 039_KM
+75 % 043_PD
+66 % 048_SB
+72 % 003_SM_c
+68 % 023_LJ
+68 % 028_PC
+72 % 033_DD
+56 % 044_CK
+57 % 047_BF
+66]; %052_HJ
          
 %% GENDER
 covars{2} = [1
@@ -51,31 +52,34 @@ covars{2} = [1
 2
 2
 2
-1];
+1
+2];
 
 %% Target regressors definition & their outdirs
 % define or create output directory
-mkdir(main_dir,'resliced_multiple_regression')
-MultiRegDir = fullfile(main_dir,'resliced_multiple_regression')
+mkdir(main_dir,'full_resliced_multiple_regression')
+MultiRegDir = fullfile(main_dir,'full_resliced_multiple_regression')
 
 if ACTION
-    RegDirC = fullfile(main_dir, '/resliced_ACT_clinic');
-    MultiRegDirC = fullfile(MultiRegDir, '/ACT_clinic');
-    Clinic = {'AXIAL','GABS','UPDRSIII','UPDRSIII_AXIAL'};
+    RegDirC = fullfile(main_dir, '/full_resliced_ACT_clinic');
+    MultiRegDirC = fullfile(MultiRegDir, '/full_ACT_clinic');
+%    Clinic = {'AXIAL','GABS','UPDRSIII','UPDRSIII_AXIAL','UPDRSIII_SUP'};
+    Clinic = {'UPDRSIII_SUP'};
     
-    RegDirG = fullfile(main_dir, '/resliced_ACT_gait/Spontaneous');
-    MultiRegDirG = fullfile(MultiRegDir, '/ACT_gait/Spontaneous');
-    Gait  = {'APA_AP','DA','Step_Size'};
+    RegDirG = fullfile(main_dir, '/full_resliced_ACT_gait/Spontaneous');
+    MultiRegDirG = fullfile(MultiRegDir, '/full_ACT_gait/Spontaneous');
+    %Gait  = {'APA_AP','DA','Step_Size'};
+    Gait  = {'DA'};
     %Gait_up  = {'Rapid','Spontaneous'}; % the Rapid gait condition is one subject shorter - needs a separate processing
 end
 
 if RS
-    RegDirC = fullfile(main_dir, '/resliced_RS_clinic');
-    MultiRegDirC = fullfile(MultiRegDir, '/RS_clinic');
-    Clinic = {'AXIAL','GABS','UPDRSIII','UPDRSIII_AXIAL'};
+    RegDirC = fullfile(main_dir, '/full_resliced_RS_clinic');
+    MultiRegDirC = fullfile(MultiRegDir, '/full_RS_clinic');
+    Clinic = {'AXIAL','GABS','UPDRSIII','UPDRSIII_AXIAL','UPDRSIII_SUP'};
     
-    RegDirG = fullfile(main_dir, '/resliced_RS_gait/Spontaneous');
-    MultiRegDirG = fullfile(MultiRegDir, '/RS_gait/Spontaneous');
+    RegDirG = fullfile(main_dir, '/full_resliced_RS_gait/Spontaneous');
+    MultiRegDirG = fullfile(MultiRegDir, '/full_RS_gait/Spontaneous');
     Gait  = {'APA_AP','DA','Step_Size'};
     %Gait_up  = {'Rapid','Spontaneous'}; % the Rapid gait condition is one subject shorter - needs a separate processing
 end
@@ -89,17 +93,17 @@ for imodel = 1:2
        mkdir(RegDir{imodel},sprintf('%s',targetmodel{ivar})); % universal creation of directories depending on the chosen model
        mkdir(MultiRegDir{imodel},sprintf('%s',targetmodel{ivar}));
         % StatDir{ivar} = fullfile(RegDir,Gait{ivar});
-        StatObjG{imodel}{ivar} = exam(RegDir{imodel}, sprintf('^[r,s]%s',targetmodel{ivar})); % the Spontaneous gait condition is one subject shorter - needs a separate processing
+        StatObjG{imodel}{ivar} = exam(RegDir{imodel}, sprintf('%s',targetmodel{ivar})); % the Spontaneous gait condition is one subject shorter - needs a separate processing
         StatObjC{imodel}{ivar} = exam(RegDir{imodel},sprintf('^%s$',targetmodel{ivar})); % we have two of them containing UPDRSIII & AXIAL
         MultiStatObjG{imodel}{ivar} = exam(MultiRegDir{imodel}, sprintf('^%s',targetmodel{ivar})); % the Spontaneous gait condition is one subject shorter - needs a separate processing
         MultiStatObjC{imodel}{ivar} = exam(MultiRegDir{imodel},sprintf('^%s$',targetmodel{ivar})); % we have two of them containing UPDRSIII & AXIAL
     end
 end
 
-Stat = StatObjG{1}{1} + StatObjG{1}{2} + StatObjG{1}{3} + StatObjC{2}{1} + StatObjC{2}{2} + StatObjC{2}{3} + StatObjC{2}{4};
+Stat = StatObjG{1}{1} + StatObjG{1}{2} + StatObjG{1}{3} + StatObjC{2}{1} + StatObjC{2}{2} + StatObjC{2}{3} + StatObjC{2}{4} + StatObjC{2}{5};
 Stat.explore
 
-MultiStat = MultiStatObjG{1}{1} + MultiStatObjG{1}{2} + MultiStatObjG{1}{3} + MultiStatObjC{2}{1} + MultiStatObjC{2}{2} + MultiStatObjC{2}{3} + MultiStatObjC{2}{4};
+MultiStat = MultiStatObjG{1}{1} + MultiStatObjG{1}{2} + MultiStatObjG{1}{3} + MultiStatObjC{2}{1} + MultiStatObjC{2}{2} + MultiStatObjC{2}{3} + MultiStatObjC{2}{4} + MultiStatObjC{2}{5};
 MultiStat.explore
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -119,7 +123,8 @@ targetsAPA1 = [34.7171835889
 41.7655772122
 26.2586959347
 32.1145722308
-35.176597489];
+35.176597489
+31.2547254406906];
 
 %% Spontan DA
 targetsDA1 = [0.229615923
@@ -135,9 +140,10 @@ targetsDA1 = [0.229615923
 0.2448816538
 0.2531833616
 0.2184634975
-0.1773839842];
+0.1773839842
+0.245088527771041];
         
-%% Spontan Step_Size
+%% Spontan Step_Length
 targetsSS1 = [257.3421060198
 461.4812761193
 249.806860919
@@ -151,7 +157,8 @@ targetsSS1 = [257.3421060198
 262.8219167263
 340.6669320703
 421.525704218
-447.2221013178];        
+447.2221013178
+240.696518058572];        
 
 %% Rapid APA_AP
 targetrAPA1 = [56.1860003179
@@ -166,7 +173,8 @@ targetrAPA1 = [56.1860003179
 53.1842418093
 51.3589704894
 61.1835358307
-51.1603131288];
+51.1603131288
+];
 %% Rapid DA
 targetrDA1 = [0.1781937653
 0.1892911011
@@ -180,7 +188,8 @@ targetrDA1 = [0.1781937653
 0.1992642898
 0.1682406621
 0.1644736842
-0.1373089983];
+0.1373089983
+];
         
 %% Rapid Step_Size
 targetrSS1 = [385.33658393
@@ -195,7 +204,8 @@ targetrSS1 = [385.33658393
 407.5565252707
 513.2893254134
 507.5458941188
-517.2496431319];        
+517.2496431319
+];        
 
 %% AXIAL
 targetAxial1 = [2
@@ -211,7 +221,8 @@ targetAxial1 = [2
 8
 7
 3
-2];
+2
+11];
            
 %% GABS
 targetGabs1 =  [20
@@ -227,7 +238,8 @@ targetGabs1 =  [20
 32
 26
 14
-18];   
+18
+39];   
 
 %% UPDRS III
 targetUPDRS1 = [17
@@ -243,7 +255,8 @@ targetUPDRS1 = [17
 36
 50
 20
-31];        
+31
+34];        
            
 %% UPDRSIII-AXIAL
 targetUPDRSIII_Axial1 = [15
@@ -259,7 +272,25 @@ targetUPDRSIII_Axial1 = [15
 28
 43
 17
-29];
+29
+23];
+
+%% UPDRSIII-MEMBRES SUP
+targetUPDRSIII_Sup1 = [4
+7
+12
+6
+5
+13
+12
+6
+14
+2
+5
+5
+8
+4
+11];
           
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% V2 - V1 regressors
@@ -278,7 +309,8 @@ targetsAPA= [23.1555713831
             9.4773158702
             0.2727108575
             -0.3172168418
-            9.8691469678];
+            9.8691469678
+            -2.09655588609517];
 
 %% Spontan DA
 targetsDA = [-0.0552436383
@@ -294,7 +326,8 @@ targetsDA = [-0.0552436383
             -0.0200398573
             0.0146434635
             0.0547832049
-            0.0004295012];
+            0.0004295012
+            0.0375939849624061];
         
 %% Spontan Step_Size
 targetsSS = [150.103370391
@@ -310,7 +343,8 @@ targetsSS = [150.103370391
             88.6692758751
             4.4760244141
             -117.5319247696
-            -25.6892601563];        
+            -25.6892601563
+            -25.0872759090923];        
 
 %% Rapid APA_AP
 targetrAPA= [2.3987452788
@@ -325,7 +359,8 @@ targetrAPA= [2.3987452788
             12.3199655882
             -2.705904908
             -15.8568741964
-            11.3793264819];
+            11.3793264819
+            ];
 %% Rapid DA
 targetrDA = [-0.017665519
             -0.0123177476
@@ -339,7 +374,8 @@ targetrDA = [-0.017665519
             -0.0114459536
             0.004957791
             0.0274072277
-            0.0137945671];
+            0.0137945671
+            ];
         
 %% Rapid Step_Size
 targetrSS = [42.2100452713
@@ -354,7 +390,8 @@ targetrSS = [42.2100452713
             80.2671310068
             -98.195711282
             -66.8538622411
-            -30.2765261511];        
+            -30.2765261511
+            ];        
 
 %% AXIAL
 targetAxial = [0
@@ -370,7 +407,8 @@ targetAxial = [0
                -2
                2
                -2
-               0];
+               0
+               1];
            
 %% GABS
 targetGabs =  [-4
@@ -386,7 +424,8 @@ targetGabs =  [-4
                1
                1
                -1
-               -5];   
+               -5
+               -8];   
 
 %% UPDRS III
 targetUPDRS = [1
@@ -402,7 +441,8 @@ targetUPDRS = [1
                -6
                -3
                -6
-               4];        
+               4
+               9];        
            
 %% UPDRSIII-AXIAL
 targetUPDRSIII_Axial = [1
@@ -418,18 +458,36 @@ targetUPDRSIII_Axial = [1
                         -4
                         -5
                         -4
-                        4];
+                        4
+                        8];
+          
+%% UPDRSIII-MEMBRES SUP
+targetUPDRSIII_Sup = [2
+                      0
+                      -5
+                      2
+                      -1
+                      4
+                      0
+                      -3
+                      0
+                      -1
+                      -3
+                      -3
+                       1
+                      -1
+                      0];
           
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% ACTION
 %% Choice of fMRI conditions //scans, condition names 
 if ACTION
     Conditions  = {'IL','IR','RL','RR'};
-    Sessions    = {'V1','V2','V2_V1','V1_V2'};
+    Sessions    = {'V1','V2','V2_V1'}; %,'V1_V2'};
 % input different groups distinction and paths for the cons we need
     fMRIObj = exam(InputfMRI,'firstlevel'); % check directory names
     fMRIObj.addSerie('PARK.*a$','a',8)
-    fMRIObj.addSerie('PARK.*[c,DD]$','c',6)
+    fMRIObj.addSerie('PARK.*[c,DD]$','c',7)
 
 % add volumes for each contrast - each individual
 % group A
@@ -478,7 +536,7 @@ end
 
 if RS
     %% get the RS inputfiles in the ref directory
-    patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a'};
+    patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a','PARKGAME_052_HJ_c'};
 
     for ipatient = 1: length(patient_list)
         mkdir(InputRS, patient_list{ipatient});
@@ -493,10 +551,11 @@ if RS
     RSObj_a = exam(InputRS,'PARK.*a$');
     RSObj_c = exam(InputRS,'PARK.*[c,DD]$');
     
-%     ROIs = {'Caudate_L','Caudate_R','Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R','Cuneus_L','Cuneus_R','Insula_L','Insula_R','Pallidum_L','Pallidum_R','Parietal_Inf_L','Parietal_Inf_R','Parietal_Sup_L','Parietal_Sup_R','PCC','Postcentral_L','Postcentral_R','PPN_L','PPN_R','Precentral_L','Precentral_R','Precuneus_L','Precuneus_R','Putamen_L','Putamen_R','SMA_Ant_L','SMA_Ant_R','SMA_Post_L','SMA_Post_R','Thalamus_L','Thalamus_R','Vermis1_2','Vermis3','Vermis4_5','Vermis6','Vermis7','Vermis8','Vermis9','Vermis10'};
-    ROIs = {'SMA_face_L','SMA_face_R','SMA_foot_L','SMA_foot_R','SMA_hand_L','SMA_hand_R'};
+     ROIs = {'Caudate_L','Caudate_R','Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R','Cuneus_L','Cuneus_R','Insula_L','Insula_R','Pallidum_L','Pallidum_R','Parietal_Inf_L','Parietal_Inf_R','Parietal_Sup_L','Parietal_Sup_R','PCC','Postcentral_L','Postcentral_R','PPN_L','PPN_R','Precentral_L','Precentral_R','Precuneus_L','Precuneus_R','Putamen_L','Putamen_R','SMA_Ant_L','SMA_Ant_R','SMA_Post_L','SMA_Post_R','Thalamus_L','Thalamus_R','Vermis1_2','Vermis3','Vermis4_5','Vermis6','Vermis7','Vermis8','Vermis9','Vermis10'};
+%    ROIs = {'SMA_face_L','SMA_face_R','SMA_foot_L','SMA_foot_R','SMA_hand_L','SMA_hand_R'};
     Conditions  = ROIs;
-    Sessions    = {'V1','V2'}%,'V2_V1'};
+    %Sessions    = {'V1','V2', 'V2_V1'};
+    Sessions    = {'V2_V1'};
     for iR = 1 : length(ROIs)
         for iS = 1 : length(Sessions)
             %mkdir(StatDir{:},char(sprintf('%s_%s',Conditions{iC},Sessions{iS})))
@@ -513,7 +572,7 @@ if RS
             RSObj_c.getSerie(sprintf('%s_%s',ROIs{iR},Sessions{iS})).addVolume('con.*01',sprintf('%s_%s',ROIs{iR},Sessions{iS}))
         end
     end
-
+    
     % do a rsync -rlv copy of all individual model dirs adding V1 or V2 at the end
     % accordingly - then the organisation would be almost the same as for the
     % double run - otherwise - prepare the doublerun analysis for RS data - all
@@ -521,6 +580,11 @@ if RS
     % per subject cf. firstlevel_tedana_doublerun & RS_firstlevel_Cecile
 
 end
+
+[RSObjac,RSObjai] = RSObj_a.removeIncomplete;
+[RSObjcc,RSObjci] = RSObj_c.removeIncomplete;
+RSObj_c = RSObjcc;
+RSObj_a = RSObjac;
 
 %% this part will probably become in common with the RS processing
 n = 1;
@@ -541,6 +605,7 @@ for iC = 1 : length(Conditions)
         multigRS_c{c} = cellstr(multiRS_c{c}(:) .toJob)
     end
     c = c + 1;
+    
     for iS = 1 : length(Sessions)
         %mkdir(StatDir{:},char(sprintf('%s_%s',Conditions{iC},Sessions{iS})))
         Stat.mkdir(sprintf('%s_%s',Conditions{iC},Sessions{iS}));
@@ -581,13 +646,15 @@ if ACTION
     
     par.run      = 1;
     par.sge      = 0;
+    par.redo     = 0;
     
     par.jobname = 'ACT_reg_model_spec';
     par.nb_cond = length(outdirs);
     par.nb_cons = length(outdirs{1});
     target_regressors.name  = {Stat.name};
-    target_regressors.value = {targetsAPA,targetsDA,targetsSS, targetAxial,targetGabs,targetUPDRS,targetUPDRSIII_Axial}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
-%     target_regressors.value = {targetrAPA,targetrDA,targetrSS};
+    %target_regressors.value = {targetsAPA,targetsDA,targetsSS, targetAxial,targetGabs,targetUPDRS,targetUPDRSIII_Axial,targetUPDRSIII_Sup}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
+    target_regressors.value = {targetsDA, targetUPDRSIII_Sup};
+%    target_regressors.value = {targetrAPA,targetrDA,targetrSS};
     %cellstr(cons_a{1}.path)
     %cons_c
     
@@ -595,14 +662,14 @@ if ACTION
     
 %% Multiregression V1 all in    
     
-    par.run = 0;
-    par.sge = 1;
+    par.run = 1;
+    par.sge = 0;
     par.jobname = 'ACT_multireg_model_spec';
     par.nb_cond = length(multioutdirs);
     par.nb_cons = length(multioutdirs{1});
     target_regressors.name  = {MultiStat.name};
-    target_regressors.value = {targetsAPA1,targetsDA1,targetsSS1, targetAxial1,targetGabs1,targetUPDRS1,targetUPDRSIII_Axial1}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
-
+    %target_regressors.value = {targetsAPA1,targetsDA1,targetsSS1, targetAxial1,targetGabs1,targetUPDRS1,targetUPDRSIII_Axial1,targetUPDRSIII_Sup1}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
+    target_regressors.value = {targetsDA1, targetUPDRSIII_Sup1};
     %cellstr(multicons_a{1}.path)
     %cons_c
     
@@ -624,19 +691,19 @@ if RS
     par.nb_cond = length(outdirs);
     par.nb_cons = length(outdirs{1});
     target_regressors.name  = {Stat.name};
-    target_regressors.value = {targetsAPA,targetsDA,targetsSS, targetAxial,targetGabs,targetUPDRS,targetUPDRSIII_Axial}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
+    target_regressors.value = {targetsAPA,targetsDA,targetsSS, targetAxial,targetGabs,targetUPDRS,targetUPDRSIII_Axial,targetUPDRSIII_Sup}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
 
     regression_model_spec(outdirs, gRS_a, gRS_c, covars, target_regressors, par)
     
     %% Multiregression V1 all in    
     
-    par.run = 0;
-    par.sge = 1;
+    par.run = 1;
+    par.sge = 0;
     par.jobname = 'RS_multireg_model_spec';
     par.nb_cond = length(multioutdirs);
     par.nb_cons = length(multioutdirs{1});
     target_regressors.name  = {MultiStat.name};
-    target_regressors.value = {targetsAPA1,targetsDA1,targetsSS1, targetAxial1,targetGabs1,targetUPDRS1,targetUPDRSIII_Axial1}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
+    target_regressors.value = {targetsAPA1,targetsDA1,targetsSS1, targetAxial1,targetGabs1,targetUPDRS1,targetUPDRSIII_Axial1,targetUPDRSIII_Sup1}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
 
     %cellstr(multicons_a{1}.path)
     %cons_c
@@ -788,6 +855,8 @@ for iout = 1 : length(multioutdirs)
         
         [PpTFCE_Z, PpTFCE_p] = pTFCE_adapt(modest{iroi}, char(poscorel));
         [NpTFCE_Z, NpTFCE_p] = pTFCE_adapt(modest{iroi}, char(negcorel));
+        
+        
         
     end
 end

@@ -273,7 +273,8 @@ end
 % verifs
 main_dir = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
 % subj_dir = gdir(main_dir,'^Subj|^___S')
-subj_dir = gdir(main_dir,'PARKGAME.*[a,c]$')
+%subj_dir = gdir(main_dir,'PARKGAME.*[a,c]$')
+subj_dir = e.gpath;
 SessDir = gdir(subj_dir,'.*RS$');
 StatDir = gdir(SessDir,'model','^model_1');
 StatDir = gdir(SessDir,'model','^model_2'); %new resliced version of denoised files

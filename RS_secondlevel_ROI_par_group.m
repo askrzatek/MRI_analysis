@@ -4,24 +4,28 @@ clc
 clear all
 
 main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
-stat_dir = fullfile(main_dir,'resliced_secondlevel_RS');
+stat_dir = fullfile(main_dir,'full_secondlevel_RS');
 
 cd (main_dir)
 
-Stat = exam(stat_dir,'PARK'); % 'PARK_V1');
+Stat = exam(stat_dir,'PARK');
+%Stat = exam(stat_dir,'PARK_V1');
 
-InputRS   = fullfile(main_dir,'firstlevel_RS'); % newly created - SMA hand/foot/face models missing
+InputRS   = fullfile(main_dir,'firstlevel_RS'); % newly created - to be checked for transfer errors
 
-patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a'};
+patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a','PARKGAMEII_052_HJ_c'};
+patient_list_V1 = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_040_RE_a','PARKGAMEII_042_RS_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_046_HJ_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a','PARKGAMEII_052_HJ_c','PARKGAMEII_053_LM_a'};
 
     for ipatient = 1: length(patient_list)
         mkdir(InputRS, patient_list{ipatient});
         patients_dir{ipatient} = get_subdir_regex(InputRS, patient_list{ipatient}); %%outdirs
+        patients_dir_V1{ipatient} = get_subdir_regex(InputRS, patient_list_V1{ipatient}); %%outdirs
     end
     
 RSObj_a = exam(InputRS,'PARK.*a$');
 RSObj_c = exam(InputRS,'PARK.*[c,DD]$');
 RS_all = exam( InputRS,'PARK.*a$') + exam(InputRS,'PARK.*[c,DD]$');
+RS_V1_all = exam( InputRS,'PARK.*a$') + exam(InputRS,'PARK.*a_V1') + exam(InputRS,'PARK.*[c,DD]$') + exam(InputRS,'PARK.*c_V1');
 
 ROIs = {'Caudate_L','Caudate_R','Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R','Cuneus_L','Cuneus_R','Insula_L','Insula_R','Pallidum_L','Pallidum_R','Parietal_Inf_L','Parietal_Inf_R','Parietal_Sup_L','Parietal_Sup_R','PCC','Postcentral_L','Postcentral_R','PPN_L','PPN_R','Precentral_L','Precentral_R','Precuneus_L','Precuneus_R','Putamen_L','Putamen_R','SMA_Ant_L','SMA_Ant_R','SMA_Face_L','SMA_Face_R','SMA_Foot_L','SMA_Foot_R','SMA_Hand_L','SMA_Hand_R','SMA_Post_L','SMA_Post_R','Thalamus_L','Thalamus_R','Vermis1_2','Vermis3','Vermis4_5','Vermis6','Vermis7','Vermis8','Vermis9','Vermis10'};
 %ROIs = {'SMA_Ant_L','SMA_Ant_R','SMA_Face_L','SMA_Face_R','SMA_Foot_L','SMA_Foot_R','SMA_Hand_L','SMA_Hand_R','SMA_Post_L','SMA_Post_R'};
@@ -47,8 +51,8 @@ for iR = 1 : length(ROIs)
     end
     % FIRSTLEVEL for ALL PARKs add volumes for each ROI's contrast
      
-     RS_all.addSerie(sprintf('%s_V1$',ROIs{iR}),sprintf('%s_V1',ROIs{iR}),1);
-     RS_all.getSerie(sprintf('%s_V1$',ROIs{iR})).addVolume('con.*01',sprintf('%s_V1_con$',ROIs{iR}))
+     RS_V1_all.addSerie(sprintf('%s_V1$',ROIs{iR}),sprintf('%s_V1',ROIs{iR}),1);
+     RS_V1_all.getSerie(sprintf('%s_V1$',ROIs{iR})).addVolume('con.*01',sprintf('%s_V1_con$',ROIs{iR}))
 end
 
 clear RS_allcell gRS_all
@@ -72,34 +76,38 @@ for iC = 1 : length(Conditions)
         
         n = n + 1;
     end
-    RS_allcell{iC} = RS_all.getSerie(sprintf('%s_V1',Conditions{iC})).getVolume(sprintf('%s_V1',Conditions{iC})) %.toJob;
+    RS_allcell{iC} = RS_V1_all.getSerie(sprintf('%s_V1',Conditions{iC})).getVolume(sprintf('%s_V1',Conditions{iC})) %.toJob;
     gRS_all{iC} = cellstr(RS_allcell{iC}(:) .toJob)        
 end
 
 
-outdirs = Stat.getSerie('Cereb.*V1') .toJob; % 7 x 1 x 108 cells
+%outdirs = Stat.getSerie('Cereb.*V1') .toJob; % 7 x 1 x 108 cells
+outdirs = Stat.getSerie('.*V') .toJob; % 7 x 1 x 108 cells
+outdirs = outdirs(2:3);
 groups  = {gRS_a, gRS_c};
+outdirs_V1 = Stat(1).getSerie('.*V1') .toJob; % 7 x 1 x 108 cells
 group_V1 = gRS_all;
 
 %% Regressors definition
-%% AGE
-covars{1,1} = [70
-74
-64
-76
-79
-61
-75
+%% AGE V2
+covars{1,1} = [70 
+74 
+64 
+76 
+79 
+61 
+75 
 66];
 
-covars{1,2} = [72
-68
-68
-72
-56
-57];
+covars{1,2} = [72 
+68 
+68 
+72 
+56 
+57 
+66];
 
-%% GENDER
+%% GENDER V2 % F : 1 M : 2
 covars{2,1} = [1
 1
 1
@@ -114,6 +122,51 @@ covars{2,2} = [1
 2
 2
 2
+1
+2];
+
+%% AGE V1
+covars_V1{1,1} = [70 
+74 
+64 
+76 
+79 
+61 
+75 
+66
+71
+72
+59];
+
+covars_V1{1,2} = [72 
+68 
+68 
+72 
+56 
+57 
+66 
+62];
+
+%% GENDER V1 % F : 1 M : 2
+covars_V1{2,1} = [1
+1
+1
+2
+1
+1
+2
+2
+1
+2
+1];
+
+covars_V1{2,2} = [1
+2
+2
+2
+2
+1
+2
 1];
 
 %% per group
@@ -121,22 +174,21 @@ addpath /home/anna.skrzatek/MRI_analysis/
 
 par.run = 0;
 par.sge = 1;
-par.jobname = 'job_RS_secondlevel_auto';
+par.jobname = 'job_RS_secondlevel_auto_ac';
 
 secondlevel_RS_matlabbatch(groups,outdirs,covars,par)
 
 %% V1 session only
-addpath /home/anna.skrzatek/MRI_analysis/
 
-par.run = 0;
-par.sge = 1;
-par.jobname = 'job_RS_V1_secondlevel_Cereb_auto';
+par.run = 1;
+par.sge = 0;
+par.jobname = 'job_RS_V1_secondlevel_V1_auto';
 
-covars_V1{1,1} = vertcat(covars{1,1},covars{1,2});
-covars_V1{2,1} = vertcat(covars{2,1},covars{2,2});
+all_covars{1,1} = vertcat(covars_V1{1,1},covars_V1{1,2});
+all_covars{2,1} = vertcat(covars_V1{2,1},covars_V1{2,2});
 groups_combined = {group_V1};
 
-secondlevel_RS_matlabbatch(groups_combined,outdirs(1),covars_V1,par)
+secondlevel_RS_matlabbatch(groups_combined,outdirs_V1,all_covars,par)
 
 %% models estimate
 
@@ -146,6 +198,23 @@ cd (main_dir)
 for iout = 1 : length(outdirs)
     
     fspm = addsuffixtofilenames(outdirs{iout}, 'SPM.mat');
+
+    par.run = 0;
+    par.sge = 1;
+    par.sge_queu = 'normal,bigmem';
+    par.jobname  = 'spm_secondlevel_RS_est';
+    job_first_level_estimate(fspm,par)
+    
+end
+
+%% V1 only
+
+clear par
+cd (main_dir)
+
+for iout = 1 : length(outdirs_V1)
+    
+    fspm = addsuffixtofilenames(outdirs_V1{iout}, 'SPM.mat');
 
     par.run = 1;
     %par.sge = 1;
@@ -159,6 +228,8 @@ end
 
 % t-statistics
     Main = 1;
+
+%%
 
 for iout = 1 : length(outdirs)
     %fspm = addsuffixtofilenames(outdirs{iout},'SPM.mat');
@@ -208,6 +279,57 @@ for iout = 1 : length(outdirs)
     end
 end
 
+    
+%% V1
+
+for iout = 1 : length(outdirs_V1)
+    %fspm = addsuffixtofilenames(outdirs{iout},'SPM.mat');
+    modest = addsuffixtofilenames(outdirs_V1{iout},'SPM.mat');
+    for iroi = 1 : length(modest)
+        parts = strsplit(char(modest(iroi)), '/');
+        roilabel = parts{end-1};   
+    
+        %% Contrast names
+        contrast_t.names = {
+            sprintf('Connectivity %s',roilabel)
+            }';
+
+        %% Contrast values
+        contrast_t.values = {
+            Main
+            }';
+
+        %% Contrast type
+        contrast_t.types = cat(1,repmat({'T'},[1 length(contrast_t.names)]));
+
+        contrast.names  = [contrast_t.names];
+        contrast.values = [contrast_t.values];
+        contrast.types  = [contrast_t.types];
+
+        %% Contrast : write
+        clear par
+
+        par.sge = 0;
+        par.run = 1;
+        par.display = 0;
+        par.jobname = sprintf('spm_write_%s_con_V1',roilabel);
+
+        % par.sessrep = 'both';
+        par.sessrep = 'none';
+
+        par.delete_previous = 1;
+        par.report          = 0;
+
+        job_first_level_contrast(modest(iroi),contrast,par);
+        
+%         Stat(iout).getSerie(roilabel).addVolume('spmT_0001','main',1)
+        
+%         mainef = Stat(iout).getSerie(roilabel).getVolume('main') .toJob
+        
+        mask{iroi} = cellstr(fullfile(outdirs_V1{iout}{iroi},'mask.nii'));
+    end
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% paired t-test models definition
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -216,7 +338,7 @@ cd (main_dir)
 % define outdirs
 
 StatDp = exam(stat_dir,'deltas','.*paired');
-Sessions    = {'V2_V1'}%
+Sessions    = {'V2_V1'};%
 
 n = 1;
 for iC = 1 : length(Conditions)
@@ -250,7 +372,7 @@ addpath /home/anna.skrzatek/MRI_analysis/
 
 par.run = 0;
 par.sge = 1;
-par.jobname = 'job_RS_paired_secondlevel_auto_wocovars';
+par.jobname = 'job_RS_paired_secondlevel_auto';
 
 secondlevel_paired_RS_matlabbatch(groups,outdirs,covars_double,par)
 
@@ -262,10 +384,10 @@ for iout = 1 : length(outdirs)
     
     fspm = addsuffixtofilenames(outdirs{iout}, 'SPM.mat');
 
-    par.run = 1;
-    %par.sge = 1;
+    par.run = 0;
+    par.sge = 1;
     par.sge_queu = 'normal,bigmem';
-    par.jobname  = 'spm_secondlevel_RS_est';
+    par.jobname  = 'spm_paired_secondlevel_RS_est';
     job_first_level_estimate(fspm,par)
     
 end
@@ -285,8 +407,8 @@ for iout = 1 : length(outdirs)
     
         %% Contrast names
         contrast_t.names = {
-            sprintf('Connectivity V1-V2 %s',roilabel)
-            sprintf('Connectivity V2-V1 %s',roilabel)
+            sprintf('Connectivity V1>V2 %s',roilabel)
+            sprintf('Connectivity V1<V2 %s',roilabel)
             }';
 
         %% Contrast values
@@ -356,7 +478,7 @@ addpath /home/anna.skrzatek/MRI_analysis/
 
 par.run = 0;
 par.sge = 1;
-par.jobname = 'job_RS_2s_secondlevel_auto_AG_covars';
+par.jobname = 'job_RS_2s_secondlevel_auto_covars';
 
 secondlevel_RS_2s_matlabbatch(groups,outdirs,covars,par)
 
@@ -368,8 +490,8 @@ for iout = 1 : length(outdirs)
     
     fspm = addsuffixtofilenames(outdirs{iout}, 'SPM.mat');
 
-    par.run = 1;
-    %par.sge = 1;
+    par.run = 0;
+    par.sge = 1;
     par.sge_queu = 'normal,bigmem';
     par.jobname  = 'spm_secondlevel_RS_2s_est';
     job_first_level_estimate(fspm,par)

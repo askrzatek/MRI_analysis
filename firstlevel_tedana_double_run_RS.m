@@ -12,30 +12,29 @@ cd      /home/anna.skrzatek/data
 
 %main_dir = fullfile(pwd,'nifti');
 % 
-% stim_dir = fullfile(pwd,'/nifti_test/behav_test');
 % main_dir = fullfile(pwd,'/nifti_test/ben');
 
-stim_dir = fullfile(pwd,'/behav');
+
 main_dir = fullfile(pwd,'/nifti_test');
 
 %model_name = 'model_meica';
 %model_name = 'model_tedana';
 %model_name = {'model_tedana', 'model_ts_tapas'};
-model_name = {'full_sts_tapas_doublerun_resliced'};%, 'smodel_ts_tapas', 'smodel_dn_tapas'};
+model_name = {'full_RS_sts_tapas_doublerun_resliced'};%, 'smodel_ts_tapas', 'smodel_dn_tapas'};
 
 %% fetch dirs
 cd (main_dir)
 
-patient_regex = {'PARKGAMEII.*NB.*_a','PARKGAMEII.*BM.*_a','PARKGAMEII.*SM.*_c','PARKGAMEII.*SD.*_a','PARKGAMEII.*JR.*_a','PARKGAMEII.*LJ.*_c','PARKGAMEII.*CA.*_a','PARKGAMEII.*PC.*_c','PARKGAMEII.*DD.*_c','PARKGAMEII.*KM.*_a','PARKGAMEII.*PD.*_a','PARKGAMEII.*CK.*_c','PARKGAMEII.*BF.*_c','PARKGAMEII.*SB.*_a','PARKGAMEII.*HJ.*_a','PARKGAMEII.*LM.*_c'};
+patient_regex = {'PARKGAMEII.*NB.*_a','PARKGAMEII.*BM.*_a','PARKGAMEII.*SM.*_c','PARKGAMEII.*SD.*_a','PARKGAMEII.*JR.*_a','PARKGAMEII.*LJ.*_c','PARKGAMEII.*CA.*_a','PARKGAMEII.*PC.*_c','PARKGAMEII.*DD.*_c','PARKGAMEII.*KM.*_a','PARKGAMEII.*PD.*_a','PARKGAMEII.*CK.*_c','PARKGAMEII.*BF.*_c','PARKGAMEII.*SB.*_a','PARKGAMEII.*HJ.*_c'}; %,'PARKGAMEII.*LM.*_c'};
 % patient_regex = {'PARKGAMEII.*009_HJ','PARKGAMEII.*013_RP','PARKGAMEII.*027_OR','PARKGAMEII.*046_HJ','PARKGAMEII.*053_LM}; %exclu
 for ip = 1 : length(patient_regex)
     clear esuj
     esuj = exam(main_dir,patient_regex{ip});
-    esuj.addSerie('ACTIVATION$','run_ACTIVATION',1);
-    esuj.getSerie('run_ACTIVATION').addStim(stim_dir, 'MRI_run\d{2}_SPM.mat', 'run', 2 )
+    esuj.addSerie('RS$','run_RS',1);
+%     esuj.getSerie('run_RS').addStim(stim_dir, 'MRI_run\d{2}_SPM.mat', 'run', 2 )
     if length(esuj) == 2
-       dirFonc(ip,:) = esuj.getSerie('run_ACTIVATION') .toJob;
-       stim_files(ip,:) = esuj.getStim.toJob(0);
+       dirFonc(ip,:) = esuj.getSerie('run_RS') .toJob;
+%        stim_files(ip,:) = esuj.getStim.toJob(0);
     end
 end
 
@@ -44,17 +43,17 @@ end
 %%or
 e = exam(main_dir,'PARKGAMEII.*_[a,c]$');
 %e = exam(main_dir,'PARKGAMEII.*exclu$');
-e.addSerie('ACTIVATION$','run_ACTIVATION',1);
+e.addSerie('RS$','run_RS',1);
 e.addSerie('t1mpr.*p2$','anat',1);
 [ec,ei] = e.removeIncomplete;
 %ei.explore
 e = ec;
-dir_func_all  = e.getSerie('run_ACTIVATION') .toJob;
+dir_func_all  = e.getSerie('run_RS') .toJob;
 dir_anat = e.getSerie('anat').toJob(0); % useful only if individual display in the end (I believe)
 
 %% Make symbolic link of the V2-stim in behav directory of V1-stim
 
-%% Make symbolic link of the V2-wts_OC.nii in ACTIVATION directory of V1-wts
+%% Make symbolic link of the V2-wts_OC.nii in RS directory of V1-wts
 % Make symbolic links from tedana_vtd_mle dir to run dir based on job_meica_afni symbolic link creation 
 
 par.fake = 0;
@@ -85,7 +84,7 @@ job_symbolic_child_to_parent(dir_func_all, par);
 par.subdir = 'wts';
 par.regfile_regex = 'multiple_regressors.txt';
 for i= 1:length(e)
-    wd = e(i).getSerie('run_ACTIVATION').path;
+    wd = e(i).getSerie('run_RS').path;
     reg_dir = char(get_subdir_regex(wd, par.subdir));
     A_src = fullfile(reg_dir, par.regfile_regex);
     regfile_out = sprintf('%s_%s',par.subdir,par.regfile_regex);
@@ -111,8 +110,8 @@ double_model_dir = get_subdir_regex(main_dir, model_name{1});
 
 %could also use the patient_regex
 %patient_list = patient_regex;
-patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a','PARKGAMEII_052_HJ_a','PARKGAMEII_053_LM_c'};
-%patient_list = {'P_ARKGAMEII_009_HJ_c','P_ARKGAMEII_013_RP_c','P_ARKGAMEII_027_OR_a','P_ARKGAMEII_046_HJ_c'}; %exclu
+patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a','PARKGAMEII_052_HJ_c'}; 
+%patient_list = {'P_ARKGAMEII_009_HJ_c','P_ARKGAMEII_013_RP_c','P_ARKGAMEII_027_OR_a','P_ARKGAMEII_046_HJ_c','PARKGAMEII_053_LM_c'}; %exclu
 
 for ipatient = 1: length(patient_list)
     mkdir(double_model_dir{1}, patient_list{ipatient});
@@ -142,11 +141,13 @@ par.sge = 1;
 par.run = 0;
 par.display = 0;
 par.jobname = 'spm_glm_auto_dbl_def';
-
-job_auto_doublerun_model_specify(dirFonc, patients_dir, stim_files, par)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% TO CREATE a MODIFIED VERSION
+job_auto_RS_doublerun_model_specify(dirFonc, patients_dir, par)
 %job_ending_rountines(job1,[],par);
 
 %return
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Model Estimate &
 
@@ -170,7 +171,7 @@ regcount1 = [];
 for sub = 1 : length(patient_regex)
     clear esuj
     esuj = exam(main_dir,patient_regex{sub});
-    esuj.addSerie('ACTIVATION$','run_ACT',1);
+    esuj.addSerie('RS$','run_ACT',1);
     esuj.gser('run_ACT').addVolume('wts.*.txt','multireg',1);
     regpath{sub,:} = esuj.gser('run_ACT').gvol('multireg').path;
 %     regpath{sub} = e(sub).gser('run_ACT').gvol('multireg').path;
