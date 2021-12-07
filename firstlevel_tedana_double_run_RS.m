@@ -25,12 +25,12 @@ model_name = {'full_RS_sts_tapas_doublerun_resliced'};%, 'smodel_ts_tapas', 'smo
 %% fetch dirs
 cd (main_dir)
 
-patient_regex = {'PARKGAMEII.*NB.*_a','PARKGAMEII.*BM.*_a','PARKGAMEII.*SM.*_c','PARKGAMEII.*SD.*_a','PARKGAMEII.*JR.*_a','PARKGAMEII.*LJ.*_c','PARKGAMEII.*CA.*_a','PARKGAMEII.*PC.*_c','PARKGAMEII.*DD.*_c','PARKGAMEII.*KM.*_a','PARKGAMEII.*PD.*_a','PARKGAMEII.*CK.*_c','PARKGAMEII.*BF.*_c','PARKGAMEII.*SB.*_a','PARKGAMEII.*HJ.*_c'}; %,'PARKGAMEII.*LM.*_c'};
+patient_regex = {'PARKGAMEII.*NB.*_a','PARKGAMEII.*BM.*_a','PARKGAMEII.*SM.*_c','PARKGAMEII.*SD.*_a','PARKGAMEII.*JR.*_a','PARKGAMEII.*LJ.*_c','PARKGAMEII.*CA.*_a','PARKGAMEII.*PC.*_c','PARKGAMEII.*DD.*_c','PARKGAMEII.*KM.*_a','PARKGAMEII.*PD.*_a','PARKGAMEII.*CK.*_c','PARKGAMEII.*BF.*_c','PARKGAMEII.*SB.*_a','PARKGAMEII_052.*HJ.*_c'}; %,'PARKGAMEII.*LM.*_c'};
 % patient_regex = {'PARKGAMEII.*009_HJ','PARKGAMEII.*013_RP','PARKGAMEII.*027_OR','PARKGAMEII.*046_HJ','PARKGAMEII.*053_LM}; %exclu
 for ip = 1 : length(patient_regex)
     clear esuj
     esuj = exam(main_dir,patient_regex{ip});
-    esuj.addSerie('RS$','run_RS',1);
+    esuj.addSerie('RS$','model','run_RS',1);
 %     esuj.getSerie('run_RS').addStim(stim_dir, 'MRI_run\d{2}_SPM.mat', 'run', 2 )
     if length(esuj) == 2
        dirFonc(ip,:) = esuj.getSerie('run_RS') .toJob;
@@ -43,7 +43,7 @@ end
 %%or
 e = exam(main_dir,'PARKGAMEII.*_[a,c]$');
 %e = exam(main_dir,'PARKGAMEII.*exclu$');
-e.addSerie('RS$','run_RS',1);
+e.addSerie('RS$','model','run_RS',1);
 e.addSerie('t1mpr.*p2$','anat',1);
 [ec,ei] = e.removeIncomplete;
 %ei.explore
@@ -51,42 +51,18 @@ e = ec;
 dir_func_all  = e.getSerie('run_RS') .toJob;
 dir_anat = e.getSerie('anat').toJob(0); % useful only if individual display in the end (I believe)
 
-%% Make symbolic link of the V2-stim in behav directory of V1-stim
+%% make a symbolic link of rp_spm.txt and of multiple_regressors to RS dir
 
-%% Make symbolic link of the V2-wts_OC.nii in RS directory of V1-wts
-% Make symbolic links from tedana_vtd_mle dir to run dir based on job_meica_afni symbolic link creation 
-
-par.fake = 0;
-par.redo = 1;
-par.verbose = 2;
-
-%par.subdir        = 'tedana_vtd_mle';
-par.subdir        = 'tedana009a1_vtd';
-par.sge = 0;
-par.run = 1;
-
-% par.warp_file_reg = '^wdn';
-% job_symbolic_child_to_parent(dir_func, par);
-
-%par.warp_file_reg = '^s5wts';
-%job_symbolic_child_to_parent(dir_func, par);
-
-%par.warp_file_reg = '^s5wdn';
-%job_symbolic_child_to_parent(dir_func, par);
-
-par.warp_file_reg = '^s6wts';
-job_symbolic_child_to_parent(dir_func_all, par);
-
-%par.warp_file_reg = '^s6wdn';
-%job_symbolic_child_to_parent(dir_func, par);
-
-%% make a symbolic link of rp_spm.txt and of multiple_regressors to dir_func
-par.subdir = 'wts';
-par.regfile_regex = 'multiple_regressors.txt';
 for i= 1:length(e)
     wd = e(i).getSerie('run_RS').path;
-    reg_dir = char(get_subdir_regex(wd, par.subdir));
-    A_src = fullfile(reg_dir, par.regfile_regex);
+    parts = strsplit(wd,'/');
+    updir = sprintf('%s/%s/%s/%s/%s/%s/%s/%s/%s/%s/%s/%s',parts{1:end-2});
+
+%% multiple regressors symbolic link
+    par.subdir = 'wts';
+    par.regfile_regex = 'multiple_regressors.txt';
+    reg_src_dir = char(get_subdir_regex(updir, par.subdir));
+    A_src = fullfile(reg_src_dir, par.regfile_regex);
     regfile_out = sprintf('%s_%s',par.subdir,par.regfile_regex);
     A_dst = fullfile(wd, regfile_out);
     
@@ -99,7 +75,23 @@ for i= 1:length(e)
     [job_session(i)] = r_movefile(A_src, A_dst, 'linkn', par);
     job = [job_session];
     
+    %% wbet symbolic link
+    clear par
+    par.regfile_regex = 'wbet_Tmean_vtde1_mask.nii';
+    
+    A_src = fullfile(updir, par.regfile_regex);
+    A_dst = fullfile(wd, par.regfile_regex);
+    
+    par.redo = 0;
+    par.verbose = 2;
+    par.run = 1;
+    par.jobname = sprintf('job_symbolic_link');
+    %par.jobname = sprintf('%s_%s_%s', 'job_symbolic_link', wd(end-46:end-16), par.subdir);
+    [job_session(i)] = r_movefile(A_src, A_dst, 'linkn', par);
+    job = [job_session];
+    
 end
+
 
 %% Create output directories architecture
 
@@ -112,10 +104,16 @@ double_model_dir = get_subdir_regex(main_dir, model_name{1});
 %patient_list = patient_regex;
 patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a','PARKGAMEII_052_HJ_c'}; 
 %patient_list = {'P_ARKGAMEII_009_HJ_c','P_ARKGAMEII_013_RP_c','P_ARKGAMEII_027_OR_a','P_ARKGAMEII_046_HJ_c','PARKGAMEII_053_LM_c'}; %exclu
+ROIs = {'Caudate_L'}
+Conditions = ROIs;
 
 for ipatient = 1: length(patient_list)
     mkdir(double_model_dir{1}, patient_list{ipatient});
-    patients_dir{ipatient} = get_subdir_regex(double_model_dir, patient_list{ipatient}); %%outdirs
+    patients_dir{ipatient} = get_subdir_regex(double_model_dir, patient_list{ipatient});
+    for iROI = 1: length(Conditions)
+        mkdir(char(patients_dir{ipatient}),Conditions{iROI})
+        outdirs{ipatient,iROI} = get_subdir_regex(patients_dir{ipatient},Conditions{iROI}); %%outdirs
+    end
 end
 
 %% Job define model
