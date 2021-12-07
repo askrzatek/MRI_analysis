@@ -2,26 +2,25 @@
 clear
 clc
 
+<<<<<<< Updated upstream
 addpath /home/anna.skrzatek/matvol/
+=======
+addpath /home/anna.skrzatek/matvol/SPM/firstlevel/
+>>>>>>> Stashed changes
 addpath('/home/anna.skrzatek/MRI_analysis/')
 
 
 cd      /home/anna.skrzatek/data
 
-%main_dir = fullfile(pwd,'nifti');
-% 
-% main_dir = fullfile(pwd,'/nifti_test/ben');
-
-
 main_dir = fullfile(pwd,'/nifti_test');
 
-%model_name = 'model_meica';
-%model_name = 'model_tedana';
-%model_name = {'model_tedana', 'model_ts_tapas'};
 model_name = {'full_RS_sts_tapas_doublerun_resliced'};%, 'smodel_ts_tapas', 'smodel_dn_tapas'};
 
+<<<<<<< Updated upstream
 %% fetch dirs
 cd (main_dir)
+=======
+>>>>>>> Stashed changes
 %% fetch Input dirs
 RSinput_dir = fullfile(main_dir,'/firstlevel_RS')
 cd (RSinput_dir)
@@ -70,13 +69,20 @@ par.run = 1;
 
 % par.warp_file_reg = '^wdn';
 % job_symbolic_child_to_parent(dir_func, par);
+patient_regex = {'PARKGAMEII.*NB.*_a','PARKGAMEII.*BM.*_a','PARKGAMEII.*SM.*_c','PARKGAMEII.*SD.*_a','PARKGAMEII.*JR.*_a','PARKGAMEII.*LJ.*_c','PARKGAMEII.*CA.*_a','PARKGAMEII.*PC.*_c','PARKGAMEII.*DD.*','PARKGAMEII.*KM.*_a','PARKGAMEII.*PD.*_a','PARKGAMEII.*CK.*_c','PARKGAMEII.*BF.*_c','PARKGAMEII.*SB.*_a','PARKGAMEII_052_HJ.*_c'}; %,'PARKGAMEII.*LM.*_c'};
+%patient_regex = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a','PARKGAMEII_052_HJ_c'}; 
+% patient_regex = {'PARKGAMEII.*009_HJ','PARKGAMEII.*013_RP','PARKGAMEII.*027_OR','PARKGAMEII.*046_HJ','PARKGAMEII.*053_LM}; %exclu
+>>>>>>> Stashed changes
 ROIs = {'Caudate_L','Caudate_R','Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R','Cuneus_L','Cuneus_R','Insula_L','Insula_R','Pallidum_L','Pallidum_R','Parietal_Inf_L','Parietal_Inf_R','Parietal_Sup_L','Parietal_Sup_R','PCC','Postcentral_L','Postcentral_R','PPN_L','PPN_R','Precentral_L','Precentral_R','Precuneus_L','Precuneus_R','Putamen_L','Putamen_R','SMA_Ant_L','SMA_Ant_R','SMA_Post_L','SMA_Post_R','Thalamus_L','Thalamus_R','Vermis1_2','Vermis3','Vermis4_5','Vermis6','Vermis7','Vermis8','Vermis9','Vermis10'};
 %    ROIs = {'SMA_face_L','SMA_face_R','SMA_foot_L','SMA_foot_R','SMA_hand_L','SMA_hand_R'};
     
 dirFonc = cell(length(patient_regex),length(ROIs));
 
+<<<<<<< Updated upstream
 %par.warp_file_reg = '^s5wts';
 %job_symbolic_child_to_parent(dir_func, par);
+=======
+>>>>>>> Stashed changes
 for ip = 1 : length(patient_regex)    
     clear esuj
     esuj = exam(RSinput_dir,patient_regex{ip});
@@ -137,29 +143,7 @@ for ip = 1 : length(patient_regex)
     end
 end
 
-%par.warp_file_reg = '^s6wdn';
-%job_symbolic_child_to_parent(dir_func, par);
 
-%% make a symbolic link of rp_spm.txt and of multiple_regressors to dir_func
-par.subdir = 'wts';
-par.regfile_regex = 'multiple_regressors.txt';
-for i= 1:length(e)
-    wd = e(i).getSerie('run_RS').path;
-    reg_dir = char(get_subdir_regex(wd, par.subdir));
-    A_src = fullfile(reg_dir, par.regfile_regex);
-    regfile_out = sprintf('%s_%s',par.subdir,par.regfile_regex);
-    A_dst = fullfile(wd, regfile_out);
-    
-    par.redo = 0;
-    par.verbose = 2;
-    par.run = 0;
-    par.run = 1;
-    par.jobname = sprintf('job_symbolic_link');
-    %par.jobname = sprintf('%s_%s_%s', 'job_symbolic_link', wd(end-46:end-16), par.subdir);
-    [job_session(i)] = r_movefile(A_src, A_dst, 'linkn', par);
-    job = [job_session];
-    
-end
 
 %% Create output directories architecture
 
@@ -171,7 +155,10 @@ Conditions = ROIs;
 
 for ipatient = 1: length(patient_list)
     mkdir(double_model_dir{1}, patient_list{ipatient});
+<<<<<<< Updated upstream
     patients_dir{ipatient} = get_subdir_regex(double_model_dir, patient_list{ipatient}); %%outdirs
+=======
+>>>>>>> Stashed changes
     patients_dir{ipatient} = get_subdir_regex(double_model_dir, patient_list{ipatient});
     for iROI = 1: length(Conditions)
         mkdir(char(patients_dir{ipatient}),Conditions{iROI});
@@ -188,18 +175,27 @@ par.sge = 0;
 
 %% ts TAPAS
 
+<<<<<<< Updated upstream
 par.file_reg = '^s6wts.*nii';
+=======
+>>>>>>> Stashed changes
 par.file_reg = '^con_0001.nii';
 par.rp_regex = 'wts_multiple_regressors.txt';
 
 par.sge = 1;
 par.run = 0;
 par.display = 0;
+<<<<<<< Updated upstream
 par.jobname = 'spm_glm_auto_dbl_def';
 par.jobname = 'spm_glm_auto_dbl_def_RS';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TO CREATE a MODIFIED VERSION
 job_auto_RS_doublerun_model_specify(dirFonc, patients_dir, par)
+=======
+par.jobname = 'spm_glm_auto_dbl_def_RS';
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% TO CREATE a MODIFIED VERSION
+>>>>>>> Stashed changes
 job_auto_RS_doublerun_model_specify(dirFonc, outdirs, par)
 %job_ending_rountines(job1,[],par);
 
