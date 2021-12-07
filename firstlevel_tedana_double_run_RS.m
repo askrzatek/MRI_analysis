@@ -1,9 +1,8 @@
-@ -3,103 +3,89 @@
+%@ -3,103 +3,89 @@
 clear
 clc
 
-addpath /home/anna.skrzatek/data/StimTemplate
-addpath /home/anna.skrzatek/matvol/SPM/firstlevel/
+addpath /home/anna.skrzatek/matvol/
 addpath('/home/anna.skrzatek/MRI_analysis/')
 
 
@@ -27,8 +26,8 @@ cd (main_dir)
 RSinput_dir = fullfile(main_dir,'/firstlevel_RS')
 cd (RSinput_dir)
 
-patient_regex = {'PARKGAMEII.*NB.*_a','PARKGAMEII.*BM.*_a','PARKGAMEII.*SM.*_c','PARKGAMEII.*SD.*_a','PARKGAMEII.*JR.*_a','PARKGAMEII.*LJ.*_c','PARKGAMEII.*CA.*_a','PARKGAMEII.*PC.*_c','PARKGAMEII.*DD.*_c','PARKGAMEII.*KM.*_a','PARKGAMEII.*PD.*_a','PARKGAMEII.*CK.*_c','PARKGAMEII.*BF.*_c','PARKGAMEII.*SB.*_a','PARKGAMEII.*HJ.*_c'}; %,'PARKGAMEII.*LM.*_c'};
-patient_regex = {'PARKGAMEII.*NB.*_a','PARKGAMEII.*BM.*_a','PARKGAMEII.*SM.*_c','PARKGAMEII.*SD.*_a','PARKGAMEII.*JR.*_a','PARKGAMEII.*LJ.*_c','PARKGAMEII.*CA.*_a','PARKGAMEII.*PC.*_c','PARKGAMEII.*DD.*','PARKGAMEII.*KM.*_a','PARKGAMEII.*PD.*_a','PARKGAMEII.*CK.*_c','PARKGAMEII.*BF.*_c','PARKGAMEII.*SB.*_a','PARKGAMEII_052_HJ.*_c'}; %,'PARKGAMEII.*LM.*_c'};
+patient_regex = {'PARKGAMEII.*NB.*_a','PARKGAMEII.*BM.*_a','PARKGAMEII.*SM.*_c','PARKGAMEII.*SD.*_a','PARKGAMEII.*JR.*_a','PARKGAMEII.*LJ.*_c','PARKGAMEII.*CA.*_a','PARKGAMEII.*PC.*_c','PARKGAMEII.*DD.*','PARKGAMEII.*KM.*_a','PARKGAMEII.*PD.*_a','PARKGAMEII.*CK.*_c','PARKGAMEII.*BF.*_c','PARKGAMEII.*SB.*_a','PARKGAMEII.*HJ.*_c'}; %,'PARKGAMEII.*LM.*_c'};
+%patient_regex = {'PARKGAMEII.*NB.*_a','PARKGAMEII.*BM.*_a','PARKGAMEII.*SM.*_c','PARKGAMEII.*SD.*_a','PARKGAMEII.*JR.*_a','PARKGAMEII.*LJ.*_c','PARKGAMEII.*CA.*_a','PARKGAMEII.*PC.*_c','PARKGAMEII.*DD.*','PARKGAMEII.*KM.*_a','PARKGAMEII.*PD.*_a','PARKGAMEII.*CK.*_c','PARKGAMEII.*BF.*_c','PARKGAMEII.*SB.*_a','PARKGAMEII_052_HJ.*_c'}; %,'PARKGAMEII.*LM.*_c'};
 %patient_regex = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a','PARKGAMEII_052_HJ_c'}; 
 % patient_regex = {'PARKGAMEII.*009_HJ','PARKGAMEII.*013_RP','PARKGAMEII.*027_OR','PARKGAMEII.*046_HJ','PARKGAMEII.*053_LM}; %exclu
 for ip = 1 : length(patient_regex)
@@ -132,13 +131,9 @@ for ip = 1 : length(patient_regex)
         [job_session(i)] = r_movefile(A_src1, A_dst1, 'linkn', par);
         job = [job_session];
 
-%par.warp_file_reg = '^s5wdn';
-%job_symbolic_child_to_parent(dir_func, par);
         [job_session(i)] = r_movefile(A_src2, A_dst2, 'linkn', par);
         job = [job_session];
 
-par.warp_file_reg = '^s6wts';
-job_symbolic_child_to_parent(dir_func_all, par);
     end
 end
 
