@@ -16,7 +16,8 @@ if ischar(dir_func)
 end
 
 if ischar(dir_func{1})
-    if size(dir_func{1},1)>1
+%     if size(dir_func{1},1)>1
+    if size(dir_func,1)>1 % needed for RS processing because of a different dir architecture
         dir_func = {cellstr(dir_func{1})};
     else
         dir_func = {dir_func};

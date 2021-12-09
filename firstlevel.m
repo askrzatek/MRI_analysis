@@ -5,7 +5,7 @@ clc
 
 addpath /home/anna.skrzatek/data/StimTemplate
 
-%load e % why doesn't the e-object work?!
+%load e % if in the correct directory - cd wd before
 
 main_dir = fullfile(pwd,'nifti');
 stim_dir = fullfile(pwd,'behav');
@@ -38,7 +38,9 @@ stim_files = e.getSerie('run_ACTIVATION').getStim.toJob(0);
 par.run = 1;
 %par.pct = 1;
 % par.TR = 1.6;
-par.file_reg = '^w';
+
+par.file_reg = '^wdn';
+
 % par.rp = 1;
 par.mask_thr = 0.07;
 
@@ -78,29 +80,29 @@ contrast_T.names = {
 'IMAGINARY_Left - Rest'
 'IMAGINARY_Right - Rest'
 
-'REAL_Left - REAL_Right'
-'REAL_Right - REAL_Left'
-'IMAGINARY_Left - IMAGINARY_Right'
-'IMAGINARY_Right - IMAGINARY_Left'
+%'REAL_Left - REAL_Right'
+%'REAL_Right - REAL_Left'
+%'IMAGINARY_Left - IMAGINARY_Right'
+%'IMAGINARY_Right - IMAGINARY_Left'
 
-'REAL_Left - IMAGINARY_Left'
-'IMAGINARY_Left - REAL_Left'
-'REAL_Right - IMAGINARY_Right'
-'IMAGINARY_Right - REAL_Right'
+%'REAL_Left - IMAGINARY_Left'
+%'IMAGINARY_Left - REAL_Left'
+%'REAL_Right - IMAGINARY_Right'
+%'IMAGINARY_Right - REAL_Right'
 
 'IMAGINARY total - REAL total'
 'REAL total       - IMAGINARY total'
 
 
-'Instruction - Rest'
-'Instruction - Total Activation'
-'Total Activation - Instruction'
-'Total_REAL_Activation - Instruction'
-'REAL_Left - Instruction'
-'REAL_Right - Instruction'
-'Total_IMAGINARY_Activation - Instruction'
-'IMAGINARY_Left - Instruction'
-'IMAGINARY_Right - Instruction'
+%'Instruction - Rest'
+%'Instruction - Total Activation'
+%'Total Activation - Instruction'
+%'Total_REAL_Activation - Instruction'
+%'REAL_Left - Instruction'
+%'REAL_Right - Instruction'
+%'Total_IMAGINARY_Activation - Instruction'
+%'IMAGINARY_Left - Instruction'
+%'IMAGINARY_Right - Instruction'
 
 }';
 
@@ -118,27 +120,28 @@ REAL_Right      - Rest
 IMAGINARY_Left  - Rest
 IMAGINARY_Right - Rest
 
-REAL_Left       - REAL_Right
-REAL_Right      - REAL_Left
-IMAGINARY_Left  - IMAGINARY_Right
-IMAGINARY_Right - IMAGINARY_Left
+%REAL_Left       - REAL_Right
+%REAL_Right      - REAL_Left
+%IMAGINARY_Left  - IMAGINARY_Right
+%IMAGINARY_Right - IMAGINARY_Left
 
-REAL_Left       - IMAGINARY_Left
-IMAGINARY_Left  - REAL_Left
-REAL_Right      - IMAGINARY_Right
-IMAGINARY_Right - REAL_Right
+%REAL_Left       - IMAGINARY_Left
+%IMAGINARY_Left  - REAL_Left
+%REAL_Right      - IMAGINARY_Right
+%IMAGINARY_Right - REAL_Right
+
 (IMAGINARY_Left + IMAGINARY_Right) - (REAL_Left + REAL_Right)
 (REAL_Left + REAL_Right)           - (IMAGINARY_Left + IMAGINARY_Right)
 
-Instruction     - Rest
-4*Instruction   - (REAL_Left + REAL_Right + IMAGINARY_Left + IMAGINARY_Right)
-(REAL_Left + REAL_Right + IMAGINARY_Left + IMAGINARY_Right) - 4*Instruction
-(REAL_Left + REAL_Right)                                    - 2*Instruction
-REAL_Left       - Instruction
-REAL_Right      - Instruction
-(IMAGINARY_Left + IMAGINARY_Right)                          - 2*Instruction
-IMAGINARY_Left  - Instruction
-IMAGINARY_Right - Instruction
+%Instruction     - Rest
+%4*Instruction   - (REAL_Left + REAL_Right + IMAGINARY_Left + IMAGINARY_Right)
+%(REAL_Left + REAL_Right + IMAGINARY_Left + IMAGINARY_Right) - 4*Instruction
+%(REAL_Left + REAL_Right)                                    - 2*Instruction
+%REAL_Left       - Instruction
+%REAL_Right      - Instruction
+%(IMAGINARY_Left + IMAGINARY_Right)                          - 2*Instruction
+%IMAGINARY_Left  - Instruction
+%IMAGINARY_Right - Instruction
 
 }';
 

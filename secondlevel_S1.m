@@ -14,23 +14,9 @@ RIGHT_IMAGINARY_S1                      = [0 0 0 1];
 
 %% T contrast
 
-%% ANOVA2x2_HAND_CTL
+%% ANOVA2x2_LxT
 
 contrast_T.names = {
-    
-    'LEFT-RIGHT_S1'
-    'RIGHT-LEFT_S1'
-    'IMAGINARY-REAL_S1'
-    'REAL-IMAGINARY_S1'
-    
-    'POS-LATERALITY-TASK-INTERACTION_S1'
-    'NEG-LATERALITY-TASK-INTERACTION_S1'
-    
-    'RIGHT_REAL-LEFT_REAL_S1'
-    'RIGHT_IMAGINARY-LEFT_IMAGINARY_S1'
-    
-    'LEFT_REAL-RIGHT_REAL_S1'
-    'LEFT_IMAGINARY-RIGHT_IMAGINARY_S1'
     
     
     'LEFT_REAL_S1'
@@ -38,41 +24,66 @@ contrast_T.names = {
     'RIGHT_REAL_S1'
     'RIGHT_IMAGINARY_S1'
     
+    %'LEFT-RIGHT_S1'
+    %'RIGHT-LEFT_S1'
+    %'IMAGINARY-REAL_S1'
+    %'REAL-IMAGINARY_S1'
+    
+    'POS-LATERALITY-TASK-INTERACTION_S1'
+    'NEG-LATERALITY-TASK-INTERACTION_S1'
+    
+    %'RIGHT_REAL-LEFT_REAL_S1'
+    %'RIGHT_IMAGINARY-LEFT_IMAGINARY_S1'
+    
+    %'LEFT_REAL-RIGHT_REAL_S1'
+    %'LEFT_IMAGINARY-RIGHT_IMAGINARY_S1'
+    
+    'LEFT_REAL_S1 - LEFT_IMAGINARY_S1'
+    'LEFT_IMAGINARY_S1 - LEFT_REAL_S1'
+    
     'RIGHT_REAL_S1 - RIGHT_IMAGINARY_S1'
     'RIGHT_IMAGINARY_S1 - RIGHT_REAL_S1'
+    
     
 }';
 
 contrast_T.values = {
     
-    % [1 1 -1 -1]      'LEFT-RIGHT_S1'
-    (LEFT_REAL_S1 + LEFT_IMAGINARY_S1)       - (RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1)
-    % [-1 -1 1 1]      'RIGHT-LEFT_S1'
-    (RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1)       - (LEFT_REAL_S1 + LEFT_IMAGINARY_S1)
-    % [-1 1 -1 1]      'IMAGINARY-REAL_S1'
-    (LEFT_IMAGINARY_S1 + RIGHT_IMAGINARY_S1)  - (LEFT_REAL_S1 + RIGHT_REAL_S1)
-    % [1 -1 1 -1]      'REAL-IMAGINARY_S1'
-    (LEFT_REAL_S1 + RIGHT_REAL_S1)            - (LEFT_IMAGINARY_S1 + RIGHT_IMAGINARY_S1)
+    LEFT_REAL_S1        % [ 1 0 0 0]
+    LEFT_IMAGINARY_S1   % [ 0 1 0 0]
+    RIGHT_REAL_S1       % [ 0 0 1 0]
+    RIGHT_IMAGINARY_S1  % [ 0 0 0 1] 
+   
+    
+    %% [1 1 -1 -1]      'LEFT-RIGHT_S1'
+    %(LEFT_REAL_S1 + LEFT_IMAGINARY_S1)       - (RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1)
+    %% [-1 -1 1 1]      'RIGHT-LEFT_S1'
+    %(RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1)       - (LEFT_REAL_S1 + LEFT_IMAGINARY_S1)
+    %% [-1 1 -1 1]      'IMAGINARY-REAL_S1'
+    %(LEFT_IMAGINARY_S1 + RIGHT_IMAGINARY_S1)  - (LEFT_REAL_S1 + RIGHT_REAL_S1)
+    %% [1 -1 1 -1]      'REAL-IMAGINARY_S1'
+    %(LEFT_REAL_S1 + RIGHT_REAL_S1)            - (LEFT_IMAGINARY_S1 + RIGHT_IMAGINARY_S1)
     
     % [ 1 -1 -1 1]     'POS-LATERALITY-TASK-INTERACTION_S1'
     (LEFT_REAL_S1 + RIGHT_IMAGINARY_S1)       - (RIGHT_REAL_S1 + LEFT_IMAGINARY_S1)
     % [ -1 1 1 -1]     'NEG-LATERALITY-TASK-INTERACTION_S1'
     (RIGHT_REAL_S1 + LEFT_IMAGINARY_S1)       - (LEFT_REAL_S1 + RIGHT_IMAGINARY_S1)
     
-    % [-1 0 1 0]       'RIGHT_REAL-LEFT_REAL_S1'
-    RIGHT_REAL_S1                         - LEFT_REAL_S1
-    % [ 0 -1 0 1]      'RIGHT_IMAGINARY-LEFT_IMAGINARY_S1'
-    RIGHT_IMAGINARY_S1                    - LEFT_IMAGINARY_S1
+    %% [-1 0 1 0]       'RIGHT_REAL-LEFT_REAL_S1'
+    %RIGHT_REAL_S1                         - LEFT_REAL_S1
+    %% [ 0 -1 0 1]      'RIGHT_IMAGINARY-LEFT_IMAGINARY_S1'
+    %RIGHT_IMAGINARY_S1                    - LEFT_IMAGINARY_S1
     
-    % [1 0 -1 0]       'LEFT_REAL-RIGHT_REAL_S1'
-    LEFT_REAL_S1                         - RIGHT_REAL_S1
-    % [ 0 1 0 -1]      'LEFT_IMAGINARY-RIGHT_IMAGINARY_S1'
-    LEFT_IMAGINARY_S1                    - RIGHT_IMAGINARY_S1
+    %% [1 0 -1 0]       'LEFT_REAL-RIGHT_REAL_S1'
+    %LEFT_REAL_S1                         - RIGHT_REAL_S1
+    %% [ 0 1 0 -1]      'LEFT_IMAGINARY-RIGHT_IMAGINARY_S1'
+    %LEFT_IMAGINARY_S1                    - RIGHT_IMAGINARY_S1
     
-    LEFT_REAL_S1        % [ 1 0 0 0]
-    LEFT_IMAGINARY_S1   % [ 0 1 0 0]
-    RIGHT_REAL_S1       % [ 0 0 1 0]
-    RIGHT_IMAGINARY_S1  % [ 0 0 0 1]
+    % [-1 1 0 0]
+    LEFT_IMAGINARY_S1 - LEFT_REAL_S1
+
+    % [1 -1 0 0]
+    LEFT_REAL_S1 - LEFT_IMAGINARY_S1
     
     % [0 0 1 -1]
     RIGHT_REAL_S1 - RIGHT_IMAGINARY_S1
@@ -91,9 +102,16 @@ contrast_T.types = cat(1,repmat({'T'},[1 length(contrast_T.names)]));
 contrast_F.names = {
     
     'Avg_Condition_Effect_S1'
-    'Main_LATERALITY_Effect_S1'
-    'Main_TASK_Effect_S1'
-    'Main_SxT_INTERACTION_Effect_S1'
+    'Main_LATERALITY_Effect_LEFT_S1'
+    'Main_LATERALITY_Effect_RIGHT_S1'
+    'Main_TASK_Effect_IMA_S1'
+    'Main_TASK_Effect_REAL_S1'
+    'Main_LxT_INTERACTION_Effect_S1'
+    
+    'Main_LEFT_REAL_S1'
+    'Main_LEFT_IMAGINARY_S1'
+    'Main_RIGHT_REAL_S1'
+    'Main_RIGHT_IMAGINARY_S1'
     
 }';
 %%% CHECK THAT !!! EQUILIBRIUM aspect !!! should it not be 2* (LEFT_REAL_S1 + LEFT_IMAGINARY_S1) ???
@@ -101,12 +119,26 @@ contrast_F.names = {
 contrast_F.values = {
     %Avg_Condition_Effect_S1            = [1 1 1 1];
     LEFT_REAL_S1 + LEFT_IMAGINARY_S1 + RIGHT_REAL_S1 + RIGHT_IMAGINARY_S1
-    %Main_LATERALITY_Effect_S1             = [1 1 0 0];
+    %Main_LATERALITY_Effect_LEFT_S1             = [1 1 0 0];
     LEFT_REAL_S1                 + LEFT_IMAGINARY_S1
-    %Main_TASK_Effect_S1                = [0 1 0 1];
+    %Main_LATERALITY_Effect_RIGHT_S1             = [0 0 1 1];
+    RIGHT_REAL_S1                 + RIGHT_IMAGINARY_S1
+    %Main_TASK_Effect_IMA_S1                = [0 1 0 1];
     LEFT_IMAGINARY_S1            + RIGHT_IMAGINARY_S1
+    %Main_TASK_Effect_REAL_S1                = [1 0 1 0];
+    LEFT_REAL_S1            + RIGHT_REAL_S1
     %Main_SxT_INTERACTION_Effect_S1     = [1 0 0 1];
     LEFT_REAL_S1                 + RIGHT_IMAGINARY_S1
+   
+    %'Main_LEFT_REAL_S1'            = [1 0 0 0]
+    LEFT_REAL_S1
+    %'Main_LEFT_IMAGINARY_S1'       = [0 1 0 0]
+    LEFT_IMAGINARY_S1
+    %'Main_RIGHT_REAL_S1'           = [0 0 1 0]
+    RIGHT_REAL_S1
+    %'Main_RIGHT_IMAGINARY_S1'      = [0 0 0 1]
+    RIGHT_IMAGINARY_S1
+    
     
 }';
 
@@ -127,15 +159,22 @@ model_contrast = {contrast_2x2_LxT};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% fetch dirs for SPM
 %% Load files from multiple folders
-main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti');
+main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
 
-% e_PARKGAME = exam(main_dir,'PARKGAME');
-% e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
-e_PARKGAME_S1 = exam(main_dir,'PARKGAME.*1'); % taking into account all S1 patients
+%e_PARKGAME = exam(main_dir,'PARKGAME');
+%e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
+
+%e_REMINARY_S1 = exam(main_dir,'REMINARY_\w{2}_.*1$');
+
+%e = {e_REMINARY_S1};
+%dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_REM_S1');
+
+e_PARKGAME_S1 = exam(main_dir,'PARKGAME.*V1_[a,c]$'); % taking into account all S1 patients
 
 e = {e_PARKGAME_S1};
 dirstat = r_mkdir(main_dir, 'secondlevel_ACTIVATION_PARK_S1');
-dirgroup = r_mkdir(char(dirstat), {'PARKGAME_S1'});
+dirgroup = dirstat;
+%dirgroup = r_mkdir(char(dirstat), {'PARKGAME_S1'});
 
 done = 0;
 %done = job_con_smooth('s',4); % comment this line if you don't want to smooth your contrast data
@@ -143,12 +182,13 @@ if done ==1
     for i = 1:length(e)
         %e{i}.explore
         %'REMINARY_\w{2}_.*1$'
-        e{i}.addSerie('model_tedana$','contrasts',1)
+%        e{i}.addSerie('model_tedana$','contrasts',1)
+        e{i}.addSerie('rsmodel_ts_tapas$','contrasts',1)
 
-        e{i}.getSerie('contrasts').addVolume('^scon_0007','REAL_L',1)
-        e{i}.getSerie('contrasts').addVolume('^scon_0008','REAL_R',1)
-        e{i}.getSerie('contrasts').addVolume('^scon_0009','IMA_L',1)
-        e{i}.getSerie('contrasts').addVolume('^scon_0010','IMA_R',1)
+        e{i}.getSerie('contrasts').addVolume('^scon_0008','REAL_L',1)
+        e{i}.getSerie('contrasts').addVolume('^scon_0010','IMA_L',1)
+        e{i}.getSerie('contrasts').addVolume('^scon_0009','REAL_R',1)
+        e{i}.getSerie('contrasts').addVolume('^scon_0011','IMA_R',1)
 
         [ec_1st, ei_1st] = e{i}.removeIncomplete;
         e{i} = ec_1st;
@@ -161,12 +201,13 @@ else
     for i = 1:length(e)
         %e{i}.explore
         %'REMINARY_\w{2}_.*1$'
-        e{i}.addSerie('model_tedana$','contrasts',1)
+%        e{i}.addSerie('model_tedana$','contrasts',1)
+        e{i}.addSerie('rsmodel_ts_tapas','contrasts',1)
 
-        e{i}.getSerie('contrasts').addVolume('^con_0007','REAL_L',1)
-        e{i}.getSerie('contrasts').addVolume('^con_0008','REAL_R',1)
-        e{i}.getSerie('contrasts').addVolume('^con_0009','IMA_L',1)
-        e{i}.getSerie('contrasts').addVolume('^con_0010','IMA_R',1)
+        e{i}.getSerie('contrasts').addVolume('^con_0008','REAL_L',1)
+        e{i}.getSerie('contrasts').addVolume('^con_0010','IMA_L',1)
+        e{i}.getSerie('contrasts').addVolume('^con_0009','REAL_R',1)
+        e{i}.getSerie('contrasts').addVolume('^con_0011','IMA_R',1)
 
         [ec_1st, ei_1st] = e{i}.removeIncomplete;
         e{i} = ec_1st;
@@ -183,7 +224,7 @@ par.redo = 0;
 par.verbose = 2;
 
 %% create a result directories
-dirout = r_mkdir(dirstat{1}, model_name);
+%dirout = r_mkdir(dirstat{1}, model_name);
 
 %% Probably a MODEL LOOP will start here with model_name and model_contrast varying with iterations
 group=1;
@@ -196,10 +237,10 @@ for imod=1:length(model_name)
     model_dir = cellstr(dirout{imod});
     fact1 = 'Hand';
     fact2 = 'Task';
-    l11 = e{group}.getSerie('contrasts').getVolume('REAL_R').toJob;
-    l12 = e{group}.getSerie('contrasts').getVolume('IMA_R').toJob;
-    l21 = e{group}.getSerie('contrasts').getVolume('REAL_L').toJob;
-    l22 = e{group}.getSerie('contrasts').getVolume('IMA_L').toJob; 
+    l11 = e{group}.getSerie('contrasts').getVolume('REAL_L').toJob;
+    l12 = e{group}.getSerie('contrasts').getVolume('IMA_L').toJob; 
+    l21 = e{group}.getSerie('contrasts').getVolume('REAL_R').toJob;
+    l22 = e{group}.getSerie('contrasts').getVolume('IMA_R').toJob;
     addpath '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/'
 %% Job define model
 
@@ -240,6 +281,6 @@ end
 %!linux command for mricrogl script
 %!/network/lustre/iss01/cenir/software/irm/mricrogl_lx/MRIcroGL '/home/anna.skrzatek/data/nifti/second_level_p001_auto_less.gls'
 
-
+%addpath /network/lustre/iss01/cenir/software/irm/spm12/toolbox/marsbar/
 
 
