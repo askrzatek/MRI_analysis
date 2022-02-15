@@ -274,7 +274,7 @@ cat.extopts.report.color = [];    % report color setting invert fontcolor if dar
 cat.extopts.verb         = 2;     % verbose output: 1 - default; 2 - details; 3 - write debugging files 
 cat.extopts.ignoreErrors = 1;     % catch errors:   0 - stop with error (default); 1 - catch preprocessing errors and proceed with next subject (requires MATLAB 2008 or higher); 
                                   %                 2 - catch preprocessing errors and try backup function if this also fails then proceed with the next subject (requires MATLAB 2008 or higher)
-cat.extopts.expertgui    = 2;     % control of user GUI:   0 - common user modus with simple GUI; 1 - expert modus with extended GUI; 2 - developer modus with full GUI
+cat.extopts.expertgui    = 0;     % control of user GUI:   0 - common user modus with simple GUI; 1 - expert modus with extended GUI; 2 - developer modus with full GUI
 cat.extopts.subfolders   = 1;     % use subfolders such as mri, surf, report, and label to organize your data (this option is ignored if BIDS structure is found in your data)
 cat.extopts.experimental = 0;     % experimental functions: 0 - default, 1 - call experimental unsafe functions
 cat.extopts.print        = 2;     % display and print out pdf-file of results: 0 - off, 1 - volume only (use this to avoid problems on servers that do not support openGL), 
