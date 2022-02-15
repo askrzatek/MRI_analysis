@@ -40,6 +40,7 @@ for iR = 1 : length(ROIs)
         %mkdir(StatDir{:},char(sprintf('%s_%s',Conditions{iC},Sessions{iS})))
         RSObj_a.mkdir(sprintf('%s_%s',ROIs{iR},Sessions{iS}));
         RSObj_a.addSerie(sprintf('%s_%s',ROIs{iR},Sessions{iS}),sprintf('%s_%s',ROIs{iR},Sessions{iS}));
+        RSObj_a.addSerie('model_2','model',1)
 
         % GROUP A add volumes for each contrast - each individual
         RSObj_a.getSerie(sprintf('%s_%s',ROIs{iR},Sessions{iS})).addVolume('con.*01',sprintf('%s_%s',ROIs{iR},Sessions{iS}))
