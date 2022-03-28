@@ -76,8 +76,8 @@ contrast_PPI = {
 data_dir = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
 
 %list_subj = step00_subject_list();
-list_subj ={'PARKGAMEII_001_NB.*a$','PARKGAMEII_002_BM.*a$','PARKGAMEII_00[1,3]_SM.*c$','PARKGAMEII_007_SD.*a$','PARKGAMEII_008_JR.*a$','PARKGAMEII_023_LJ.*c$','PARKGAMEII_025_CA.*a$','PARKGAMEII_028_PC.*c$','PARKGAMEII_033_DD.*c$','PARKGAMEII_039_KM.*a$','PARKGAMEII_040_RE.*a$','PARKGAMEII_042_RS.*a$','PARKGAMEII_043_PD.*a$','PARKGAMEII_044_CK.*c$','PARKGAMEII_046_HJ.*c$','PARKGAMEII_047_BF.*c$','PARKGAMEII_048_SB.*a$','PARKGAMEII_052_HJ.*a$','PARKGAMEII_053_LM.*c$'}; 
-%list_subj ={'PARKGAMEII_052_HJ.*a$','PARKGAMEII_053_LM.*c$'}
+list_subj ={'PARKGAMEII_001_NB.*a$','PARKGAMEII_002_BM.*a$','PARKGAMEII_00[1,3]_SM.*c$','PARKGAMEII_007_SD.*a$','PARKGAMEII_008_JR.*a$','PARKGAMEII_023_LJ.*c$','PARKGAMEII_025_CA.*a$','PARKGAMEII_028_PC.*c$','PARKGAMEII_033_DD.*c$','PARKGAMEII_039_KM.*a$','PARKGAMEII_040_RE.*a$','PARKGAMEII_042_RS.*a$','PARKGAMEII_043_PD.*a$','PARKGAMEII_044_CK.*c$','PARKGAMEII_046_HJ.*c$','PARKGAMEII_047_BF.*c$','PARKGAMEII_048_SB.*a$','PARKGAMEII_052_HJ.*c$','PARKGAMEII_053_LM.*a$'}; 
+%list_subj ={'PARKGAMEII_052_HJ.*c$','PARKGAMEII_053_LM.*a$'}
 subj_dir  = gdir(data_dir,cellstr2regex(list_subj));
 %subj_dir  = gdir(data_dir,{'072','074','075','076'}); % change
 
@@ -145,19 +145,27 @@ end
 % Onsets identical for everybody (resting state)
 TR    = 1.6;
 nbvol = 300;
+par.redo = 1;
 
 for iSubj = 1 : nSubj
     
+    skip = [];
+        
     for iROI = 1 : nROI
        
         [~,roi_name] = fileparts(fileROI{iROI}); % not aplied since we create one VOI individually from a sphere at coordinates (PCC)
 
 %         roi_name = fileROI_id{iROI};
-       
         for iRun = 1 : nRun
            
             stat_dir = get_parent_path( model_dir{iSubj}(iRun) );
-           
+            
+%             beta_file = fullfile(stat_dir,'beta_0001.nii');
+%             if ~par.redo   &&  exist(beta_file,'file')
+%                 skip = [skip iSubj];
+%                 fprintf('[%s]: skiping subj %d because %s exist \n',mfilename,iSubj,beta_file);
+%             end
+            
             jobs{iSubj,iROI,iRun}.spm.stats.fmri_spec.dir = fullfile( stat_dir, sprintf('Modele_VOI__%s', roi_name) ); %'PCC')); %VOI__rCerebellum_6_Left__run1_1
             jobs{iSubj,iROI,iRun}.spm.stats.fmri_spec.timing.units = 'secs';
             jobs{iSubj,iROI,iRun}.spm.stats.fmri_spec.timing.RT = 1.6;
@@ -203,27 +211,63 @@ jobs = jobs(:);
 % clear par
 % par.display=1;
 %jobs = jobs(1:10);
+par.sge_queu = 'normal,bigmem';
+par.walltime = '01:00:00';
+par.run = 0;
+par.sge = 1;
+
 job_ending_rountines(jobs,[],par);
 
 %%  Estimate
 
 
 % model_dir = gdir(subj_dir,'^P','RS$','LFF_BOX_glm');
-
-
-Modele_roi_dir = gdir(subj_dir,'RS$','model','^Modele_VOI_'); % change ?
-SPM_roi_file = gfile(Modele_roi_dir,'SPM.mat');
-
 clear par
+clear Modele_roi_dir
+clear SPM_roi_file
+
 par.sge = 1;
+par.run = 0;
+
 par.sge_queu = 'normal,bigmem';
-par.jobname  = 'spm_firstlevel_VOI_est_double_wbet';
-job_first_level_estimate(SPM_roi_file,par);
+par.walltime = '01:00:00';
+
+for ir = 1 : nROI
+
+    for subj = 1 : nSubj
+
+        [~,roi_name] = fileparts(fileROI{ir});
+        roi_name = roi_name(1:end-10);
+
+        Modele_roi_dir{subj} = gdir(subj_dir{subj},'RS$','model',sprintf('Modele_VOI__%s.*',roi_name));
+        SPM_roi_file{subj} = char(gfile(Modele_roi_dir{subj},'SPM.mat'));
+
+    end
+    
+    cd (main_dir)
+    
+    par.jobname  = sprintf('spm_firstlevel_VOI_est_%s',roi_name);
+    job_first_level_estimate(SPM_roi_file,par);
+
+end
+
+%Modele_roi_dir = gdir(subj_dir,'RS$','model','^Modele_VOI_'); % change ?
+
+%SPM_roi_file = gfile(Modele_roi_dir,'SPM.mat');
+
+%clear par
+%par.sge = 1;
+%par.sge_queu = 'normal,bigmem';
+%par.walltime = '01:00:00';
+
+%par.jobname  = 'spm_firstlevel_VOI_est_double_wbet';
+%job_first_level_estimate(SPM_roi_file,par);
 
 %%  Define contrasts
 
 clear par
-par.sge=1;
+par.sge=0;
+par.run = 1;
 par.sge_queu = 'normal,bigmem';
 par.jobname = 'spm_firstlevel_ROI_con_double_wbet_pcc';
 
@@ -236,5 +280,34 @@ contrast.values={PositiveEffectROI};
 contrast.types={'T'};
 
 par.delete_previous = 1;
+for ir = 1 : nROI
 
-j=job_first_level_contrast(SPM_roi_file,contrast,par);
+    for subj = 1 : nSubj
+
+        [~,roi_name] = fileparts(fileROI{ir});
+        roi_name = roi_name(1:end-10);
+
+        Modele_roi_dir{subj} = gdir(subj_dir{subj},'RS$','model',sprintf('Modele_VOI__%s.*',roi_name));
+        SPM_roi_file{subj} = char(gfile(Modele_roi_dir{subj},'SPM.mat'));
+
+    end
+
+    j=job_first_level_contrast(SPM_roi_file,contrast,par);
+    
+end
+
+%% Create the directories in subject firstlevel_RS/
+firstlevel_dir = fullfile(main_dir,'firstlevel_RS');
+list_subj ={'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_040_RE_a','PARKGAMEII_042_RS_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_046_HJ_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a','PARKGAMEII_052_HJ_c','PARKGAMEII_053_LM_a'};
+
+for ir = 1 : nROI
+    for subj = 1 : length(list_subj)
+        outdir = char(gdir(firstlevel_dir,list_subj{subj}));
+        
+        [~,roi_name] = fileparts(fileROI{ir});
+        roi_name = roi_name(1:end-10);
+        
+        mkdir(outdir,sprintf('%s_V1',roi_name));
+        mkdir(outdir,sprintf('%s_V2',roi_name));
+    end
+end

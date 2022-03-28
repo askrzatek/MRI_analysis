@@ -3,7 +3,7 @@
 clear
 clc
 
-addpath /home/anna.skrzatek/data/StimTemplate
+addpath /home/anna.skrzatek/data/nifti_test/StimTemplate
 addpath /home/anna.skrzatek/matvol/SPM/firstlevel/
 addpath('/home/anna.skrzatek/MRI_analysis/')
 

@@ -36,7 +36,7 @@ dir_RS   = e.getSerie('run_RS$').removeEmpty. toJob(0);
 %dir_RS   = cellstr(dir_RS(1:length(dir_RS)/2));
 dirFunc  = e.getSerie('tedana_RS').removeEmpty.toJob(0);
 
-dirStats = e.getSerie('run_RS$').mkdir('model','model_1'); % basic model ALFF
+%dirStats = e.getSerie('run_RS$').mkdir('model','model_1'); % basic model ALFF
 dirStats = e.getSerie('run_RS$').mkdir('model','model_2'); % basic model ALFF %better denoising from tapas resliced masks
 %dirStats = dirStats(1:length(dirStats)/2);
 %% Make symbolic links from tedana_vtd_mle dir to run dir based on job_meica_afni symbolic link creation 
@@ -341,8 +341,12 @@ j=job_first_level_contrast(fspm,contrast,par)
 fmask = addsuffixtofilenames(StatDir, 'mask.nii');
 
 clear par
-par.roi_dir = sprintf('%s/ROI_pariet_mot_premot_cereb_BG_PPN',main_dir);
-par.jobname = 'spm_voi_ts_extract_atlas_wbet';
+%par.roi_dir = sprintf('%s/ROI_pariet_mot_premot_cereb_BG_PPN',main_dir);
+par.roi_dir = sprintf('%s/ROIs_masks',main_dir);
+par.jobname = 'spm_voi_ts_extract_atlas_wbet_lasttry';
+par.run = 1;
+par.sge = 0;
+par.pct = 0;
 
 spm_job_voi(fspm, fmask, par);
 
