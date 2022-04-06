@@ -7,8 +7,8 @@ clear all
 CLUSTER = 1;
 par.pct = 0;
 
-main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
-%main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test', 'firstlevel_sts_tapas_PARK_doublerun'); %,'PRISMA_REMINARY'); % pour comparer les résultats avec les VS
+main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
+%main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test', 'firstlevel_sts_tapas_PARK_doublerun'); %,'PRISMA_REMINARY'); % pour comparer les résultats avec les VS
 
 e_PARKGAME = exam(main_dir,'PARKGAME.*._[a,c]$');
 e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
@@ -184,7 +184,7 @@ e.gser('run').gvol('mask').removeEmpty.unzip_and_keep(par);
 % 
 % job = cell(0);
 % for iJob = 1 : length(run_dir)
-%     job{iJob,1} = sprintf('export FSLOUTPUTTYPE=NIFTI; cd %s; /network/lustre/iss01/cenir/software/irm/fsl5/bin/bet %s %s -R -m -f 0.3',...
+%     job{iJob,1} = sprintf('export FSLOUTPUTTYPE=NIFTI; cd %s; /network/lustre/iss02/cenir/software/irm/fsl5/bin/bet %s %s -R -m -f 0.3',...
 %         run_dir{iJob},...
 %         'mean_vtde1.nii',...
 %         'bet_mean_vtde1.nii');

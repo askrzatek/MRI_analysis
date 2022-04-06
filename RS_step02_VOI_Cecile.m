@@ -1,7 +1,7 @@
 clear
 clc
 
-%addpath '/network/lustre/iss01/cenir/analyse/irm/users/cecile.gallea/ASYA/asyasuit/'
+%addpath '/network/lustre/iss02/cenir/analyse/irm/users/cecile.gallea/ASYA/asyasuit/'
 
 par.run     = 0;
 par.display = 0;
@@ -11,30 +11,30 @@ par.jobname = 'spm_firstlevel_VOI_resliced_double_wbet';
 
 %% get ROIs & default values
 
-% dirROI  = '/network/lustre/iss01/cenir/analyse/irm/users/asya.ekmen/AMEDYST/rawIRMf/RSall/ROI_RestingState'; %%ATTENTION : nouvelles analyses avec la session 2 -> nouveau dossier de ROI
+% dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/asya.ekmen/AMEDYST/rawIRMf/RSall/ROI_RestingState'; %%ATTENTION : nouvelles analyses avec la session 2 -> nouveau dossier de ROI
 % fileROI = cellstr(char(gfile(dirROI,'^r'))); %fileROI = remove_regex(fileROI,'T1');
 % char(fileROI)
 
-% dirROI  = '/network/lustre/iss01/cenir/analyse/irm/studies/AMEDYST/RS/ROI_RS'; % change
+% dirROI  = '/network/lustre/iss02/cenir/analyse/irm/studies/AMEDYST/RS/ROI_RS'; % change
 % fileROI = cellstr(char(gfile(dirROI,{'^rROI_CbVI_L','^rROI_CbVI_R','^rROI_CbVIII_R','rROI_CingAntL','rROI_CingAntR','^rROI_FrontSupR'}))); %fileROI = remove_regex(fileROI,'T1');
 % char(fileROI)
 
 % %% case 1 .mat
 % 
-% dirROI  = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/secondlevel_sts_tapas_PARK/PARKGAME_all/rois_all_S1_p001_k10';
+% dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/secondlevel_sts_tapas_PARK/PARKGAME_all/rois_all_S1_p001_k10';
 % fileROI = cellstr(char(gfile(dirROI,{'^k10'}))); %fileROI = remove_regex(fileROI,'T1');
 % char(fileROI)
 % 
 % % ? .nii
 % 
-% dirROI  = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/secondlevel';
+% dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/secondlevel';
 % fileROI = cellstr(char(gfile(dirROI,{'^k10'}))); %fileROI = remove_regex(fileROI,'T1');
 % char(fileROI)
 % 
 % 
 % %% case 2 .mat
 % 
-% dirROI  = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/rois_atlas';
+% dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/rois_atlas';
 % fileROI = cellstr(char(gfile(dirROI,{'roi.mat$'}))); %fileROI = remove_regex(fileROI,'T1');
 % char(fileROI)
 % 
@@ -42,11 +42,11 @@ par.jobname = 'spm_firstlevel_VOI_resliced_double_wbet';
 
 %% case 3 .nii
 
-% dirROI  = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROI_aal_pariet_mot_premot_cereb_BG';
-% dirROI  = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_SMA_RS';
-% dirROI  = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROI_RestingState';
-% dirROI  = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_Cereb_RS';
-dirROI  = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROI_pariet_mot_premot_cereb_BG_PPN';
+% dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROI_aal_pariet_mot_premot_cereb_BG';
+% dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_SMA_RS';
+% dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROI_RestingState';
+% dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_Cereb_RS';
+dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROI_pariet_mot_premot_cereb_BG_PPN';
 
 fileROI = cellstr(char(gfile(dirROI,'.*'))); %fileROI = remove_regex(fileROI,'T1');
 
@@ -67,13 +67,13 @@ contrast_PPI = {
 
 %% prepare job
 % % verifs
-% main_dir = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
+% main_dir = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
 % % subj_dir = gdir(main_dir,'^Subj|^___S')
 % subj_dir = gdir(main_dir,'PARKGAME.*[a,c]$')
 % SessDir = gdir(subj_dir,'.*RS$');
 % StatDir = gdir(SessDir,'model','model_1');
 
-data_dir = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
+data_dir = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
 
 %list_subj = step00_subject_list();
 list_subj ={'PARKGAMEII_001_NB.*a$','PARKGAMEII_002_BM.*a$','PARKGAMEII_00[1,3]_SM.*c$','PARKGAMEII_007_SD.*a$','PARKGAMEII_008_JR.*a$','PARKGAMEII_023_LJ.*c$','PARKGAMEII_025_CA.*a$','PARKGAMEII_028_PC.*c$','PARKGAMEII_033_DD.*c$','PARKGAMEII_039_KM.*a$','PARKGAMEII_040_RE.*a$','PARKGAMEII_042_RS.*a$','PARKGAMEII_043_PD.*a$','PARKGAMEII_044_CK.*c$','PARKGAMEII_046_HJ.*c$','PARKGAMEII_047_BF.*c$','PARKGAMEII_048_SB.*a$','PARKGAMEII_052_HJ.*c$','PARKGAMEII_053_LM.*a$'}; 

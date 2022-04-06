@@ -9,7 +9,7 @@ clear all
 
 %% Initialise
 
-main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
+main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
 cd (main_dir)
 
 ACTION = 0;
@@ -17,7 +17,7 @@ RS = 1;
 
 % define input directory
 InputfMRI = fullfile(main_dir,'/full_sts_tapas_doublerun_resliced');
-InputRS   = fullfile(main_dir,'firstlevel_RS');
+InputRS   = fullfile(main_dir,'full_RS_sts_tapas_doublerun_resliced');
 
 
 %% Regressors definition
@@ -58,7 +58,7 @@ covars{2} = [1
 %% Target regressors definition & their outdirs
 % define or create output directory
 mkdir(main_dir,'full_resliced_multiple_regression')
-MultiRegDir = fullfile(main_dir,'full_resliced_multiple_regression')
+MultiRegDir = fullfile(main_dir,'full_resliced_multiple_regression_delta')
 
 if ACTION
     RegDirC = fullfile(main_dir, '/full_resliced_ACT_clinic');
@@ -536,7 +536,7 @@ end
 
 if RS
     %% get the RS inputfiles in the ref directory
-    patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a','PARKGAME_052_HJ_c'};
+    patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a','PARKGAMEII_052_HJ_c'};
 
     for ipatient = 1: length(patient_list)
         mkdir(InputRS, patient_list{ipatient});
@@ -551,12 +551,27 @@ if RS
     RSObj_a = exam(InputRS,'PARK.*a$');
     RSObj_c = exam(InputRS,'PARK.*[c,DD]$');
     
-     ROIs = {'Caudate_L','Caudate_R','Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R','Cuneus_L','Cuneus_R','Insula_L','Insula_R','Pallidum_L','Pallidum_R','Parietal_Inf_L','Parietal_Inf_R','Parietal_Sup_L','Parietal_Sup_R','PCC','Postcentral_L','Postcentral_R','PPN_L','PPN_R','Precentral_L','Precentral_R','Precuneus_L','Precuneus_R','Putamen_L','Putamen_R','SMA_Ant_L','SMA_Ant_R','SMA_Post_L','SMA_Post_R','Thalamus_L','Thalamus_R','Vermis1_2','Vermis3','Vermis4_5','Vermis6','Vermis7','Vermis8','Vermis9','Vermis10'};
+    ROIs = {'Caudate_L','Caudate_R','Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R','Cuneus_L','Cuneus_R','Insula_L','Insula_R','Pallidum_L','Pallidum_R','Parietal_Inf_L','Parietal_Inf_R','Parietal_Sup_L','Parietal_Sup_R','PCC','Postcentral_L','Postcentral_R','PPN_L','PPN_R','Precentral_L','Precentral_R','Precuneus_L','Precuneus_R','SMA_Ant_L','SMA_Ant_R','SMA_Post_L','SMA_Post_R','Vermis1_2','Vermis3','Vermis4_5','Vermis6','Vermis7','Vermis8','Vermis9','Vermis10'};
 %    ROIs = {'SMA_face_L','SMA_face_R','SMA_foot_L','SMA_foot_R','SMA_hand_L','SMA_hand_R'};
+%    ROIs = {'Thalamus_aal_L','Thalamus_aal_R','Putamen_aal_L','Putamen_aal_R'}
     Conditions  = ROIs;
     %Sessions    = {'V1','V2', 'V2_V1'};
-    Sessions    = {'V2_V1'};
+    Sessions    = {'V1_V2','V2_V1'};
     for iR = 1 : length(ROIs)
+        roi_name1 = ROIs{iR}(1:end-2);
+        roi_name2 = ROIs{iR}(end);
+    
+        RSObj_a.addSerie(sprintf('^%s.*%s',roi_name1,roi_name2),ROIs{iR});
+        % GROUP A add volumes for each contrast - each individual
+        RSObj_a.getSerie(ROIs{iR}).addVolume('con.*001',sprintf('%s_V1_V2',ROIs{iR}))
+        RSObj_a.getSerie(ROIs{iR}).addVolume('con.*002',sprintf('%s_V2_V1',ROIs{iR}))
+
+        RSObj_c.addSerie(sprintf('^%s.*%s',roi_name1,roi_name2),ROIs{iR});
+        % GROUP C add volumes for each contrast - each individual
+        RSObj_c.getSerie(ROIs{iR}).addVolume('con.*001',sprintf('%s_V1_V2',ROIs{iR}))
+        RSObj_c.getSerie(ROIs{iR}).addVolume('con.*002',sprintf('%s_V2_V1',ROIs{iR}))
+        
+%% needs to be changed/put in another loop - doesn't work with the double run model
         for iS = 1 : length(Sessions)
             %mkdir(StatDir{:},char(sprintf('%s_%s',Conditions{iC},Sessions{iS})))
             RSObj_a.mkdir(sprintf('%s_%s',ROIs{iR},Sessions{iS}));
@@ -597,11 +612,21 @@ for iC = 1 : length(Conditions)
         multigcons_a{c} = cellstr(multicons_a{c}(:) .toJob)
         multicons_c{c} = fMRIObj.getSerie('c').getVolume(sprintf('^%s_V1$',Conditions{iC})) %.toJob;
         multigcons_c{c} = cellstr(multicons_c{c}(:) .toJob)
+        
+        multicons_a{c} = fMRIObj.getSerie('a').getVolume(sprintf('^%s_V2_V1$',Conditions{iC})) %.toJob;
+        multigcons_a{c} = cellstr(multicons_a{c}(:) .toJob)
+        multicons_c{c} = fMRIObj.getSerie('c').getVolume(sprintf('^%s_V2_V1$',Conditions{iC})) %.toJob;
+        multigcons_c{c} = cellstr(multicons_c{c}(:) .toJob)
     end
     if RS
         multiRS_a{c}   = RSObj_a.getSerie(sprintf('%s_V1',Conditions{iC})).getVolume(sprintf('^%s_V1$',Conditions{iC})) %.toJob;
         multigRS_a{c} = cellstr(multiRS_a{c}(:) .toJob)            
         multiRS_c{c}  = RSObj_c.getSerie(sprintf('%s_V1',Conditions{iC})).getVolume(sprintf('^%s_V1$',Conditions{iC})) %.toJob;
+        multigRS_c{c} = cellstr(multiRS_c{c}(:) .toJob)
+        
+        multiRS_a{c}   = RSObj_a.getSerie(sprintf('%s',Conditions{iC})).getVolume(sprintf('%s_V2_V1',Conditions{iC})) %.toJob;
+        multigRS_a{c} = cellstr(multiRS_a{c}(:) .toJob)            
+        multiRS_c{c}  = RSObj_c.getSerie(sprintf('%s',Conditions{iC})).getVolume(sprintf('%s_V2_V1',Conditions{iC})) %.toJob;
         multigRS_c{c} = cellstr(multiRS_c{c}(:) .toJob)
     end
     c = c + 1;
@@ -622,9 +647,16 @@ for iC = 1 : length(Conditions)
             gcons_c{n} = cellstr(cons_c{n}(:) .toJob)
         end
         if RS
+            %% V1 & V2 separetely
             RS_a{n}   = RSObj_a.getSerie(sprintf('%s_%s',Conditions{iC},Sessions{iS})).getVolume(sprintf('%s_%s',Conditions{iC},Sessions{iS})) %.toJob;
             gRS_a{n} = cellstr(RS_a{n}(:) .toJob)            
             RS_c{n}  = RSObj_c.getSerie(sprintf('%s_%s',Conditions{iC},Sessions{iS})).getVolume(sprintf('%s_%s',Conditions{iC},Sessions{iS})) %.toJob;
+            gRS_c{n} = cellstr(RS_c{n}(:) .toJob)
+            
+            %% deltas
+            RS_a{n}   = RSObj_a.getSerie(Conditions{iC}).getVolume(sprintf('%s_%s',Conditions{iC},Sessions{iS})) %.toJob;
+            gRS_a{n} = cellstr(RS_a{n}(:) .toJob)            
+            RS_c{n}  = RSObj_c.getSerie(Conditions{iC}).getVolume(sprintf('%s_%s',Conditions{iC},Sessions{iS})) %.toJob;
             gRS_c{n} = cellstr(RS_c{n}(:) .toJob)
         end
         n = n + 1;
@@ -636,6 +668,7 @@ if ACTION
 end
 if RS
     outdirs = Stat.getSerie('.*') .toJob; % 7 x 1 x 108 cells
+%    outdirs_left = Stat.getSerie('.*') .toJob;
     multioutdirs = MultiStat.getSerie('.*') .toJob;
 end
 
@@ -675,7 +708,20 @@ if ACTION
     
     multiregression_model_spec(multioutdirs, multigcons_a, multigcons_c, covars, target_regressors, par)
     
+%% Multiregression V2-V1 all in    
     
+    par.run = 1;
+    par.sge = 0;
+    par.jobname = 'ACT_multireg_model_spec';
+    par.nb_cond = length(multioutdirs);
+    par.nb_cons = length(multioutdirs{1});
+    target_regressors.name  = {MultiStat.name};
+    %target_regressors.value = {targetsAPA1,targetsDA1,targetsSS1, targetAxial1,targetGabs1,targetUPDRS1,targetUPDRSIII_Axial1,targetUPDRSIII_Sup1}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
+    target_regressors.value = {targetsAPA, targetsDA, targetAxial, targetGabs};
+    %cellstr(multicons_a{1}.path)
+    %cons_c
+    
+    multiregression_model_spec(multioutdirs, multigcons_a, multigcons_c, covars, target_regressors, par)
  
 end
 
@@ -684,8 +730,8 @@ end
 %% Models specification
 if RS
     
-    par.run      = 1;
-    par.sge      = 0;
+    par.run      = 0;
+    par.sge      = 1;
     
     par.jobname = 'RS_reg_model_spec';
     par.nb_cond = length(outdirs);
@@ -710,6 +756,21 @@ if RS
     
     multiregression_model_spec(multioutdirs, multigRS_a, multigRS_c, covars, target_regressors, par)
 
+    %% Multiregression V2-V1 all in    
+    
+    par.run = 1;
+    par.sge = 0;
+    par.jobname = 'RS_multireg_model_spec';
+    par.nb_cond = length(multioutdirs);
+    par.nb_cons = length(multioutdirs{1});
+    target_regressors.name  = {MultiStat.name};
+    target_regressors.value = {targetsAPA,targetsDA,targetAxial,targetGabs}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
+
+    %cellstr(multicons_a{1}.path)
+    %cons_c
+    
+    multiregression_model_spec(multioutdirs, multigRS_a, multigRS_c, covars, target_regressors, par)
+
 %%
  
 end
@@ -722,8 +783,8 @@ for iout = 1 : length(outdirs)
     fspm = addsuffixtofilenames(outdirs{iout}, 'SPM.mat');
     multifspm = addsuffixtofilenames(multioutdirs{iout}, 'SPM.mat');
 
-    par.run = 1;
-    %par.sge = 1;
+    par.run = 0;
+    par.sge = 1;
     par.sge_queu = 'normal,bigmem';
     
     par.jobname  = sprintf('spm_reg_model_est_%s',target_regressors.name{iout});
@@ -787,7 +848,7 @@ for iout = 1 : length(outdirs)
         
         %% pTFCE toolbox for all con_001 & con_002 in our outdirs
 %% % sadly we still don't know how to transform variable to img - computation works, but no file is created
-        addpath /network/lustre/iss01/cenir/software/irm/spm12/toolbox/pTFCE/
+        addpath /network/lustre/iss02/cenir/software/irm/spm12/toolbox/pTFCE/
         
         [MpTFCE_Z, MpTFCE_p] = pTFCE_adapt(modest{iroi}, char(mainef));
         [DpTFCE_Z, DpTFCE_p] = pTFCE_adapt(modest{iroi}, char(diffef));
@@ -851,7 +912,7 @@ for iout = 1 : length(multioutdirs)
         %% pTFCE toolbox for all con_001 & con_002 in our outdirs
 %% % sadly we still don't know how to transform variable to img - computation works, but no file is created
 
-        addpath /network/lustre/iss01/cenir/software/irm/spm12/toolbox/pTFCE/
+        addpath /network/lustre/iss02/cenir/software/irm/spm12/toolbox/pTFCE/
         
         [PpTFCE_Z, PpTFCE_p] = pTFCE_adapt(modest{iroi}, char(poscorel));
         [NpTFCE_Z, NpTFCE_p] = pTFCE_adapt(modest{iroi}, char(negcorel));

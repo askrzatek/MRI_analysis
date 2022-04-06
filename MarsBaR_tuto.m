@@ -8,12 +8,12 @@
 %%% $Id: run_tutorial.m,v 1.3 2004/08/15 01:19:43 matthewbrett Exp $
 
 %%% Start marsbar to make sure spm_get works
-addpath /network/lustre/iss01/cenir/software/irm/spm12/toolbox/marsbar/
+addpath /network/lustre/iss02/cenir/software/irm/spm12/toolbox/marsbar/
 marsbar('on')
 
 %%% You might want to define the path to the example data here, as in
 %%% subjroot = '/my/path/somewhere';
-%% dir_model = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti/secondlevel_ACTIVATION_PARK_S1/ANOVA2x2_LxT'
+%% dir_model = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti/secondlevel_ACTIVATION_PARK_S1/ANOVA2x2_LxT'
 %% subjroot = dir_model; %maybe needs to be transformed in cell
 subjroot = get_subjroot();
 

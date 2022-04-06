@@ -316,7 +316,7 @@ e.getSerie('model').addVolume('^spm[TF]_\d{4}','con',length(contrast.names));
 % Coordlist.names = {'centre'; 'RIGHT SM'; 'LEFT SM'; 'CEREBELLUM'; 'MOTOR BI'};
 % %mkdir('/home/anna.skrzatek/Desktop','auto_figures_first_level_con4');
 % output_dir = '/home/anna.skrzatek/Desktop/auto_figures_first_level_con4/';
-% wd = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/';
+% wd = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/';
 % 
 % for n =1:length(fspm)
 %     mdir = e(n).getSerie('model').path;
@@ -328,7 +328,7 @@ e.getSerie('model').addVolume('^spm[TF]_\d{4}','con',length(contrast.names));
 
 %% Save the new e object
 
-%cd /network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/
+%cd /network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/
 %save e
 
 %% Create figures

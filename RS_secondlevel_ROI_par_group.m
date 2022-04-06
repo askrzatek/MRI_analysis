@@ -3,7 +3,7 @@
 clc
 clear all
 
-main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
+main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
 stat_dir = fullfile(main_dir,'full_secondlevel_RS');
 A_dir = fullfile(main_dir,'resliced_RS_ANOVA_V1V2');
 

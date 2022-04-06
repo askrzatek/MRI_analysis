@@ -1,7 +1,7 @@
 clear all
 close all
 %%
-main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti');
+main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek','nifti');
 
 e_REMINARYS1 = exam(main_dir,'REMINARY_\w{2}_.*1$');
 e_REMINARYS2 = exam(main_dir,'REMINARY_\w{2}_.*2$');

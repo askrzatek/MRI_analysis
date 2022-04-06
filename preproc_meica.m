@@ -2,7 +2,7 @@ clear
 clc
 
 %% Load files from multiple folders
-main_dir = fullfile('/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek','nifti');
+main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek','nifti');
 
 e_PARKGAME = exam(main_dir,'PARKGAME');
 e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');

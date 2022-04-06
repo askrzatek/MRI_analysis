@@ -3,12 +3,12 @@
 clear
 clc
 
-main_dir = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
+main_dir = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
 cd(main_dir)
 
 load e
 
-%addpath '/network/lustre/iss01/cenir/analyse/irm/users/cecile.gallea/ASYA/asyasuit/'
+%addpath '/network/lustre/iss02/cenir/analyse/irm/users/cecile.gallea/ASYA/asyasuit/'
 
 %% Modeling low frequency fluctuations
 
@@ -271,7 +271,7 @@ end
 
 %% Other routines
 % verifs
-main_dir = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
+main_dir = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
 % subj_dir = gdir(main_dir,'^Subj|^___S')
 %subj_dir = gdir(main_dir,'PARKGAME.*[a,c]$')
 subj_dir = e.gpath;
@@ -288,7 +288,7 @@ par.jobname = 'spm_first_level_spec_RS_wbet';
 [ jobs ] = job_ending_rountines( jobs, skip, par );
 %% Estimate
 
-% main_dir = '/network/lustre/iss01/cenir/analyse/irm/studies/AMEDYST/RS/nifti';
+% main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AMEDYST/RS/nifti';
 % subj_dir = gdir(main_dir,'^Subj|^')
 %
 % spm_file = gfile(dirStats(subj),'SPM.mat'))
