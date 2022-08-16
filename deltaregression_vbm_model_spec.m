@@ -36,18 +36,23 @@ for i = 1 : par.nb_cond % a loop for each target regressor
 
         %%
         jobs{ijob}.spm.stats.factorial_design.dir = outdir{i};
-        cons = [cellstr(char(cons_a{:}));cellstr(char(cons_c{:}))];
-        %cons{2,iout} = cons_c{iout};
-        
-        jobs{ijob}.spm.stats.factorial_design.des.mreg.scans = spm_select('expand',cons);
         %%
-        %%
-        jobs{ijob}.spm.stats.factorial_design.des.mreg.mcov.c = target_regressor.value{i};
-        %%
-        jobs{ijob}.spm.stats.factorial_design.des.mreg.mcov.cname = target_regressor.name{i};
-        jobs{ijob}.spm.stats.factorial_design.des.mreg.mcov.iCC = 1;
-        jobs{ijob}.spm.stats.factorial_design.des.mreg.incint = 1;
-        %%
+        jobs{ijob}.spm.stats.factorial_design.des.t2.scans1 = spm_select('expand',cons_a);
+        jobs{ijob}.spm.stats.factorial_design.des.t2.scans2 = spm_select('expand',cons_c);
+        jobs{ijob}.spm.stats.factorial_design.des.t2.dept = 0;
+        jobs{ijob}.spm.stats.factorial_design.des.t2.variance = 1;
+        jobs{ijob}.spm.stats.factorial_design.des.t2.gmsca = 0;
+        jobs{ijob}.spm.stats.factorial_design.des.t2.ancova = 0;
+%         %%
+%         cons = [cellstr(char(cons_a{:}));cellstr(char(cons_c{:}))];
+%         jobs{ijob}.spm.stats.factorial_design.des.mreg.scans = spm_select('expand',cons);
+%         %%
+%         jobs{ijob}.spm.stats.factorial_design.des.mreg.mcov.c = target_regressor.value{i};
+%         %%
+%         jobs{ijob}.spm.stats.factorial_design.des.mreg.mcov.cname = target_regressor.name{i};
+%         jobs{ijob}.spm.stats.factorial_design.des.mreg.mcov.iCC = 1;
+%         jobs{ijob}.spm.stats.factorial_design.des.mreg.incint = 1;
+%         %%
         jobs{ijob}.spm.stats.factorial_design.cov(1).c = covars{1};
         %%
         jobs{ijob}.spm.stats.factorial_design.cov(1).cname = 'Age';
@@ -65,6 +70,12 @@ for i = 1 : par.nb_cond % a loop for each target regressor
         jobs{ijob}.spm.stats.factorial_design.cov(3).cname = 'TIV';
         jobs{ijob}.spm.stats.factorial_design.cov(3).iCFI = 1;
         jobs{ijob}.spm.stats.factorial_design.cov(3).iCC = 1;
+        %%
+        jobs{ijob}.spm.stats.factorial_design.cov(4).c = target_regressor.value{i};
+        %%
+        jobs{ijob}.spm.stats.factorial_design.cov(4).cname = target_regressor.name{i};
+        jobs{ijob}.spm.stats.factorial_design.cov(4).iCFI = 2;
+        jobs{ijob}.spm.stats.factorial_design.cov(4).iCC = 1;
         %%
         jobs{ijob}.spm.stats.factorial_design.multi_cov = struct('files', {}, 'iCFI', {}, 'iCC', {});
         jobs{ijob}.spm.stats.factorial_design.masking.tm.tm_none = 1;
