@@ -20,7 +20,11 @@ for igroup = 1 : length(groups)
     for icon = 1 : 2 : length(groups{igroup})-1
         %icon
         jobs{ijob}.spm.stats.factorial_design.dir = outdirs{igroup}(iout);
-
+        
+        
+        if exist(outdirs{igroup}{iout},'dir') && exist(char(get_subdir_regex_files(outdirs{igroup}(iout),'SPM.mat')),'file')
+            skip = [skip ijob];
+        end
         for ipatient = 1 : length(groups{igroup}{icon})
 %             jobs{ijob}.spm.stats.factorial_design.des.pt.pair(ipatient).scans = {
 %                                                                           '/home/anna.skrzatek/data/nifti_test/firstlevel_RS/PARKGAMEII_001_NB_a/Caudate_L_V1/con_0001.nii,1'
