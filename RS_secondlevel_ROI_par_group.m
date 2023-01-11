@@ -28,9 +28,24 @@ RSObj_c = exam(InputRS,'PARK.*[c,DD]$');
 RS_all = exam( InputRS,'PARK.*a$') + exam(InputRS,'PARK.*[c,DD]$');
 RS_V1_all = exam( InputRS,'PARK.*a$') + exam(InputRS,'PARK.*a_V1') + exam(InputRS,'PARK.*[c,DD]$') + exam(InputRS,'PARK.*c_V1');
 
-ROIs = {'Caudate_L','Caudate_R','Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R','Cuneus_L','Cuneus_R','Insula_L','Insula_R','Pallidum_L','Pallidum_R','Parietal_Inf_L','Parietal_Inf_R','Parietal_Sup_L','Parietal_Sup_R','PCC','Postcentral_L','Postcentral_R','PPN_L','PPN_R','Precentral_L','Precentral_R','Precuneus_L','Precuneus_R','Putamen_L','Putamen_R','SMA_Ant_L','SMA_Ant_R','SMA_Face_L','SMA_Face_R','SMA_Foot_L','SMA_Foot_R','SMA_Hand_L','SMA_Hand_R','SMA_Post_L','SMA_Post_R','Thalamus_L','Thalamus_R','Vermis1_2','Vermis3','Vermis4_5','Vermis6','Vermis7','Vermis8','Vermis9','Vermis10'};
+%ROIs = {'Caudate_L','Caudate_R','Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R','Cuneus_L','Cuneus_R','Insula_L','Insula_R','Pallidum_L','Pallidum_R','Parietal_Inf_L','Parietal_Inf_R','Parietal_Sup_L','Parietal_Sup_R','PCC','Postcentral_L','Postcentral_R','PPN_L','PPN_R','Precentral_L','Precentral_R','Precuneus_L','Precuneus_R','Putamen_L','Putamen_R','SMA_Ant_L','SMA_Ant_R','SMA_Face_L','SMA_Face_R','SMA_Foot_L','SMA_Foot_R','SMA_Hand_L','SMA_Hand_R','SMA_Post_L','SMA_Post_R','Thalamus_L','Thalamus_R','Vermis1_2','Vermis3','Vermis4_5','Vermis6','Vermis7','Vermis8','Vermis9','Vermis10'};
 %ROIs = {'SMA_Ant_L','SMA_Ant_R','SMA_Face_L','SMA_Face_R','SMA_Foot_L','SMA_Foot_R','SMA_Hand_L','SMA_Hand_R','SMA_Post_L','SMA_Post_R'};
 %ROIs = {'Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R'};
+
+dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/FOG_APA_network';
+dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Cortical_loco';
+dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Basal_Ganglia_loco';
+dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Cognitive_circuit';
+dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Cueing';
+dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Ordi';
+
+fileROI = cellstr(char(gfile(dirROI,'.*.nii'))); %fileROI = remove_regex(fileROI,'T1');
+ROIs = cell(1,length(fileROI));
+for iROI = 1 : length(fileROI)
+    [~,roi_name] = fileparts(fileROI{iROI});
+    ROIs{iROI} = roi_name;
+end
+
 Conditions  = ROIs;
 Sessions    = {'V1','V2'}%,'V2-V1'};
 A_Sessions  = {'V2_V1'}; % pour ANOVA
@@ -40,7 +55,7 @@ for iR = 1 : length(ROIs)
         %mkdir(StatDir{:},char(sprintf('%s_%s',Conditions{iC},Sessions{iS})))
         RSObj_a.mkdir(sprintf('%s_%s',ROIs{iR},Sessions{iS}));
         RSObj_a.addSerie(sprintf('%s_%s',ROIs{iR},Sessions{iS}),sprintf('%s_%s',ROIs{iR},Sessions{iS}));
-        RSObj_a.addSerie('model_2','model',1)
+%        RSObj_a.addSerie('model_2','model',1)
 
         % GROUP A add volumes for each contrast - each individual
         RSObj_a.getSerie(sprintf('%s_%s',ROIs{iR},Sessions{iS})).addVolume('con.*01',sprintf('%s_%s',ROIs{iR},Sessions{iS}))
@@ -179,8 +194,8 @@ covars_V1{2,2} = [1
 %% per group
 addpath /home/anna.skrzatek/MRI_analysis/
 
-par.run = 0;
-par.sge = 1;
+par.run = 1;
+par.sge = 0;
 par.jobname = 'job_RS_secondlevel_auto_ac';
 
 secondlevel_RS_matlabbatch(groups,outdirs,covars,par)
@@ -206,8 +221,8 @@ for iout = 1 : length(outdirs)
     
     fspm = addsuffixtofilenames(outdirs{iout}, 'SPM.mat');
 
-    par.run = 0;
-    par.sge = 1;
+    par.run = 1;
+    par.sge = 0;
     par.sge_queu = 'normal,bigmem';
     par.jobname  = 'spm_secondlevel_RS_est';
     job_first_level_estimate(fspm,par)
@@ -382,8 +397,8 @@ end
 % define models per group
 addpath /home/anna.skrzatek/MRI_analysis/
 
-par.run = 0;
-par.sge = 1;
+par.run = 1;
+%par.sge = 1;
 par.jobname = 'job_RS_paired_secondlevel_auto';
 
 secondlevel_paired_RS_matlabbatch(groups,outdirs,covars_double,par)
@@ -396,8 +411,8 @@ for iout = 1 : length(outdirs)
     
     fspm = addsuffixtofilenames(outdirs{iout}, 'SPM.mat');
 
-    par.run = 0;
-    par.sge = 1;
+    par.run = 1;
+    par.sge = 0;
     par.sge_queu = 'normal,bigmem';
     par.jobname  = 'spm_paired_secondlevel_RS_est';
     job_first_level_estimate(fspm,par)
@@ -488,8 +503,8 @@ groups  = {gRS_a, gRS_c};
 % define models per group
 addpath /home/anna.skrzatek/MRI_analysis/
 
-par.run = 0;
-par.sge = 1;
+par.run = 1;
+par.sge = 0;
 par.jobname = 'job_RS_2s_secondlevel_auto_covars';
 
 secondlevel_RS_2s_matlabbatch(groups,outdirs,covars,par)
@@ -502,8 +517,8 @@ for iout = 1 : length(outdirs)
     
     fspm = addsuffixtofilenames(outdirs{iout}, 'SPM.mat');
 
-    par.run = 0;
-    par.sge = 1;
+    par.run = 1;
+    par.sge = 0;
     par.sge_queu = 'normal,bigmem';
     par.jobname  = 'spm_secondlevel_RS_2s_est';
     job_first_level_estimate(fspm,par)
@@ -592,8 +607,8 @@ A_groups  = {gRS_a_V1, gRS_a_V2; gRS_c_V1, gRS_c_V2}; % A_groups{1,:} : 2 groupe
 cd (main_dir)
 addpath /home/anna.skrzatek/MRI_analysis/
 
-par.run = 0;
-par.sge = 1;
+par.run = 1;
+par.sge = 0;
 par.jobname = 'job_RS_ANOVA_full_auto_covars';
 par.con_auto = 0;
 
