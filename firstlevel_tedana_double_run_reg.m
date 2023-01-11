@@ -27,7 +27,7 @@ model_name = {'full_sts_tapas_doublerun_resliced_emg'};%, 'smodel_ts_tapas', 'sm
 %% fetch dirs
 cd (main_dir)
 
-patient_regex = {'PARKGAMEII.*NB.*_a$','PARKGAMEII.*BM.*_a$','PARKGAMEII.*SM.*_c$','PARKGAMEII.*SD.*_a$','PARKGAMEII.*JR.*_a$','PARKGAMEII.*LJ.*_c$','PARKGAMEII.*CA.*_a$','PARKGAMEII.*PC.*_c$','PARKGAMEII.*DD.*','PARKGAMEII.*KM.*_a$','PARKGAMEII.*PD.*_a$','PARKGAMEII.*CK.*_c$','PARKGAMEII.*BF.*_c$','PARKGAMEII.*SB.*_a$','PARKGAMEII_052.*HJ.*_c$'}; %,'PARKGAMEII.*LM.*_a'};
+patient_regex = {'PARKGAMEII.*NB.*_a$','PARKGAMEII.*BM.*_a$','PARKGAMEII.*SM.*_c$','PARKGAMEII.*SD.*_a$','PARKGAMEII.*JR.*_a$','PARKGAMEII.*LJ.*_c$','PARKGAMEII.*CA.*_a$','PARKGAMEII.*PC.*_c$','PARKGAMEII.*DD.*','PARKGAMEII.*KM.*_a$','PARKGAMEII.*PD.*_a$','PARKGAMEII.*CK.*_c$','PARKGAMEII.*BF.*_c$','PARKGAMEII_052.*HJ.*_c$'}; %,'PARKGAMEII.*SB.*_a$','PARKGAMEII.*LM.*_a'};
 % patient_regex = {'PARKGAMEII.*009_HJ','PARKGAMEII.*013_RP','PARKGAMEII.*027_OR','PARKGAMEII.*046_HJ','PARKGAMEII.*053_LM}; %exclu
 for ip = 1 : length(patient_regex)
     clear esuj
@@ -120,7 +120,7 @@ double_model_dir = get_subdir_regex(main_dir, model_name{1});
 
 %could also use the patient_regex
 %patient_list = patient_regex;
-patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_048_SB_a','PARKGAMEII_052_HJ_c'}; %,'PARKGAMEII_053_LM_c'};
+patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c','PARKGAMEII_007_SD_a','PARKGAMEII_008_JR_a','PARKGAMEII_023_LJ_c','PARKGAMEII_025_CA_a','PARKGAMEII_028_PC_c','PARKGAMEII_033_DD','PARKGAMEII_039_KM_a','PARKGAMEII_043_PD_a','PARKGAMEII_044_CK_c','PARKGAMEII_047_BF_c','PARKGAMEII_052_HJ_c'}; %,'PARKGAMEII_048_SB_a','PARKGAMEII_053_LM_c'};
 %patient_list = {'P_ARKGAMEII_009_HJ_c','P_ARKGAMEII_013_RP_c','P_ARKGAMEII_027_OR_a','P_ARKGAMEII_046_HJ_c'}; %exclu
 
 for ipatient = 1: length(patient_list)
@@ -147,8 +147,9 @@ par.rp = 1;
 par.file_reg = '^s6wts.*nii';
 par.rp_regex = 'wts_multiple_regressors.txt';
 
-par.sge = 1;
-par.run = 0;
+par.sge = 0;
+par.run = 1;
+par.redo = 0;
 par.display = 0;
 par.jobname = 'emg_spm_glm_auto_dbl_def';
 
@@ -161,8 +162,8 @@ job_doublerun_model_specify_reg(dirFonc, patients_dir, stim_files, emg_reg, par)
 
 clear par
 
-par.run = 0;
-par.sge = 1;
+par.run = 1;
+par.sge = 0;
 par.display = 0;
 par.jobname = 'spm_glm_dble_est'
 
@@ -196,30 +197,37 @@ par.sessrep = 'none';
 
 if par.sessrep == 'none'
     %% T-Contrast : definition
-    Rest            = [1 0 0 0 0 0];
-    REAL_Left       = [0 1 0 0 0 0];
-    REAL_Right      = [0 0 1 0 0 0];
-    IMAGINARY_Left  = [0 0 0 1 0 0];
-    IMAGINARY_Right = [0 0 0 0 1 0];
-    Instruction     = [0 0 0 0 0 1];
+    % cond 1:Rest cond 2:Ima_L cond 3:Ima_R cond 4:Ext_R cond 5:Ext_L cond 6:Fle_R cond 7:Fle_L
+    Rest            = [1 0 0 0 0 0 0 ];
+    REAL_Left_e       = [0 0 0 0 1 0 0 ]; 
+    REAL_Right_e      = [0 0 0 1 0 0 0 ];
+    IMAGINARY_Left  = [0 1 0 0 0 0 0 ];
+    IMAGINARY_Right = [0 0 1 0 0 0 0 ];
+    REAL_Left_f       = [0 0 0 0 0 0 1 ]; 
+    REAL_Right_f      = [0 0 0 0 0 1 0 ];
+%     Instruction     = [0 0 0 0 0 1];
     
     for isuj = 1: length(fspm)
         
         %% V1
-        Rest_S1            = horzcat(Rest, regcon{isuj},zeros(1,6));
-        REAL_Left_S1       = horzcat(REAL_Left, regcon{isuj},zeros(1,6));
-        REAL_Right_S1      = horzcat(REAL_Right, regcon{isuj},zeros(1,6));
-        IMAGINARY_Left_S1  = horzcat(IMAGINARY_Left, regcon{isuj},zeros(1,6));
-        IMAGINARY_Right_S1 = horzcat(IMAGINARY_Right, regcon{isuj},zeros(1,6));
-        Instruction_S1     = horzcat(Instruction, regcon{isuj},zeros(1,6));
+        Rest_S1            = horzcat(Rest, regcon{isuj},zeros(1,7));
+        REAL_Left_S1_e       = horzcat(REAL_Left_e, regcon{isuj},zeros(1,7));
+        REAL_Right_S1_e      = horzcat(REAL_Right_e, regcon{isuj},zeros(1,7));
+        IMAGINARY_Left_S1  = horzcat(IMAGINARY_Left, regcon{isuj},zeros(1,7));
+        IMAGINARY_Right_S1 = horzcat(IMAGINARY_Right, regcon{isuj},zeros(1,7));
+        REAL_Left_S1_f       = horzcat(REAL_Left_e, regcon{isuj},zeros(1,7));
+        REAL_Right_S1_f      = horzcat(REAL_Right_e, regcon{isuj},zeros(1,7));
+%         Instruction_S1     = horzcat(Instruction, regcon{isuj},zeros(1,6));
         
         %% V2
-        Rest_S2            = horzcat(zeros(1,6),regcon{isuj},Rest);
-        REAL_Left_S2       = horzcat(zeros(1,6),regcon{isuj},REAL_Left);
-        REAL_Right_S2      = horzcat(zeros(1,6),regcon{isuj},REAL_Right);
-        IMAGINARY_Left_S2  = horzcat(zeros(1,6),regcon{isuj},IMAGINARY_Left);
-        IMAGINARY_Right_S2 = horzcat(zeros(1,6),regcon{isuj},IMAGINARY_Right);
-        Instruction_S2     = horzcat(zeros(1,6),regcon{isuj},Instruction);
+        Rest_S2            = horzcat(zeros(1,7),regcon{isuj},Rest);
+        REAL_Left_S2_e       = horzcat(zeros(1,7),regcon{isuj},REAL_Left_e);
+        REAL_Right_S2_e      = horzcat(zeros(1,7),regcon{isuj},REAL_Right_e);
+        IMAGINARY_Left_S2  = horzcat(zeros(1,7),regcon{isuj},IMAGINARY_Left);
+        IMAGINARY_Right_S2 = horzcat(zeros(1,7),regcon{isuj},IMAGINARY_Right);
+        REAL_Left_S2_f       = horzcat(zeros(1,7),regcon{isuj},REAL_Left_f);
+        REAL_Right_S2_f      = horzcat(zeros(1,7),regcon{isuj},REAL_Right_f);
+%         Instruction_S2     = horzcat(zeros(1,6),regcon{isuj},Instruction);
         
         %%
     
@@ -228,39 +236,51 @@ if par.sessrep == 'none'
 
         contrast_T.names = {
 
-            'Rest_S1'
-            'Rest_S2'
-            'REAL_Left_S1'
-            'REAL_Left_S2'
-            'REAL_Right_S1'
-            'REAL_Right_S2'
-            'IMAGINARY_Left_S1'
-            'IMAGINARY_Left_S2'
-            'IMAGINARY_Right_S1'
-            'IMAGINARY_Right_S2'
-            'Instruction_S1'
-            'Instruction_S1'
+            'Rest_V1'
+            'Rest_V2'
+            'REAL_Left_V1_e'
+            'REAL_Left_V2_e'
+            'REAL_Right_V1_e'
+            'REAL_Right_V2_e'
+            'IMAGINARY_Left_V1'
+            'IMAGINARY_Left_V2'
+            'IMAGINARY_Right_V1'
+            'IMAGINARY_Right_V2'
+            'REAL_Left_V1_f'
+            'REAL_Left_V2_f'
+            'REAL_Right_V1_f'
+            'REAL_Right_V2_f'
 
-            'REAL_Left - Rest_S1'
-            'REAL_Left - Rest_S2'
-            'REAL_Right - Rest_S1'
-            'REAL_Right - Rest_S2'
-            'IMAGINARY_Left - Rest_S1'
-            'IMAGINARY_Left - Rest_S2'
-            'IMAGINARY_Right - Rest_S1'
-            'IMAGINARY_Right - Rest_S2'
+%             'Instruction_S1'
+%             'Instruction_S1'
+
+            'REAL_Left - Rest_V1_e'
+            'REAL_Left - Rest_V2_e'
+            'REAL_Right - Rest_V1_e'
+            'REAL_Right - Rest_V2_e'
+            'IMAGINARY_Left - Rest_V1'
+            'IMAGINARY_Left - Rest_V2'
+            'IMAGINARY_Right - Rest_V1'
+            'IMAGINARY_Right - Rest_V2'
+            'REAL_Left - Rest_V1_f'
+            'REAL_Left - Rest_V2_f'
+            'REAL_Right - Rest_V1_f'
+            'REAL_Right - Rest_V2_f'
 
             %Add the S1 vs S2 contrasts
-            'REAL_Right_S2 > S1'
-            'IMAGINARY_Right_S2 > S1'
-            'REAL_Left_S2 > S1'
-            'IMAGINARY_Left_S2 > S1'
+            'REAL_Right_V2 > V1_e'
+            'IMAGINARY_Right_V2 > V1'
+            'REAL_Left_V2 > V1_e'
+            'IMAGINARY_Left_V2 > V1'
+            'REAL_Right_V2 > V1_f'
+            'REAL_Left_V2 > V1_f'
             
-            'REAL_Right_S1 > S2'
-            'IMAGINARY_Right_S1 > S2'
-            'REAL_Left_S1 > S2'
-            'IMAGINARY_Left_S1 > S2'
-            
+            'REAL_Right_V1 > V2_e'
+            'IMAGINARY_Right_V1 > V2'
+            'REAL_Left_V1 > V2_e'
+            'IMAGINARY_Left_V1 > V2'
+            'REAL_Right_V1 > V2_f'
+            'REAL_Left_V1 > V2_f'
 
             %% complementary individual contrasts
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -284,36 +304,49 @@ if par.sessrep == 'none'
 
             Rest_S1
             Rest_S2
-            REAL_Left_S1
-            REAL_Left_S2
-            REAL_Right_S1
-            REAL_Right_S2
+            REAL_Left_S1_e
+            REAL_Left_S2_e
+            REAL_Right_S1_e
+            REAL_Right_S2_e
             IMAGINARY_Left_S1
             IMAGINARY_Left_S2
             IMAGINARY_Right_S1
             IMAGINARY_Right_S2
-            Instruction_S1
-            Instruction_S2
+            REAL_Left_S1_f
+            REAL_Left_S2_f
+            REAL_Right_S1_f
+            REAL_Right_S2_f
+            
+%             Instruction_S1
+%             Instruction_S2
 
-            REAL_Left_S1 - Rest_S1
-            REAL_Left_S2 - Rest_S2
-            REAL_Right_S1 - Rest_S1
-            REAL_Right_S2 - Rest_S2
+            REAL_Left_S1_e - Rest_S1
+            REAL_Left_S2_e - Rest_S2
+            REAL_Right_S1_e - Rest_S1
+            REAL_Right_S2_e - Rest_S2
             IMAGINARY_Left_S1 - Rest_S1
             IMAGINARY_Left_S2 - Rest_S2
             IMAGINARY_Right_S1 - Rest_S1
             IMAGINARY_Right_S2 - Rest_S2
+            REAL_Left_S1_f - Rest_S1
+            REAL_Left_S2_f - Rest_S2
+            REAL_Right_S1_f - Rest_S1
+            REAL_Right_S2_f - Rest_S2
 
             %Add the S1 vs S2 contrasts
-            REAL_Right_S2 - REAL_Right_S1
+            REAL_Right_S2_e - REAL_Right_S1_e
             IMAGINARY_Right_S2 - IMAGINARY_Right_S1
-            REAL_Left_S2 - REAL_Left_S1
+            REAL_Left_S2_e - REAL_Left_S1_e
             IMAGINARY_Left_S2 - IMAGINARY_Left_S1
+            REAL_Right_S2_f - REAL_Right_S1_f
+            REAL_Left_S2_f - REAL_Left_S1_f
             
-            REAL_Right_S1 - REAL_Right_S2
+            REAL_Right_S1_e - REAL_Right_S2_e
             IMAGINARY_Right_S1 - IMAGINARY_Right_S2
-            REAL_Left_S1 - REAL_Left_S2
+            REAL_Left_S1_e - REAL_Left_S2_e
             IMAGINARY_Left_S1 - IMAGINARY_Left_S2
+            REAL_Right_S1_f - REAL_Right_S2_f
+            REAL_Left_S1_f - REAL_Left_S2_f
 
             %% complementary individual contrasts
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -357,8 +390,8 @@ if par.sessrep == 'none'
             %% Contrast : write
             clear par
 
-            par.sge = 1;
-            par.run = 0;
+            par.sge = 0;
+            par.run = 1;
             par.display = 0;
             par.jobname = sprintf('spm_glm_con_%d',isuj);
             
