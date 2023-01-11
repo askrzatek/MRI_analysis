@@ -1,4 +1,4 @@
-function jobs = deltaregression_vbm_model_spec(outdir, cons_a, cons_c, covars, target_regressor, par)
+function jobs = multiregression_vbm_model_spec(outdir, cons, covars, target_regressor, par)
 %%
 
   skip = [];
@@ -36,7 +36,7 @@ for i = 1 : par.nb_cond % a loop for each target regressor
 
         %%
         jobs{ijob}.spm.stats.factorial_design.dir = outdir{i};
-        cons = [cellstr(char(cons_a{:}));cellstr(char(cons_c{:}))];
+        %cons = [cellstr(char(cons_a{:}));cellstr(char(cons_c{:}))];
         %cons{2,iout} = cons_c{iout};
         
         jobs{ijob}.spm.stats.factorial_design.des.mreg.scans = spm_select('expand',cons);
