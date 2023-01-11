@@ -3,20 +3,21 @@
 clear
 clc
 
-addpath /home/anna.skrzatek/data/nifti_test/StimTemplate
+addpath /network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/StimTemplate
 addpath /home/anna.skrzatek/matvol/SPM/firstlevel/
 addpath('/home/anna.skrzatek/MRI_analysis/')
 
 
-cd      /home/anna.skrzatek/data
+cd      /network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/
 
 %main_dir = fullfile(pwd,'nifti');
 % 
 % stim_dir = fullfile(pwd,'/nifti_test/behav_test');
 % main_dir = fullfile(pwd,'/nifti_test/ben');
 
-stim_dir = fullfile(pwd,'/behav');
+%stim_dir = fullfile(pwd,'/behav');
 main_dir = fullfile(pwd,'/nifti_test');
+stim_dir = fullfile(main_dir,'electrophy');
 
 %model_name = 'model_meica';
 %model_name = 'model_tedana';
@@ -26,7 +27,7 @@ model_name = {'full_sts_tapas_doublerun_resliced'};%, 'smodel_ts_tapas', 'smodel
 %% fetch dirs
 cd (main_dir)
 
-patient_regex = {'PARKGAMEII.*NB.*_a','PARKGAMEII.*BM.*_a','PARKGAMEII.*SM.*_c','PARKGAMEII.*SD.*_a','PARKGAMEII.*JR.*_a','PARKGAMEII.*LJ.*_c','PARKGAMEII.*CA.*_a','PARKGAMEII.*PC.*_c','PARKGAMEII.*DD.*_c','PARKGAMEII.*KM.*_a','PARKGAMEII.*PD.*_a','PARKGAMEII.*CK.*_c','PARKGAMEII.*BF.*_c','PARKGAMEII.*SB.*_a','PARKGAMEII.*HJ.*_a','PARKGAMEII.*LM.*_c'};
+patient_regex = {'PARKGAMEII.*NB.*_a$','PARKGAMEII.*BM.*_a$','PARKGAMEII.*SM.*_c$','PARKGAMEII.*SD.*_a$','PARKGAMEII.*JR.*_a$','PARKGAMEII.*LJ.*_c$','PARKGAMEII.*CA.*_a$','PARKGAMEII.*PC.*_c$','PARKGAMEII.*DD.*','PARKGAMEII.*KM.*_a$','PARKGAMEII.*PD.*_a$','PARKGAMEII.*CK.*_c$','PARKGAMEII.*BF.*_c$','PARKGAMEII.*SB.*_a$','PARKGAMEII.*HJ.*_c$'}; %,'PARKGAMEII.*LM.*_a'};
 % patient_regex = {'PARKGAMEII.*009_HJ','PARKGAMEII.*013_RP','PARKGAMEII.*027_OR','PARKGAMEII.*046_HJ','PARKGAMEII.*053_LM}; %exclu
 for ip = 1 : length(patient_regex)
     clear esuj
@@ -230,7 +231,7 @@ if par.sessrep == 'none'
             'IMAGINARY_Right_S1'
             'IMAGINARY_Right_S2'
             'Instruction_S1'
-            'Instruction_S1'
+            'Instruction_S2'
 
             'REAL_Left - Rest_S1'
             'REAL_Left - Rest_S2'
