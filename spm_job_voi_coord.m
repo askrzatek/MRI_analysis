@@ -49,7 +49,7 @@ function [jobs] = spm_job_voi_coord(fspm, fmask, par)
     defpar.walltime                           = '04:00:00';
     defpar.run                                = 0;
     defpar.sge                                = 1;
-    defpar.voi.name                           = {'New VOI'};
+    defpar.voi.name                           = {'Test_VOI'};
     defpar.voi.coord                          = {[0 0 0]};
     defpar.voi.radius                         = {8};
     
