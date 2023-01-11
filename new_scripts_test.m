@@ -120,16 +120,14 @@ patients_dir = get_subdir_regex(Input, patient_list); %%outdirs
 
 %% ONCE THE INPUT STRUCTURE EXISTS
 % separate files in analysis groups : V1_all, PARK_c, PARK_a
-Sessions = exam(Input,'^V[1,2]');
+Sessions = exam(Input,'^PARKGAMEII.*');
 Sessions.addSerie('report','TIV',1);
 Sessions.addSerie('mri','mri',1);
 
-Sessions.gser('mri').addVolume('^smwp1.*a.nii$','smwp1_a',8);
-Sessions.gser('mri').addVolume('^smwp1.*c.nii$','smwp1_c',7);
+Sessions.gser('mri').addVolume('^swp1v_V1.*.nii$','smwp1',1);
+Sessions.gser('TIV').addVolume('^cat_v.*.xml','TIV',1);
 
-Sessions.gser('TIV').addVolume('^cat_rmv.*a.xml','TIV_a',8);
-Sessions.gser('TIV').addVolume('^cat_rmv.*c.xml','TIV_c',7);
-
+addpath('/home/anna.skrzatek/MRI_analysis/')
 
 %% CAT12 TIV estimation
 %% V1
@@ -143,6 +141,7 @@ par.foutdir     = main_dir;
 par.run         = 1;
 
 job_cat_TIV_estimate(catreport_xml,par);
+
 load TIV_V1.txt
 
 %% V1 per group
@@ -319,6 +318,107 @@ for iout = 1 : length(outdirs)
     job_first_level_contrast(fspm,contrast,par);
 
 end
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% VBM V2-V1 individual statistics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+cocovars{1,:} = [covars{1,1};covars{1,2}];
+cocovars{2,:} = [covars{2,1};covars{2,2}];
+coTIV_reg = [TIV_reg{:,1};TIV_reg{:,2}];
+
+for iS = 1 : length(patients_dir)
+
+    cocovars_double{1,iS}(1) = cocovars{1}(iS);
+    cocovars_double{2,iS}(1) = cocovars{2}(iS);
+    cocovars_double{3,iS}(1) = coTIV_reg(iS,1);
+    
+    cocovars_double{1,iS}(2) = cocovars{1}(iS);
+    cocovars_double{2,iS}(2) = cocovars{2}(iS);
+    cocovars_double{3,iS}(2) = coTIV_reg(iS,2);
+
+end
+
+for iS = 1:length(patients_dir)
+    mkdir(patients_dir{iS},'V2_V1')
+end
+
+out_a = exam(Input,'^PARKGAME.*_a$');
+out_c = exam(Input,'^PARKGAME.*[D,c]$');
+out = out_a + out_c;
+out.addSerie('V2_V1','V2_V1',1);
+cooutdir = gpath(out.gser('V2_V1'));
+
+subj = [VBM_a, VBM_c];
+
+par.run = 1;
+
+firstlevel_2s_vbm_matlabbatch(subj,cooutdir,cocovars_double,par)
+
+%% Single paired t-test model estimate
+
+for iout = 10 : length(cooutdir)
+    
+    fspm = addsuffixtofilenames(cooutdir(iout), '/SPM.mat');
+
+    %fspm = addsuffixtofilenames(cooutdir(15), '/SPM.mat');
+
+    par.run = 1;
+    par.sge = 0;
+    par.sge_queu = 'normal,bigmem';
+    par.jobname  = 'spm_single_paired_secondlevel_vbm_est';
+    job_first_level_estimate(fspm,par)
+    
+end
+
+%% Contrast creation for each SPM.mat : single paired t-test
+% t-statistics
+V1 = [1 0];    
+V2 = [0 1];
+%%%%%% ???
+
+for iout = 1 : length(cooutdir)
+    
+    fspm = addsuffixtofilenames(cooutdir(iout), '/SPM.mat');
+
+%% Contrast names
+    contrast_t.names = {
+        'VBM V1'
+        'VBM V2'
+        'VBM V1<V2'
+        'VBM V1>V2'
+        }';
+
+    %% Contrast values
+    contrast_t.values = {
+        V1
+        V2
+        V2-V1
+        V1-V2
+        }';
+
+    %% Contrast type
+    contrast_t.types = cat(1,repmat({'T'},[1 length(contrast_t.names)]));
+
+    contrast.names  = [contrast_t.names];
+    contrast.values = [contrast_t.values];
+    contrast.types  = [contrast_t.types];
+
+    %% Contrast : write
+    clear par
+
+    par.sge = 0;
+    par.run = 1;
+    par.display = 0;
+    par.jobname = 'spm_write_vbm_con';
+
+    par.sessrep = 'none';
+
+    par.delete_previous = 1;
+    par.report          = 0;
+     
+    job_first_level_contrast(fspm,contrast,par);
+
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 2 SAMPLE T-TEST // shouldn't apply because of too small sample sizes
@@ -386,23 +486,82 @@ job_first_level_estimate(fspm,par)
      
     job_first_level_contrast(fspm,contrast,par);
     
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% REGRESSION
+%% REGRESSION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 covarsV1_reg = {vertcat(covars{1,:}),vertcat(covars{2,:}),vertcat(TIV_reg{1,1},TIV_reg{1,2})};
 covarsV2_reg = {vertcat(covars{1,:}),vertcat(covars{2,:}),vertcat(TIV_reg{2,1},TIV_reg{2,2})};
 
-mkdir(stat_dir,'full_resliced_multiple_regression')
-MultiRegDir = fullfile(stat_dir,'multiple_regression')
+%% AGE
+covars{1} = [70 % 001_NB_a
+74              % 002_BM
+64              % 007_SD
+76              % 008_JR
+79              % 025_CA
+61              % 039_KM
+71              % 040_RE ?
+72              % 042_RS ?
+75              % 043_PD
+66              % 048_SB
+59              % 053_LM ?
+72              % 003_SM_c
+68              % 023_LJ
+68              % 028_PC_c
+72              % 033_DD
+56              % 044_CK
+62              % 046_HJ ?
+57              % 047_BF
+66];            % 052_HJ
+         
+%% GENDER
+covars{2} = [1  % 001_NB_a
+1               % 002_BM
+1               % 007_SD
+2               % 008_JR
+1               % 025_CA
+1               % 039_KM
+1               % 040_RE ?
+2               % 042_RS ?
+2               % 043_PD
+2               % 048_SB
+1               % 053_LM ?
+1               % 003_SM_c
+2               % 023_LJ
+2               % 028_PC_c
+2               % 033_DD
+2               % 044_CK
+1               % 046_HJ ?
+1               % 047_BF
+2];             % 052_HJ
 
-MultiRegDirC = fullfile(MultiRegDir, '/VBM_clinic');
-%   Clinic = {'AXIAL','GABS','UPDRSIII','UPDRSIII_AXIAL','UPDRSIII_SUP'};
-Clinic = {'AXIAL','GABS','UPDRSIII'};
+%% TIV
+covars{3} = vertcat(TIV_reg{1,1},TIV_reg{1,2});
+
+%% Target regressors definition & their outdirs
+% define or create output directory
+mkdir(main_dir,'full_resliced_multiple_regression_V1')
+MultiRegDir = fullfile(main_dir,'full_resliced_multiple_regression_V1')
+
+if ACTION
+    MultiRegDirC = fullfile(MultiRegDir, '/ACT_clinic_V1');
+    Clinic = {'AXIAL','GABS','UPDRSIII','UPDRSIII_AXIAL','UPDRSIII_SUP'};
     
-MultiRegDirG = fullfile(MultiRegDir, '/VBM_gait/Spontaneous');
-%   Gait  = {'APA_AP','DA','Step_Size'};
-Gait  = {'APA_AP','DA'};
+    MultiRegDirG = fullfile(MultiRegDir, '/ACT_gait_V1/Spontaneous');
+    Gait  = {'APA_AP','DA','Step_Size'};
+    %Gait_up  = {'Rapid','Spontaneous'}; % the Rapid gait condition is one subject shorter - needs a separate processing
+end
 
+if RS
+    MultiRegDirC = fullfile(MultiRegDir, '/RS_clinic_V1');
+    Clinic = {'AXIAL','GABS','UPDRSIII','UPDRSIII_AXIAL','UPDRSIII_SUP'};
+    
+    MultiRegDirG = fullfile(MultiRegDir, '/RS_gait/Spontaneous');
+    Gait  = {'APA_AP','DA','Step_Size'};
+    %Gait_up  = {'Rapid','Spontaneous'}; % the Rapid gait condition is one subject shorter - needs a separate processing
+end
+
+%RegDir = horzcat({RegDirG}, {RegDirC});
 MultiRegDir = horzcat({MultiRegDirG}, {MultiRegDirC});
 model = horzcat({Gait},{Clinic});
 for imodel = 1:2
@@ -414,184 +573,244 @@ for imodel = 1:2
     end
 end
 
-MultiStat = MultiStatObjG{1}{1} + MultiStatObjG{1}{2} + MultiStatObjC{2}{1} + MultiStatObjC{2}{2} + MultiStatObjC{2}{3};
+MultiStat = MultiStatObjG{1}{1} + MultiStatObjG{1}{2} + MultiStatObjG{1}{3} + MultiStatObjC{2}{1} + MultiStatObjC{2}{2} + MultiStatObjC{2}{3} + MultiStatObjC{2}{4} + MultiStatObjC{2}{5} ;
 MultiStat.explore
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% V1 regressors
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Spontan APA_AP
-targetsAPA1 = [34.7171835889
-20.8184436256
-14.0398756669
-26.6625447276
-30.8778153637
-34.7289858365
-36.4238611957
-30.6084803157
-37.3914711347
-33.3035609785
-41.7655772122
-26.2586959347
-32.1145722308
-35.176597489
-31.2547254406906];
+targetsAPA1 = [34.7171835889    % 001_NB
+20.8184436256                   % 002_BM
+14.0398756669                   % 007_SD
+26.6625447276                   % 008_JR
+30.8778153637                   % 025_CA
+34.7289858365                   % 039_KM
+12.809081479101                 % 040_RE ?
+38.1662614156685                % 042_RS ?
+36.4238611957                   % 043_PD
+30.6084803157                   % 048_SB
+55.1500901593812                % 053_LM ?
+37.3914711347                   % 003_SM_c
+33.3035609785                   % 023_LJ
+41.7655772122                   % 028_PC
+26.2586959347                   % 033_DD
+32.1145722308                   % 044_CK
+34.2056328066679                % 046_HJ ?
+35.176597489                    % 047_BF
+31.2547254406906];              % 052_HJ
 
 %% Spontan DA
-targetsDA1 = [0.229615923
-0.2486013264
-0.2995684834
-0.2920857032
-0.2572407702
-0.2558116756
-0.1843411258
-0.2517826825
-0.1624504829
-0.2447760219
-0.2448816538
-0.2531833616
-0.2184634975
-0.1773839842
-0.245088527771041];
+targetsDA1 = [0.229615923       % 001_NB
+0.2486013264                    % 002_BM
+0.2995684834                    % 007_SD
+0.2920857032                    % 008_JR
+0.2572407702                    % 025_CA
+0.2558116756                    % 039_KM
+0.26562558007923                % 040_RE ?
+0.197120826259196               % 042_RS ?
+0.1843411258                    % 043_PD
+0.2517826825                    % 048_SB
+0.210950764006791               % 053_LM ?
+0.1624504829                    % 003_SM_c
+0.2447760219                    % 023_LJ
+0.2448816538                    % 028_PC
+0.2531833616                    % 033_DD
+0.2184634975                    % 044_CK
+0.283773951006549               % 046_HJ ?
+0.1773839842                    % 047_BF
+0.245088527771041];             % 052_HJ
+
+%% Spontan Step_Size
+targetsSS1 = [257.3421060198    % 001_NB
+461.4812761193                  % 002_BM
+249.806860919                   % 007_SD
+388.3478308826                  % 008_JR
+163.3475358607                  % 025_CA
+275.7546680306                  % 039_KM
+162.962895971799                % 040_RE ?
+415.737032074417                % 042_RS ?
+315.6876356933                  % 043_PD
+371.2412257681                  % 048_SB
+406.869666413503                % 053_LM ?
+230.2511033831                  % 003_SM_c
+302.5132704199                  % 023_LJ
+262.8219167263                  % 028_PC
+340.6669320703                  % 033_DD
+421.525704218                   % 044_CK
+336.690629708893                % 046_HJ ?
+447.2221013178                  % 047_BF
+240.696518058572];              % 052_HJ
+
+%% Rapid APA_AP
+targetrAPA1 = [56.1860003179    % 001_NB
+42.202244009                    % 002_BM
+19.9279281562                   % 007_SD
+38.3572741643                   % 008_JR
+43.1886233663                   % 039_KM
+% 040_RE ?
+% 042_RS ?
+63.3029794047                   % 043_PD
+57.0992020159                   % 048_SB
+% 053_LM
+61.9964561812                   % 003_SM_c
+42.2617161059                   % 023_LJ
+53.1842418093                   % 028_PC
+51.3589704894                   % 033_DD
+61.1835358307                   % 044_CK
+% 046_HJ
+51.1603131288                    % 047_BF
+];  % 052_HJ
+
+%% Rapid DA
+targetrDA1 = [0.1781937653      % 001_NB
+0.1892911011                    % 002_BM
+0.2379586858                    % 007_SD
+0.2200210944                    % 008_JR
+0.1808432371                    % 039_KM
+% RE ?
+% RS ?
+0.1457373272                    % 043_PD
+0.2024911505                    % 048_SB
+0.1217863129                    % 003_SM_c
+0.2044142615                    % 023_LJ
+
+
+0.1992642898                    % 028_PC
+0.1682406621                    % 033_DD
+0.1644736842                    % 044_CK
+% HJ
+0.1373089983                    % 047_BF
+];  % 052_HJ
         
-%% AXIAL
-targetAxial1 = [2
-4
-7
-7
-10
-4
-1
-3
-3
-4
-8
-7
-3
-2
-11];
-           
-%% GABS
-targetGabs1 =  [20
-28
-31
-33
-43
-28
-19
-29
-19
-18
-32
-26
-14
-18
-39];   
+%% Rapid Step_Size
+targetrSS1 = [385.33658393      % 001_NB
+400.9512381886                  % 002_BM
+326.7006392201                  % 007_SD
+428.223371688                   % 008_JR
+398.4146093581                  % 039_KM
+% RE ?
+% RS ?
+502.8718930147                  % 043_PD
+484.1753627556                  % 048_SB
+200.2581921664                  % 003_SM_c
+424.4445720736                  % 023_LJ
 
-%% UPDRS III
-targetUPDRS1 = [17
-22
-28
-25
-36
-13
-20
-15
-23
-33
-36
-50
-20
-31
-34];        
-           
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% V2 - V1 regressors
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Spontan APA_AP
-targetsAPA= [23.1555713831
-            1.40458578
-            2.0220748182
-            -2.0984142453
-            13.9773798135
-            3.4770321678
-            21.0407162019
-            9.1372754791
-            12.9359263434
-            7.3001966719
-            9.4773158702
-            0.2727108575
-            -0.3172168418
-            9.8691469678
-            -2.09655588609517];
 
-%% Spontan DA
-targetsDA = [-0.0552436383
-            -0.0173607532
-            -0.0288778442
-            0.0046389714
-            0.0163977306
-            -0.023941678
-            -0.0038788317
-            -0.0083970006
-            0.0099967642
-            0.0302428424
-            -0.0200398573
-            0.0146434635
-            0.0547832049
-            0.0004295012
-            0.0375939849624061];
+407.5565252707                  % 028_PC
+513.2893254134                  % 033_DD
+507.5458941188                  % 044_CK
+% HJ
+517.2496431319                    % 047_BF
+];  % 052_HJ
 
 %% AXIAL
-targetAxial = [0
-               -1
-               0
-               -1
-               -6
-               0
-               -1
-               -2
-               0
-               1
-               -2
-               2
-               -2
-               0
-               1];
-           
+targetAxial1 = [2               % 001_NB
+4                               % 002_BM
+7                               % 007_SD
+7                               % 008_JR
+10                              % 025_CA
+4                               % 039_KM
+5                               % 040_RE ?
+14                              % 042_RS ?
+1                               % 043_PD
+3                               % 048_SB
+1                               % 053_LM ?
+3                               % 003_SM_c
+4                               % 023_LJ
+8                               % 028_PC
+7                               % 033_DD
+3                               % 044_CK
+7                               % 046_HJ ?
+2                               % 047_BF
+11];                            % 052_HJ
+
 %% GABS
-targetGabs =  [-4
-               -7
-               0
-               -2
-               1
-               -11
-               -12
-               -8
-               -4
-               11
-               1
-               1
-               -1
-               -5
-               -8];   
+targetGabs1 =  [20              % 001_NB
+28                              % 002_BM
+31                              % 007_SD
+33                              % 008_JR
+43                              % 025_CA
+28                              % 039_KM
+47                              % 040_RE ?
+22                              % 042_RS ?
+19                              % 043_PD
+29                              % 048_SB
+31                              % 053_LM ?
+19                              % 003_SM_c
+18                              % 023_LJ
+32                              % 028_PC
+26                              % 033_DD
+14                              % 044_CK
+21                              % 046_HJ ?
+18                              % 047_BF
+39];                            % 052_HJ
 
 %% UPDRS III
-targetUPDRS = [1
-               -3
-               3
-               -3
-               -7
-               -4
-               -13
-               -5
-               -5
-               -1
-               -6
-               -3
-               -6
-               4
-               9];        
+targetUPDRS1 = [17              % 001_NB
+22                              % 002_BM
+28                              % 007_SD
+25                              % 008_JR
+36                              % 025_CA
+13                              % 039_KM
+18                              % 040_RE ?
+23                              % 042_RS ?
+20                              % 043_PD
+15                              % 048_SB
+8                               % 053_LM ?
+23                              % 003_SM_c
+33                              % 023_LJ
+36                              % 028_PC
+50                              % 033_DD
+20                              % 044_CK
+37                              % 046_HJ ?
+31                              % 047_BF
+34];                            % 052_HJ
+
+%% UPDRSIII-AXIAL
+targetUPDRSIII_Axial1 = [15     % 001_NB
+18                              % 002_BM
+21                              % 007_SD
+18                              % 008_JR
+26                              % 025_CA
+9                               % 039_KM
+13                              % 040_RE ?
+9                               % 042_RS ?
+19                              % 043_PD
+12                              % 048_SB
+7                               % 053_LM ?
+20                              % 003_SM_c
+29                              % 023_LJ
+28                              % 028_PC
+43                              % 033_DD
+17                              % 044_CK
+30                              % 046_HJ ?
+29                              % 047_BF
+23];                            % 052_HJ
+
+%% UPDRSIII-MEMBRES SUP
+targetUPDRSIII_Sup1 = [4       % 001_NB
+7                              % 002_BM
+12                             % 007_SD
+6                              % 008_JR
+5                              % 025_CA
+13                             % 039_KM
+7                              % 040_RE ?
+4                              % 042_RS ?
+12                             % 043_PD
+6                              % 048_SB
+5                              % 053_LM ?
+14                             % 003_SM_c
+2                              % 023_LJ
+5                              % 028_PC
+5                              % 033_DD
+8                              % 044_CK
+16                             % 046_HJ ?
+4                              % 047_BF
+11];                           % 052_HJ
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 
            
 %% Creating groups structure
 MultiStat.mkdir('V1');
@@ -601,19 +820,25 @@ MultiStat.addSerie('V2_V1','V2_V1');
 multioutdirs = MultiStat.getSerie('.*') .toJob;
 
 %% Multiregression V1 & V2-V1 all in    
-%    VBM_a = {VBM_a_V1, VBM_a_V2_V1};    
-%    VBM_c = {VBM_c_V1, VBM_c_V2_V1};
-    VBM_a = {VBM_a_V1, VBM_a_V2};
-    VBM_c = {VBM_c_V1, VBM_c_V2};
-    covarsV2_V1_reg = vertcat(covarsV2_reg{1}, covarsV2_reg{2},covarsV2_reg{3}-covarsV1_reg{3});
-    covars_multi = {covarsV1_reg ;covarsV2_V1_reg};
-    target_regressors.name  = {MultiStat.name};
-    APA         = {targetsAPA1; targetsAPA};
-    DA          = {targetsDA1; targetsDA};
-    Axial       = {targetAxial1; targetAxial};
-    GABS        = {targetGabs1; targetGabs};
-    UPDRSIII    = {targetUPDRS1, targetUPDRS};
+%     VBM_a = {VBM_a_V1, VBM_a_V2};
+%     VBM_c = {VBM_c_V1, VBM_c_V2};
+%     covarsV2_V1_reg = vertcat(covarsV2_reg{1}, covarsV2_reg{2},covarsV2_reg{3}-covarsV1_reg{3});
+%     covars_multi = {covarsV1_reg ;covarsV2_V1_reg};
+%     
+%     target_regressors.name  = {MultiStat.name};
+%     
+%     APA         = {targetsAPA1; targetsAPA};
+%     DA          = {targetsDA1; targetsDA};
+%     Axial       = {targetAxial1; targetAxial};
+%     GABS        = {targetGabs1; targetGabs};
+%     UPDRSIII    = {targetUPDRS1, targetUPDRS};
+%
+    VBM_a = {VBM_a_V1};
+    VBM_c = {VBM_c_V1};
+    covars_multi = covars;
     
+    APA = {targetsAPA1};
+    target_regressors.name = {MultiStat.name};
     target_regressors.value = {APA,DA, Axial,GABS,UPDRSIII};
     
     par.run = 1;
@@ -676,6 +901,7 @@ for iout = 1 : length(MultiStat)
 
         job_first_level_contrast(fspm,contrast,par);
 end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% This part I did through the interface : flexible factorial design 
