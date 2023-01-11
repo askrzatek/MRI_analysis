@@ -27,6 +27,12 @@ for igroup = 1 : length(groups)
         %                                                           '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/2020_11_18_PARKGAMEII_047_BF_18_11_2020_V2_c/S06_RS/model/Modele_VOI__Supp_Motor_Area_R/con_0001.nii,1'
         %                                                           };
         jobs{ijob}.spm.stats.factorial_design.dir = outdirs{igroup}(icon);
+        
+        %fspm = char(get_subdir_regex_files(outdirs{igroup}(icon),'SPM.mat'));
+        if exist(outdirs{igroup}{icon},'dir') && exist(char(char(get_subdir_regex_files(outdirs{igroup}(icon),'SPM.mat'))),'file')
+            skip = [skip ijob];
+        end
+        
         jobs{ijob}.spm.stats.factorial_design.des.t1.scans = spm_select('expand',groups{igroup}{icon});
         jobs{ijob}.spm.stats.factorial_design.cov(1).c = covars{1,igroup};
         jobs{ijob}.spm.stats.factorial_design.cov(1).cname = 'Age';
