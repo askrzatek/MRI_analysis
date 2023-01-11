@@ -8,6 +8,7 @@ clc
 clear all
 
 %% Initialise
+addpath /home/anna.skrzatek/MRI_analysis/
 
 main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
 cd (main_dir)
@@ -314,6 +315,23 @@ targetsAPA= [23.1555713831
             9.8691469678
             -2.09655588609517];
 
+targetsAPAK= [23.1555713831
+            1.40458578
+            2.0220748182
+            -2.0984142453
+            13.9773798135
+            3.4770321678
+            21.0407162019
+            9.1372754791];
+        
+targetsAPAO= [12.9359263434
+            7.3001966719
+            9.4773158702
+            0.2727108575
+            -0.3172168418
+            9.8691469678
+            -2.09655588609517];
+        
 %% Spontan DA
 targetsDA = [-0.0552436383
             -0.0173607532
@@ -330,6 +348,23 @@ targetsDA = [-0.0552436383
             0.0547832049
             0.0004295012
             0.0375939849624061];
+
+targetsDAK = [-0.0552436383
+            -0.0173607532
+            -0.0288778442
+            0.0046389714
+            0.0163977306
+            -0.023941678
+            -0.0038788317
+            -0.0083970006];
+        
+targetsDAO = [0.0099967642
+            0.0302428424
+            -0.0200398573
+            0.0146434635
+            0.0547832049
+            0.0004295012
+            0.0375939849624061];        
         
 %% Spontan Step_Size
 targetsSS = [150.103370391
@@ -341,6 +376,23 @@ targetsSS = [150.103370391
             131.2529377267
             -70.3945812668
             60.0510168179
+            32.1219007707
+            88.6692758751
+            4.4760244141
+            -117.5319247696
+            -25.6892601563
+            -25.0872759090923];
+        
+targetsSSK = [150.103370391
+            -123.5867048881
+            -9.7077513532
+            4.697752465
+            45.0325100751
+            8.0160415648
+            131.2529377267
+            -70.3945812668];
+        
+targetsSSO = [60.0510168179
             32.1219007707
             88.6692758751
             4.4760244141
@@ -365,6 +417,23 @@ targetAxial = [0
                0
                1];
            
+targetAxialK = [0
+               -1
+               0
+               -1
+               -6
+               0
+               -1
+               -2];
+           
+targetAxialO = [0
+               1
+               -2
+               2
+               -2
+               0
+               1];           
+           
 %% GABS
 targetGabs =  [-4
                -7
@@ -380,7 +449,24 @@ targetGabs =  [-4
                1
                -1
                -5
-               -8];   
+               -8];
+           
+targetGabsK =  [-4
+               -7
+               0
+               -2
+               1
+               -11
+               -12
+               -8];
+           
+targetGabsO =  [-4
+               11
+               1
+               1
+               -1
+               -5
+               -8];
 
 %% UPDRS III
 targetUPDRS = [1
@@ -397,7 +483,24 @@ targetUPDRS = [1
                -3
                -6
                4
-               9];        
+               9];
+           
+targetUPDRSK = [1
+               -3
+               3
+               -3
+               -7
+               -4
+               -13
+               -5];
+           
+targetUPDRSO = [-5
+               -1
+               -6
+               -3
+               -6
+               4
+               9];
            
 %% UPDRSIII-AXIAL
 targetUPDRSIII_Axial = [1
@@ -415,22 +518,56 @@ targetUPDRSIII_Axial = [1
                         -4
                         4
                         8];
+                    
+targetUPDRSIII_AxialK = [1
+                        -2
+                        3
+                        -2
+                        -1
+                        -4
+                        -12
+                        -3];
+                    
+targetUPDRSIII_AxialO = [-5
+                        -2
+                        -4
+                        -5
+                        -4
+                        4
+                        8];
           
 %% UPDRSIII-MEMBRES SUP
 targetUPDRSIII_Sup = [2
                       0
-                      -5
                       2
                       -1
-                      4
-                      0
-                      -3
                       0
                       -1
                       -3
+                      -1
+                      -5
+                      4
+                      -3
+                      0
                       -3
                        1
+                      0];
+                  
+targetUPDRSIII_SupK = [2
+                      0
+                      2
                       -1
+                      0
+                      -1
+                      -3
+                      -1];
+                  
+targetUPDRSIII_SupO = [-5
+                      4
+                      -3
+                      0
+                      -3
+                       1
                       0];
           
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -479,11 +616,17 @@ gcons_c = cellstr(cons_c{:});
 
 Stat.mkdir('VBM_V2_V1_multireg');
 Stat.addSerie('VBM_V2_V1_multi','VBM_V2_V1');
+Stat.mkdir('VBM_V2_V1_multireg_a');
+Stat.addSerie('VBM_V2_V1_multireg_a','VBM_V2_V1_a');
+Stat.mkdir('VBM_V2_V1_multireg_c');
+Stat.addSerie('VBM_V2_V1_multireg_c','VBM_V2_V1_c');
 
 MultiStat.mkdir('VBM_V1');
 MultiStat.addSerie('VBM_V1','VBM_V1');
 
 outdirs = Stat.getSerie('.*') .toJob; % 7 x 1 x 12 cells
+outdirs_a = Stat.getSerie('.*_a') .toJob;
+outdirs_c = Stat.getSerie('.*_c') .toJob;
 multioutdirs = MultiStat.getSerie('.*') .toJob;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -505,6 +648,24 @@ covars{1} = [70 % 001_NB
 57 % 047_BF
 66]; %052_HJ
          
+
+covars_a{1} = [70 % 001_NB
+74 % 002_BM
+64 % 007_SD
+76 % 008_JR
+79 % 025_CA
+61 % 039_KM
+75 % 043_PD
+66]; % 048_SB
+
+covars_c{1} = [72 % 003_SM_c
+68 % 023_LJ
+68 % 028_PC
+72 % 033_DD
+56 % 044_CK
+57 % 047_BF
+66]; %052_HJ
+
 %% GENDER
 covars{2} = [1
 1
@@ -515,6 +676,23 @@ covars{2} = [1
 2
 2
 1
+2
+2
+2
+2
+1
+2];
+
+covars_a{2} = [1
+1
+1
+2
+1
+1
+2
+2];
+
+covars_c{2} = [1
 2
 2
 2
@@ -544,16 +722,18 @@ job_cat_TIV_estimate(catreport_xml_V2,par);
 TIV_reg{1} = load('TIV_V1_n15.txt');
 TIV_reg{2} = load('TIV_V2_n15.txt');
 
+
 covars{3} = TIV_reg{1};
 % covars{3} = TIV_reg{2} - TIV_reg{1};
 
+covars_a{3} = TIV_reg{1}(1:8);
+covars_c{3} = TIV_reg{1}(9:15);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-addpath /home/anna.skrzatek/MRI_analysis/
 
 %% Multiregression V2-V1 (n=15)    
     
-par.run = 1;
-par.sge = 0;
+par.run = 0;
+par.sge = 1;
 par.sge_queu = 'normal,bigmem';
 par.jobname = 'VBM_delta_reg_model_spec';
 par.mem = 10000;
@@ -675,6 +855,163 @@ for iout = 1 : length(outdirs)
         
 end
 
+%% Multiregression V2-V1 (n=15) per group    
+%% KINECT    
+par.run = 0;
+par.sge = 1;
+par.sge_queu = 'normal,bigmem';
+par.jobname = 'VBM_delta_reg_model_spec_a';
+par.mem = 10000;
+par.nb_cond = length(outdirs_a);
+par.nb_cons = length(outdirs_a{1});
+target_regressors_a.name  = {Stat.name};
+target_regressors_a.value = {targetsAPAK,targetsDAK,targetsSSK, targetAxialK,targetGabsK,targetUPDRSK,targetUPDRSIII_AxialK,targetUPDRSIII_SupK}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
+
+multiregression_vbm_model_spec(outdirs_a, gcons_a, covars_a, target_regressors_a, par)
+
+%% Models estimation
+clear par
+cd (main_dir)
+
+for iout = 1 : length(outdirs_a)
+    fspm_a = addsuffixtofilenames(outdirs_a{iout}, 'SPM.mat');
+%     multifspm = addsuffixtofilenames(multioutdirs{iout}, 'SPM.mat');
+
+    par.run = 0;
+    par.sge = 1;
+    par.sge_queu = 'normal,bigmem';
+    par.jobname = 'VBM_delta_reg_est';
+    par.mem = 10000;
+
+    par.jobname  = sprintf('spm_reg_model_est_%s',target_regressors_a.name{iout});
+    job_first_level_estimate(fspm_a,par)
+
+%     par.jobname  = sprintf('spm_multireg_model_est_%s',target_regressors.name{iout});
+%     job_first_level_estimate(multifspm,par)
+end
+
+
+%% Contrast creation for each SPM.mat
+% F-statistics
+    PosCorrelation = [0 0 0 0 1] ;
+    NegCorrelation = [0 0 0 0 -1] ;
+
+for iout = 1 : length(outdirs_a)
+    modest = addsuffixtofilenames(outdirs_a{iout},'SPM.mat');
+        
+    %% Contrast names
+    contrast_T.names = {
+        sprintf('Pos correlation_%s_on_VBM_delta',target_regressors_a.name{iout})
+        sprintf('Neg correlation_%s_on_VBM_delta',target_regressors_a.name{iout})}';
+
+    %% Contrast values
+    contrast_T.values = {
+        PosCorrelation
+        NegCorrelation}';
+
+    %% Contrast type
+    contrast_T.types = cat(1,repmat({'T'},[1 length(contrast_T.names)]));
+
+    contrast.names  = [contrast_T.names];
+    contrast.values = [contrast_T.values];
+    contrast.types  = [contrast_T.types];
+
+    %% Contrast : write
+    clear par
+
+    par.sge = 0;
+    par.run = 1;
+    par.display = 0;
+    par.jobname = sprintf('spm_write_%s_con',target_regressors_a.name{iout});
+
+    % par.sessrep = 'both';
+    par.sessrep = 'none';
+
+    par.delete_previous = 1;
+    par.report          = 0;
+
+    job_first_level_contrast(modest,contrast,par);
+        
+end
+
+%% ORDINATEUR    
+par.run = 0;
+par.sge = 1;
+par.sge_queu = 'normal,bigmem';
+par.jobname = 'VBM_delta_reg_model_spec_c';
+par.mem = 10000;
+par.nb_cond = length(outdirs_c);
+par.nb_cons = length(outdirs_c{1});
+target_regressors_c.name  = {Stat.name};
+target_regressors_c.value = {targetsAPAO,targetsDAO,targetsSSO, targetAxialO,targetGabsO,targetUPDRSO,targetUPDRSIII_AxialO,targetUPDRSIII_SupO}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
+
+multiregression_vbm_model_spec(outdirs_c, gcons_c, covars_c, target_regressors_c, par)
+
+%% Models estimation
+clear par
+cd (main_dir)
+
+for iout = 1 : length(outdirs_c)
+    fspm_c = addsuffixtofilenames(outdirs_c{iout}, 'SPM.mat');
+%     multifspm = addsuffixtofilenames(multioutdirs{iout}, 'SPM.mat');
+
+    par.run = 0;
+    par.sge = 1;
+    par.sge_queu = 'normal,bigmem';
+    par.jobname = 'VBM_delta_reg_est';
+    par.mem = 10000;
+
+    par.jobname  = sprintf('spm_reg_model_est_%s',target_regressors_c.name{iout});
+    job_first_level_estimate(fspm_c,par)
+
+%     par.jobname  = sprintf('spm_multireg_model_est_%s',target_regressors.name{iout});
+%     job_first_level_estimate(multifspm,par)
+end
+
+
+%% Contrast creation for each SPM.mat
+% F-statistics
+    PosCorrelation = [0 0 0 0 1] ;
+    NegCorrelation = [0 0 0 0 -1] ;
+
+for iout = 1 : length(outdirs_c)
+    modest = addsuffixtofilenames(outdirs_c{iout},'SPM.mat');
+        
+    %% Contrast names
+    contrast_T.names = {
+        sprintf('Pos correlation_%s_on_VBM_delta',target_regressors_c.name{iout})
+        sprintf('Neg correlation_%s_on_VBM_delta',target_regressors_c.name{iout})}';
+
+    %% Contrast values
+    contrast_T.values = {
+        PosCorrelation
+        NegCorrelation}';
+
+    %% Contrast type
+    contrast_T.types = cat(1,repmat({'T'},[1 length(contrast_T.names)]));
+
+    contrast.names  = [contrast_T.names];
+    contrast.values = [contrast_T.values];
+    contrast.types  = [contrast_T.types];
+
+    %% Contrast : write
+    clear par
+
+    par.sge = 0;
+    par.run = 1;
+    par.display = 0;
+    par.jobname = sprintf('spm_write_%s_con',target_regressors_c.name{iout});
+
+    % par.sessrep = 'both';
+    par.sessrep = 'none';
+
+    par.delete_previous = 1;
+    par.report          = 0;
+
+    job_first_level_contrast(modest,contrast,par);
+        
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Multiregression
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -694,7 +1031,7 @@ target_regressors.value = {targetsAPA1,targetsDA1,targetsSS1, targetAxial1,targe
 %cellstr(multicons_a{1}.path)
 %cons_c
 
-multiregression_vbm_model_spec(multioutdirs, {multigcons_a}, {multigcons_c}, covars_V1, target_regressors, par);
+multiregression_vbm_model_spec(multioutdirs, [cellstr(char(multigcons_a{:}));cellstr(char(multigcons_c{:}))], covars_V1, target_regressors, par);
 %multiregression_vbm_model_spec(multioutdirs, VBM_a, VBM_c, covars_multi, target_regressors, par)
 %regression_model_spec(multioutdirs, {multigcons_a}, {multigcons_c}, covars_V1, target_regressors, par)
 
