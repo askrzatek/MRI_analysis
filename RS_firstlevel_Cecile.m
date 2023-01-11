@@ -39,8 +39,10 @@ dirFunc  = e.getSerie('tedana_RS').removeEmpty.toJob(0);
 %dirStats = e.getSerie('run_RS$').mkdir('model','model_1'); % basic model ALFF
 dirStats = e.getSerie('run_RS$').mkdir('model','model_2'); % basic model ALFF %better denoising from tapas resliced masks
 %dirStats = dirStats(1:length(dirStats)/2);
+
 %% Make symbolic links from tedana_vtd_mle dir to run dir based on job_meica_afni symbolic link creation 
 addpath /home/anna.skrzatek/MRI_analysis/
+
 clear par
 %par.subdir        = 'tedana_vtd_mle';
 par.subdir        = 'tedana009a1_vtd';
@@ -273,8 +275,9 @@ end
 % verifs
 main_dir = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
 % subj_dir = gdir(main_dir,'^Subj|^___S')
-%subj_dir = gdir(main_dir,'PARKGAME.*[a,c]$')
-subj_dir = e.gpath;
+
+subj_dir = gdir(main_dir,'PARKGAME.*[a,c]$');
+
 SessDir = gdir(subj_dir,'.*RS$');
 StatDir = gdir(SessDir,'model','^model_1');
 StatDir = gdir(SessDir,'model','^model_2'); %new resliced version of denoised files
@@ -299,9 +302,19 @@ par.jobname = 'spm_first_level_spec_RS_wbet';
 %fspm = addsuffixtofilenames( dirStats, 'SPM.mat');
 fspm = addsuffixtofilenames(StatDir, 'SPM.mat');
 
+%osubj_dir = e.gpath;
+oSessDir = e.gser('run_RS').gpath;
+%oStatDir = addsuffixtofilenames(oSessDir,'model/model_2'); %new resliced version of denoised files
+
+%change_spm_path(fspm,oSessDir,SessDir)
+%i = 4;
+%for i = 5 : length(fspm)
+%    change_spm_path(fspm(i),'/network/lustre/iss01/','/network/lustre/iss02/')
+%end
+
 clear par
-%par.run = 1;
-par.sge = 1;
+par.run = 1;
+%par.sge = 1;
 par.sge_queu = 'normal,bigmem';
 par.jobname  = 'spm_first_level_est_RS_wbet';
 job_first_level_estimate(fspm,par)
@@ -342,8 +355,8 @@ fmask = addsuffixtofilenames(StatDir, 'mask.nii');
 
 clear par
 %par.roi_dir = sprintf('%s/ROI_pariet_mot_premot_cereb_BG_PPN',main_dir);
-par.roi_dir = sprintf('%s/ROIs_masks',main_dir);
-par.jobname = 'spm_voi_ts_extract_atlas_wbet_lasttry';
+par.roi_dir = sprintf('%s/ROIs_masks/Basal_Ganglia_loco',main_dir);
+par.jobname = 'spm_voi_ts_extract_locomotion_BG';
 par.run = 1;
 par.sge = 0;
 par.pct = 0;
@@ -351,5 +364,183 @@ par.pct = 0;
 spm_job_voi(fspm, fmask, par);
 
 clear par
+cd(main_dir)
+par.roi_dir = sprintf('%s/ROIs_masks/Cortical_loco',main_dir);
+par.jobname = 'spm_voi_ts_extract_locomotion_Cortical';
+par.run = 0;
+par.sge = 1;
+par.pct = 0;
+
+spm_job_voi(fspm, fmask, par);
+
+clear par
+cd(main_dir)
+par.roi_dir = sprintf('%s/ROIs_masks/Midbrain_loco',main_dir);
+par.jobname = 'spm_voi_ts_extract_locomotion_Midbrain';
+par.run = 0;
+par.sge = 1;
+par.pct = 0;
+
+spm_job_voi(fspm, fmask, par);
+
+clear par
+cd(main_dir)
+par.roi_dir = sprintf('%s/ROIs_masks/Cerebellar_loco',main_dir);
+par.jobname = 'spm_voi_ts_extract_locomotion_CB';
+par.run = 0;
+par.sge = 1;
+par.pct = 0;
+
+spm_job_voi(fspm, fmask, par);
+
+clear par
+cd(main_dir)
+par.roi_dir = sprintf('%s/ROIs_masks/Cueing',main_dir);
+par.jobname = 'spm_voi_ts_extract_locomotion_Cueing';
+par.run = 1;
+par.redo = 0;
+par.sge = 0;
+par.pct = 0;
+
+spm_job_voi(fspm, fmask, par);
+
+clear par
+cd(main_dir)
+par.roi_dir = sprintf('%s/ROIs_masks/AOT-MI',main_dir);
+par.jobname = 'spm_voi_ts_extract_AOT_MI';
+par.run = 1;
+par.redo = 0;
+par.sge = 0;
+par.pct = 0;
+
+spm_job_voi(fspm, fmask, par);
+
+clear par
+cd(main_dir)
+par.roi_dir = sprintf('%s/ROIs_masks/Cognitive_circuit',main_dir);
+par.jobname = 'spm_voi_ts_extract_locomotion_Cogni';
+par.run = 1;
+par.redo = 0;
+par.sge = 0;
+par.pct = 0;
+
+spm_job_voi(fspm, fmask, par);
+
+clear par
+cd(main_dir)
+par.roi_dir = sprintf('%s/ROIs_masks/Limbic_network',main_dir);
+par.jobname = 'spm_voi_ts_extract_Limbic_net';
+par.run = 1;
+par.redo = 0;
+par.sge = 0;
+par.pct = 0;
+
+spm_job_voi(fspm, fmask, par);
+
+clear par
+cd(main_dir)
+par.roi_dir = sprintf('%s/ROIs_masks/Motor_execution_network',main_dir);
+par.jobname = 'spm_voi_ts_extract_Motor_exec_net';
+par.run = 1;
+par.redo = 0;
+par.sge = 0;
+par.pct = 0;
+
+spm_job_voi(fspm, fmask, par);
+
+clear par
+cd(main_dir)
+par.roi_dir = sprintf('%s/ROIs_masks/Motor_mask_Fling',main_dir);
+par.jobname = 'spm_voi_ts_extract_motor_Fling';
+par.run = 1;
+par.redo = 0;
+par.sge = 0;
+par.pct = 0;
+
+spm_job_voi(fspm, fmask, par);
+
+clear par
+cd(main_dir)
+par.roi_dir = sprintf('%s/ROIs_masks/Locomotion_network',main_dir);
+par.jobname = 'spm_voi_ts_extract_Locomotion_net';
+par.run = 1;
+par.redo = 0;
+par.sge = 0;
+par.pct = 0;
+
+spm_job_voi(fspm, fmask, par);
+
+clear par
+%par.roi_dir = sprintf('%s/ROI_pariet_mot_premot_cereb_BG_PPN',main_dir);
+par.roi_dir = sprintf('%s/ROIs_masks/Ordi',main_dir);
+par.jobname = 'spm_voi_ts_extract_Ordi';
+par.run = 1;
+par.sge = 0;
+par.pct = 0;
+
+spm_job_voi(fspm, fmask, par);
+
+clear par
+par.roi_dir = sprintf('%s/ROIs_masks/Grouped_ROIs/Cereb_Motor',main_dir);
+par.jobname = 'spm_voi_ts_extract_Cereb_Motor';
+par.run = 1;
+par.sge = 0;
+par.pct = 0;
+
+spm_job_voi(fspm, fmask, par);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% VOI CREATION BY COORDINATES %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+clear par
+par.sge_queu = 'normal,bigmem';
+par.mem = 10000;
 par.jobname = 'spm_voi_PCC_wbet'
+
 spm_job_voi_PCC(fspm,fmask,par);
+
+%% De Lima-Pardini's ROIs for FOG & APA
+
+clear par
+par.sge_queu = 'normal,bigmem';
+par.mem = 10000;
+par.jobname = 'spm_voi_ts_extract_coord';
+%par.voi.name = {'CLR_R','CLR_L', 'DLPFC_R','DLPFC_L', 'MLR', 'Ant_Insula_R','Ant_Insula_L', 'Central_SMA'};
+%par.voi.coord = {[8 -51 -24],[-8 -52 -24], [42 26 28],[-42 26 28], [0 -29 -28], [38 21 -3],[-38 21 -3], [0 -11 60]};
+%par.voi.radius = {6,6, 8,8, 6, 6,6, 10};
+par.voi.name = {'STN_R','STN_L', 'M1_R','M1_L'};
+par.voi.coord = {[12 -13 -8],[-12 -13 -8], [6 -31 67],[-6 -31 67]};
+par.voi.radius = {6,6, 8,8};
+par.run = 1;
+par.sge = 0;
+
+spm_job_voi_coord(fspm,fmask,par)
+
+%% DMN network // Task negative network (Fox et al. 2005)
+
+clear par
+par.sge_queu = 'normal,bigmem';
+par.mem = 10000;
+par.jobname = 'spm_voi_ts_extract_coord';
+par.voi.name = {'Lateral_Parietal_L','Lateral_Parietal_R', 'Med_Prefrontal', 'Precuneus_PCC'};
+par.voi.coord = {[-45 -67 36],[45 -67 36], [-1 47 -4], [-5 -49 40]};
+par.voi.radius = {12,12, 12,12, 12, 12};
+par.run = 1;
+par.sge = 0;
+
+spm_job_voi_coord(fspm,fmask,par)
+
+%% DMN network // Task positive network (Fox et al. 2005) externally cued attention
+
+clear par
+par.sge_queu = 'normal,bigmem';
+par.mem = 10000;
+par.jobname = 'spm_voi_ts_extract_coord';
+par.voi.name = {'Intra_Parietal_Sulcus','FEF', 'Middle_Temporal_Region'};
+par.voi.coord = {[-25 -57 -46], [25 -13 50], [-45 -69 -2]};
+par.voi.radius = {12, 12, 12, 12};
+par.run = 1;
+par.sge = 0;
+
+spm_job_voi_coord(fspm,fmask,par)
+
