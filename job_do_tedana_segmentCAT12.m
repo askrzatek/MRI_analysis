@@ -122,7 +122,7 @@ for nbsuj = 1:length(img)
     jobs{nbsuj}.spm.tools.cat.estwrite.data = cellstr(img{nbsuj}); %#ok<*AGROW>
     jobs{nbsuj}.spm.tools.cat.estwrite.nproc = 0;
     
-    jobs{nbsuj}.spm.tools.cat.estwrite.opts.tpm = {'/network/lustre/iss01/cenir/software/irm/spm12/tpm/TPM.nii'};
+    jobs{nbsuj}.spm.tools.cat.estwrite.opts.tpm = {'/network/lustre/iss02/cenir/software/irm/spm12/tpm/TPM.nii'};
     
     jobs{nbsuj}.spm.tools.cat.estwrite.opts.affreg = 'mni';
     jobs{nbsuj}.spm.tools.cat.estwrite.opts.biasstr = 0.5;
@@ -137,8 +137,8 @@ for nbsuj = 1:length(img)
     jobs{nbsuj}.spm.tools.cat.estwrite.extopts.segmentation.WMHC = 1;
     jobs{nbsuj}.spm.tools.cat.estwrite.extopts.segmentation.restypes.best = [0.5 0.3];
     
-    jobs{nbsuj}.spm.tools.cat.estwrite.extopts.registration.darteltpm = {'/network/lustre/iss01/cenir/software/irm/spm12/toolbox/cat12/templates_1.50mm/Template_1_IXI555_MNI152.nii'};
-    jobs{nbsuj}.spm.tools.cat.estwrite.extopts.registration.shootingtpm = {'/network/lustre/iss01/cenir/software/irm/spm12/toolbox/cat12/templates_1.50mm/Template_0_IXI555_MNI152_GS.nii'};
+    jobs{nbsuj}.spm.tools.cat.estwrite.extopts.registration.darteltpm = {'/network/lustre/iss02/cenir/software/irm/spm12/toolbox/cat12/templates_1.50mm/Template_1_IXI555_MNI152.nii'};
+    jobs{nbsuj}.spm.tools.cat.estwrite.extopts.registration.shootingtpm = {'/network/lustre/iss02/cenir/software/irm/spm12/toolbox/cat12/templates_1.50mm/Template_0_IXI555_MNI152_GS.nii'};
     jobs{nbsuj}.spm.tools.cat.estwrite.extopts.registration.regstr = 0;
     
     jobs{nbsuj}.spm.tools.cat.estwrite.extopts.vox = 1.5;

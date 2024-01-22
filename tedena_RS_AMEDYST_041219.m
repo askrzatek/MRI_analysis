@@ -3,7 +3,7 @@ clc
 
 par.pct = 0;
 
-main_dir = '/network/lustre/iss01/cenir/analyse/irm/users/anna.skrzatek/data/nifti/';
+main_dir = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/data/nifti/';
 
 e = exam(main_dir,'037$|019$|053$|062$|066$');
 
@@ -147,7 +147,7 @@ run_dir = e.getSerie('rs').removeEmpty.toJob(0);
 
 job = cell(0);
 for iJob = 1 : length(run_dir)
-    job{iJob,1} = sprintf('export FSLOUTPUTTYPE=NIFTI; cd %s; /network/lustre/iss01/cenir/software/irm/fsl5/bin/bet %s %s -R -m -f 0.3',...
+    job{iJob,1} = sprintf('export FSLOUTPUTTYPE=NIFTI; cd %s; /network/lustre/iss02/cenir/software/irm/fsl5/bin/bet %s %s -R -m -f 0.3',...
         run_dir{iJob},...
         'mean_vtde1.nii',...
         'bet_mean_vtde1.nii');
