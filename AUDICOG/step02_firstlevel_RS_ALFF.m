@@ -5,8 +5,8 @@ clc
 
 
 main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
-cd '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG';
-
+project_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG'
+cd (project_dir)
 
 load e
 
@@ -229,15 +229,6 @@ par.jobname = 'spm_first_level_spec_RS_wbet';
 [ jobs ] = job_ending_rountines( jobs, skip, par );
 %% Estimate
 
-% main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AMEDYST/RS/nifti';
-% subj_dir = gdir(main_dir,'^Subj|^')
-%
-% spm_file = gfile(dirStats(subj),'SPM.mat'))
-%
-% Modele_Sess_dir = gdir(subj_dir,'^P','RS$','^modele','model_1');
-% SPM_Sess_file = gfile(Modele_Sess_dir,'SPM.mat');
-
-%fspm = addsuffixtofilenames( dirStats, 'SPM.mat');
 fspm = addsuffixtofilenames(StatDir, 'SPM.mat');
 
 clear par
@@ -284,7 +275,8 @@ fmask = addsuffixtofilenames(StatDir, 'mask.nii');
 
 clear par
 %par.roi_dir = sprintf('%s/ROI_pariet_mot_premot_cereb_BG_PPN',main_dir);
-par.roi_dir = sprintf('%s/ROIs_masks',main_dir);
+network_dir = 'RSN'
+par.roi_dir = sprintf('%s/Networks_masks/%s',project_dir,network_dir);
 par.jobname = 'spm_voi_ts_extract_atlas_wbet_lasttry';
 par.run = 1;
 par.sge = 0;
