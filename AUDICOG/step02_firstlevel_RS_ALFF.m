@@ -1,4 +1,5 @@
-%% script RS firstlevel : Cecile Gallea
+%% script RS firstlevel : 
+%% not necessary anymore while we use rsfc toolbox (we have ALFF clean per subject directly, no need for creating contrasts
 
 clear
 clc

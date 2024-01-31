@@ -73,10 +73,11 @@ par.jacobian  = 0;         % write jacobian determinant in normalize space
 par.doROI     = 0;         % will compute the volume in each atlas region
 
 job_do_segmentCAT12(anat,par);
-e.getSerie('anat_T1').addVolume('^p0','p0',1)
-e.getSerie('anat_T1').addVolume('^p1','p1',1)
-e.getSerie('anat_T1').addVolume('^p2','p2',1)
-e.getSerie('anat_T1').addVolume('^p3','p3',1)
+%% AUTO ADD in jobs
+% e.getSerie('anat_T1').addVolume('^p0','p0',1)
+% e.getSerie('anat_T1').addVolume('^p1','p1',1)
+% e.getSerie('anat_T1').addVolume('^p2','p2',1)
+% e.getSerie('anat_T1').addVolume('^p3','p3',1)
 
 %% Sort echos #MATLAB/matvol
 
@@ -116,10 +117,12 @@ afni_subdir = ['afni_' afni_prefix];
 par.subdir = afni_subdir;
 job_afni_proc_multi_echo( meinfo, par );
 
-e.addSerie('RS','afni','afni',1)
+e.addSerie('RS','afni','afni_RS',1)
 
 %% do_fsl_robust_mask_epi #FSL
-e.getSerie('run_RS').addVolume(['^' afni_prefix 'e1.nii'],[afni_prefix 'e1'],1)
+%% volume added in the job
+%e.getSerie('run_RS').addVolume(['^' afni_prefix 'e1.nii'],[afni_prefix 'e1'],1)
+
 fin  = e.getSerie('run').getVolume(['^' afni_prefix 'e1']);
 
 clear par
@@ -138,7 +141,9 @@ do_fsl_robust_mask_epi( fin, par );
 
 % Checkpoint & unzip
 par.jobname = 'unzip_and_keep__bet';
-e.getSerie('run_RS').addVolume(['^bet_Tmean_' afni_prefix 'e1.nii$'],'bet_Tmean',1)
+%e.getSerie('run_RS').addVolume(['^bet_Tmean_' afni_prefix
+%'e1.nii$'],'bet_Tmean',1) %% volume added directly in the job
+
 e.getSerie('run_RS').getVolume('bet_Tmean').removeEmpty().unzip_and_keep(par)
 
 
@@ -168,9 +173,12 @@ job_tedana_009a1( meinfo, afni_prefix, tedana_subdir, ['bet_Tmean_' afni_prefix 
 
 % Checkpoint & unzip
 par.jobname = 'unzip_and_keep__tedana';
-e.addSerie('RS', tedana_subdir,'tedana_RS',1)
-e.getSerie('tedana_RS').addVolume('^ts_OC.nii$','ts_OC',1)
-e.getSerie('tedana_RS').getVolume('ts_OC').removeEmpty().unzip_and_keep(par)
+
+%e.addSerie('RS', tedana_subdir,'tedana_RS',1)
+%e.getSerie('tedana_RS').addVolume('^ts_OC.nii$','ts_OC',1) %% added
+%directly in the job
+e.getSerie('run').getVolume('ts_OC').removeEmpty().unzip_and_keep(par)
+e.getSerie('run').getVolume('Tmean').removeEmpty().unzip_and_keep(par)
 
 
 %% Coregister TEDANA outputs to Anat #SPM12
@@ -195,7 +203,7 @@ ref = e.getSerie('run').removeEmpty().getExam.getSerie('anat_T1').getVolume('p0'
 par.jobname = 'spm_coreg_epi2anat';
 job_coregister(src,ref,oth,par);
 
-e.getSerie('anat_T1').addVolume('^wp0','wp0',1)
+e.getSerie('anat_T1').addVolume('^wp0','wp0',1) %% probably added in the job
 e.getSerie('anat_T1').addVolume('^wp1','wp1',1)
 e.getSerie('anat_T1').addVolume('^wp2','wp2',1)
 e.getSerie('anat_T1').addVolume('^wp3','wp3',1)
@@ -214,14 +222,15 @@ else
 end
 par.redo = 0;
 par.vox = [2.5 2.5 2.5]; % IMPORTANT keep original EPI voxel size
-img = e.getSerie('run_RS').getVolume('(^ts_OC)|(^dn_ts_OC)').removeEmpty();
+%img = e.getSerie('run').getVolume('(^ts_OC)|(^dn_ts_OC)').removeEmpty();
+img = e.getSerie('run').getVolume('(^ts_OC)').removeEmpty();
 img.getExam.getSerie('anat_T1').addVolume('^y','y',1)
 y   = img.getExam.getSerie('anat_T1').getVolume('^y');
 par.jobname = 'spm_normalize_epi';
 job_apply_normalize(y,img,par);
 
 % Nomalize Tmean, used later for PhysIO Noise ROI
-img = e.getSerie('run_RS').removeEmpty().getVolume('bet_Tmean');
+img = e.getSerie('run').removeEmpty().getVolume('bet_Tmean_vte1$');
 y   = img.getExam.getSerie('anat_T1').getVolume('^y');
 par.jobname = 'spm_normalize_meanepi';
 job_apply_normalize(y,img,par);
@@ -240,18 +249,18 @@ else
 end
 par.redo = 0;
 
-e.getSerie('tedana_RS').addVolume('^wts_OC','wts')
-img = e.getSerie('tedana_RS').getVolume('wts').removeEmpty();
+%e.getSerie('run').addVolume('^wts_OC','wts')
+img = e.getSerie('run_RS').getVolume('wts').removeEmpty();
 
 par.smooth   = [5 5 5];
 par.prefix   = 's5';
 job_smooth(img,par);
-e.getSerie('tedana_RS').addVolume('^s5wts_OC','s5wts')
+%e.getSerie('tedana_RS').addVolume('^s5wts_OC','s5wts') %% autoadd job
 
 par.smooth   = [8 8 8];
 par.prefix   = 's8';
 job_smooth(img,par);
-e.getSerie('tedana_RS').addVolume('^s8wts_OC','s8wts')
+%e.getSerie('tedana_RS').addVolume('^s8wts_OC','s8wts') %% autoadd job
 
 
 %% coregister WM & CSF on functionnal (using the warped mean) #SPM12
@@ -279,15 +288,15 @@ job_coregister(src,ref,oth,par);
 %% rp afni2spm #matlab/matvol
 
 % input
-e.getSerie('afni').addRP('rp','rp_afni',1)
-dfile = e.getSerie('afni').getRP('rp_afni').removeEmpty();
+%e.getSerie('run').addRP('rp','rp_afni',1)
+dfile = e.getSerie('run').getRP('rp_afni').removeEmpty();
 
 % output
-output_dir = e.getSerie('run_RS').getPath();
+output_dir = e.getSerie('run').getPath();
 
 % go
 job_rp_afni2spm(dfile, output_dir);
-rp = fullfile(e.getSerie('run_RS').getPath(),'rp_spm.txt');
+rp = fullfile(e.getSerie('run').getPath(),'rp_spm.txt');
 
 %% extract physio from special dicom
 
@@ -305,7 +314,7 @@ e.getSerie('phy').getPhysio('phy').check() % takes a bit of time, use it once to
 info = e.getSerie('phy').getPhysio('info').removeEmpty;
 puls = e.getSerie('phy').getPhysio('puls').removeEmpty;
 resp = e.getSerie('phy').getPhysio('resp').removeEmpty;
-run  = e.getSerie('tedana_RS').removeEmpty;
+run  = e.getSerie('run').removeEmpty;
 
 %--------------------------------------------------------------------------
 % in AFNI, outside the mask is NaN
@@ -323,14 +332,18 @@ else
 end
 job_afni_remove_nan( run.getVolume('^wts'), par );
 %--------------------------------------------------------------------------
-e.getSerie('tedana_RS').addVolume('^nwts_OC','nwts_OC',1)
+%e.getSerie('tedana_RS').addVolume('^nwts_OC','nwts_OC',1) %% auto add in
+%job
 volume = run.getVolume('^nwts_OC').removeEmpty;
 
 outdir = volume.getDir();
 
 %rp = e.getSerie('tedana_RS').getRP('rp_spm');
-run.getExam.getSerie('anat').addVolume('^rwp2','rwp2',1)
-run.getExam.getSerie('anat').addVolume('^rwp3','rwp3',1)
+%run.getExam.getSerie('anat').addVolume('^rwp2','rwp2',1) %% auto add in
+%job
+%run.getExam.getSerie('anat').addVolume('^rwp3','rwp3',1) %% auto add in
+%job
+
 mask = run.getExam.getSerie('anat').getVolume('^rwp[23]').squeeze;
 
 
