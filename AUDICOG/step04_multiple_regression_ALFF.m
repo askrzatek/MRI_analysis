@@ -23,18 +23,85 @@ ALFF_OutputDir = fullfile(project_dir,'Results/ALFF');
 
 
 %% Regressors definition
-% importing the table with multiple columns with patients characteristics [only NUM]
-% 1) IRM ids, 2) Group, 3) Age, 4) Sex, 5) ANT
-demo = csvread(fullfile(project_dir,'DATA/Correspondance_Numero_Comportement_IRM.csv'));
-group = [];
-age   = [];
-sex   = [];
-ANT   = [];
+% importing the table with multiple columns with patients characteristics
+% from CSV: filtered by IRM==1
+tab = readtable(fullfile(project_dir,'DATA/ANT_Alerting_RT_multiregression.csv'));
+tab_sel = ismember(tab.IRM, 1);
+group = tab.Group(tab_sel);
+age   = tab.Age(tab_sel);
+sex   = tab.Genre(tab_sel);
+ANT   = tab.log_ANT_RT_Alerting(tab_sel);
 
 %% Creating the par structure for multiple regression (both groups combined)
+clear par
+par.run = 1;
+par.sge = 0;
+par.sge_queu = 'normal,bigmem';
+par.jobname = 'ANT_ALFF_reg_model_spec';
+par.mem = 10000;
+par.nb_cond = 1;
+par.nb_cons = length(ALFF_Input);
+target_regressors.name  = {'Alerting_ANT_RT_log'};
+%target_regressors.value = {targetsAPA1,targetsDA1,targetsSS1, targetAxial1,targetGabs1,targetUPDRS1,targetUPDRSIII_Axial1,targetUPDRSIII_Sup1}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
+target_regressors.value = {ANT};
+covars = {age; sex; group};
+mkdir(ALFF_OutputDir,'Multireg_ANT');
+outputdir = fullfile(ALFF_OutputDir,'Multireg_ANT');
+multiregression_vbm_model_spec({{outputdir}}, ALFF_Input(:), covars, target_regressors, par);
 
+%% Model estimation
+fspm = addsuffixtofilenames(outputdir,'/SPM.mat');
 
+clear par
+par.run = 1;
+par.sge = 0;
+par.sge_queu = 'normal,bigmem';
+par.jobname = 'ALFF_ANT_multireg_est';
+par.mem = 10000;
 
+par.jobname  = sprintf('spm_multireg_model_est_%s',target_regressors.name{1});
+
+job_first_level_estimate({fspm},par)
+
+%% Contrast creation for each SPM.mat
+% t-statistics : vérifier les
+    PosCorrelation = [0 0 0 0 1] ;
+    NegCorrelation = [0 0 0 0 -1] ;
+
+% fspm doesn't change: no need to load
+%% Contrast names
+    contrast_T.names = {
+    sprintf('Pos correlation_%s_on_ALFF',target_regressors.name{1})
+    sprintf('Neg correlation_%s_on_ALFF',target_regressors.name{1})}';
+
+%% Contrast values
+contrast_T.values = {
+    PosCorrelation
+    NegCorrelation}';
+
+%% Contrast type
+contrast_T.types = cat(1,repmat({'T'},[1 length(contrast_T.names)]));
+
+contrast.names  = [contrast_T.names];
+contrast.values = [contrast_T.values];
+contrast.types  = [contrast_T.types];
+
+%% Contrast : write
+clear par
+
+par.sge = 0;
+par.run = 1;
+par.display = 0;
+par.jobname = sprintf('spm_write_%s_con',target_regressors.name{1});
+
+% par.sessrep = 'both';
+par.sessrep = 'none';
+
+par.delete_previous = 1;
+par.report          = 0;
+
+job_first_level_contrast({fspm},contrast,par);
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% IF connectivity hasn't been done yet
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
