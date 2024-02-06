@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Script for multiple regression analysis : AUDICOG + new data orga                                                  %%
+%% Script for multiple regression analysis : AUDICOG + behav                                                  %%
 %% Anna SKRZATEK January 2024                                                                                         %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -8,6 +8,7 @@ load e
 
 %% Initialise
 addpath /home/anna.skrzatek/MRI_analysis
+addpath /home/anna.skrzatek/MRI_analysis/AUDICOG
 
 project_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG'
 main_dir = fullfile(project_dir,'/DATA','/Non_chirurgicaux')
@@ -19,6 +20,7 @@ Input_RS = e.getSerie('run_RS').getVolume('s5wts_OC').getPath();
 e.addSerie('RS','tedana','tedana_RS')
 ALFF_InputDir = get_subdir_regex(e.getSerie('tedana_RS').gpath(),'rsfc');
 ALFF_Input = get_subdir_regex_files(ALFF_InputDir,'^ALFF_clean.nii');
+%mkdir(project_dir,'/Results/fALFF');
 ALFF_OutputDir = fullfile(project_dir,'Results/ALFF');
 
 
@@ -44,10 +46,12 @@ par.nb_cons = length(ALFF_Input);
 target_regressors.name  = {'Alerting_ANT_RT_log'};
 %target_regressors.value = {targetsAPA1,targetsDA1,targetsSS1, targetAxial1,targetGabs1,targetUPDRS1,targetUPDRSIII_Axial1,targetUPDRSIII_Sup1}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
 target_regressors.value = {ANT};
-covars = {age; sex; group};
-mkdir(ALFF_OutputDir,'Multireg_ANT');
+covars.name = {'Age';'Sex';'Group'};
+covars.val = {age; sex; group};
+%mkdir(ALFF_OutputDir,'Multireg_ANT');
 outputdir = fullfile(ALFF_OutputDir,'Multireg_ANT');
-multiregression_vbm_model_spec({{outputdir}}, ALFF_Input(:), covars, target_regressors, par);
+
+varcov_multiregression_model_spec({cellstr(outputdir)}, {ALFF_Input(:)}, covars, target_regressors, par);
 
 %% Model estimation
 fspm = addsuffixtofilenames(outputdir,'/SPM.mat');
@@ -71,8 +75,8 @@ job_first_level_estimate({fspm},par)
 % fspm doesn't change: no need to load
 %% Contrast names
     contrast_T.names = {
-    sprintf('Pos correlation_%s_on_ALFF',target_regressors.name{1})
-    sprintf('Neg correlation_%s_on_ALFF',target_regressors.name{1})}';
+    sprintf('Pos correlation_%s_on_fALFF',target_regressors.name{1})
+    sprintf('Neg correlation_%s_on_fALFF',target_regressors.name{1})}';
 
 %% Contrast values
 contrast_T.values = {
