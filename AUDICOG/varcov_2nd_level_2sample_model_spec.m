@@ -18,6 +18,8 @@ function matlabbatch = varcov_2nd_level_2sample_model_spec(groups,outdirs,covars
 % covars.val : cell structure (n,nsuj) where n is the number of covariates
 % and nsuj the number of subjects data ordered per group (same order as in
 % groups variable
+% par : varying parameters for the model
+% par.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
   skip = [];

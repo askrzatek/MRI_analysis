@@ -1,4 +1,4 @@
-%% script RS firstlevel : 
+%% script RS firstlevel with VOI regressor : 
 %% not necessary anymore while we use rsfc toolbox (we have ALFF clean per subject directly, no need for creating contrasts
 
 clear
@@ -38,9 +38,19 @@ y8 = square(2*pi*0.08*t);
 dir_RS   = e.getSerie('run_RS$').removeEmpty. toJob(0);
 % dirFunc  = e.getSerie('tedana_RS').removeEmpty.toJob(0);  %%%%%% NE LE TROUVE PAS
 
-%dirStats = e.getSerie('run_RS$').mkdir('model','ALFF'); % basic model ALFF %better denoising from tapas resliced masks
-%dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'model','ALFF_VOIreg');
-dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'ALFF');
+%dirStats = e.getSerie('run_RS$').mkdir('model','ALFF_VOIreg_BA31'); % basic model ALFF %better denoising from tapas resliced masks
+%dirStats = e.getSerie('run_RS$').mkdir('model','ALFF_VOIreg_ParaHipp'); % basic model ALFF %better denoising from tapas resliced masks
+%dirStats = e.getSerie('run_RS$').mkdir('model','ALFF_VOIreg_LC'); % basic model ALFF %better denoising from tapas resliced masks
+%dirStats = e.getSerie('run_RS$').mkdir('model','ALFF_VOIreg_Alert'); % basic model ALFF %better denoising from tapas resliced masks
+%dirStats = e.getSerie('run_RS$').mkdir('model','ALFF_VOIreg_Audio'); % basic model ALFF %better denoising from tapas resliced masks
+
+dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'model','ALFF_VOIreg_BA31');
+%dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'model','ALFF_VOIreg_ParaHipp');
+%dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'model','ALFF_VOIreg_LC');
+%dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'model','ALFF_VOIreg_Alert');
+%dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'model','ALFF_VOIreg_Audio');
+%dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'ALFF');
+
 %% Make symbolic links from tedana_vtd_mle dir to run dir based on job_meica_afni symbolic link creation 
 addpath /home/anna.skrzatek/MRI_analysis/
 clear par
@@ -79,7 +89,7 @@ clear par
 
 par.TR = 1.6;
 
-par.file_reg = '^s5wts.*nii';
+par.file_regexp = '^s5wts.*nii';
 par.rp       = 1;
 par.rp_regex = 'multiple_regressors.txt';   
 
@@ -100,7 +110,24 @@ par.user_regressor = {};
 % multilevel_cells(char  ) for used defined regressors : they will NOT be convolved
 % The regressors in the file will be concatenated with rp_*.txt
 
-par.file_regressor = addsuffixtofilenames(dir_RS,  [ '/tedana009a1_vt/multiple_regressors.txt']); 
+par.file_regexpressor = addsuffixtofilenames(dir_RS,  [ '/tedana009a1_vt/multiple_regressors.txt']);
+
+% if we want to use a VOI regressor then par.covars = 1;
+% and we need to find the VOI file and load the timeseries
+
+par.covars = 1;
+
+par.covname = 'BA31';
+% par.covname = 'ParaHipp';
+% par.covname = 'LC';
+% par.covname = 'Alert';
+% par.covname = 'Audio';
+
+voi_path = get_subdir_regex_files(addsuffixtofilenames(dir_RS,'/ALFF'),sprintf('.*%s_1.mat',par.covname));
+for isub = 1: length(voi_path)
+   voi_dat = load(voi_path{isub});
+   par.covval{isub} = voi_dat.Y;
+end
 
 par.jobname  = 'spm_glm_rs_wbet';
 par.walltime = '04:00:00';
@@ -108,7 +135,7 @@ par.walltime = '04:00:00';
 par.sge   = 0;
 par.run      = 0;
 par.display  = 1;
-par.redo     = 1;
+par.redo     = 0;
 
 
 % %% tests
@@ -136,17 +163,18 @@ for subj = 1 : nrSubject
     else
 
 
-        subjectRuns = get_subdir_regex_files([dir_RS{subj},'tedana009a1_vt' ] , par.file_reg);
-        
+        subjectRuns = get_subdir_regex_files([dir_RS{subj},'tedana009a1_vt' ] , par.file_regexp);
+        %subjectRuns = get_subdir_regex_files(addsuffixtofilenames(dir_RS,'/ALFF'),sprintf('%s',par.file_regexp));
         unzip_volume(subjectRuns);
-        subjectRuns = get_subdir_regex_files([dir_RS{subj}, 'tedana009a1_vt' ] ,par.file_reg,struct('verbose',0));
+        %subjectRuns = get_subdir_regex_files([dir_RS{subj}, 'tedana009a1_vt' ] ,par.file_regexp,struct('verbose',0));
         
         if par.rp
             fileRP = get_subdir_regex_files([dir_RS{subj}, 'tedana009a1_vt' ] ,'multiple_regressors.txt'); %%% un truc comme ça fonctionnerait
         end
 
 
-        for run = 1 : length(subjectRuns)
+%        for run = 1 : length(subjectRuns)
+        run = 1;
             currentRun = cellstr(subjectRuns{run}) ;
             clear allVolumes
 
@@ -160,33 +188,44 @@ for subj = 1 : nrSubject
             jobs{subj}.spm.stats.fmri_spec.sess(run).multi = {''};
 
 
-            if par.rp && isempty(par.file_regressor)
+            if par.rp && isempty(par.file_regexpressor)
                 jobs{subj}.spm.stats.fmri_spec.sess(run).multi_reg = fileRP(run);
-            elseif ~par.rp && ~isempty(par.file_regressor)
-                jobs{subj}.spm.stats.fmri_spec.sess(run).multi_reg = par.file_regressor(subj);
-            elseif par.rp && ~isempty(par.file_regressor)
-                jobs{subj}.spm.stats.fmri_spec.sess(run).multi_reg = [par.file_regressor{subj} ; fileRP(run)];
+            elseif ~par.rp && ~isempty(par.file_regexpressor)
+                jobs{subj}.spm.stats.fmri_spec.sess(run).multi_reg = par.file_regexpressor(subj);
+            elseif par.rp && ~isempty(par.file_regexpressor)
+                jobs{subj}.spm.stats.fmri_spec.sess(run).multi_reg = [par.file_regexpressor{subj} ; fileRP(run)];
             else
                 jobs{subj}.spm.stats.fmri_spec.sess(run).multi_reg = {''};
             end
-
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress = struct('name', {}, 'val', {});
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(1) = user_reg1{subj}{run};
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(2) = user_reg2{subj}{run};
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(3) = user_reg3{subj}{run};
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(4) = user_reg4{subj}{run};
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(5) = user_reg5{subj}{run};
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(6) = user_reg6{subj}{run};
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(7) = user_reg7{subj}{run};
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(8) = user_reg8{subj}{run};
-
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(1).name = user_reg1{subj}{run}.name;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(1).val = user_reg1{subj}{run}.val;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(2).name = user_reg2{subj}{run}.name;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(2).val = user_reg2{subj}{run}.val;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(3).name = user_reg3{subj}{run}.name;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(3).val = user_reg3{subj}{run}.val;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(4).name = user_reg4{subj}{run}.name;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(4).val = user_reg4{subj}{run}.val;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(5).name = user_reg5{subj}{run}.name;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(5).val = user_reg5{subj}{run}.val;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(6).name = user_reg6{subj}{run}.name;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(6).val = user_reg6{subj}{run}.val;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(7).name = user_reg7{subj}{run}.name;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(7).val = user_reg7{subj}{run}.val;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(8).name = user_reg8{subj}{run}.name;
+            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(8).val = user_reg8{subj}{run}.val;
+            if par.covars == 1
+                jobs{subj}.spm.stats.fmri_spec.sess(run).regress(9).name = par.covname;
+                jobs{subj}.spm.stats.fmri_spec.sess(run).regress(9).val = par.covval{subj};
+            else
+                jobs{subj}.spm.stats.fmri_spec.sess(run).regress = struct('name', {}, 'val', {});
+            end
 
             if ~isempty(par.user_regressor)
                 jobs{subj}.spm.stats.fmri_spec.sess(run).regress = par.user_regressor{subj}{run};
             end
             jobs{subj}.spm.stats.fmri_spec.sess(run).hpf = 128;
 
-        end % run
+%        end % run
 
         jobs{subj}.spm.stats.fmri_spec.timing.units = 'secs';
         jobs{subj}.spm.stats.fmri_spec.timing.RT = par.TR;
@@ -219,25 +258,25 @@ main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chi
 subj_dir = e.gpath;
 SessDir = gdir(subj_dir,'.*RS$');
 TedanaDir = gdir(SessDir,'tedana*');
-StatDir = gdir(SessDir,'^ALFF');%'model','^ALFF');
+StatDir = gdir(SessDir,'model','^ALFF_VOIreg_BA31');
 % StatDir = gdir(SessDir,'model','^model_2'); %new resliced version of denoised files
 regressors_test = gfile(TedanaDir,'multiple_regressors.txt');
 
-par.run = 0;
-par.sge = 1;  % Creer des scripts executables sur le cluster
+par.run = 1;
+par.sge = 0;  % Creer des scripts executables sur le cluster
 par.display = 0;
-par.jobname = 'spm_first_level_spec_RS_wbet';
+par.jobname = 'spm_first_level_VOIreg_spec_RS';
 
 [ jobs ] = job_ending_rountines( jobs, skip, par );
 %% Estimate
 
-fspm = addsuffixtofilenames(StatDir, 'SPM.mat');
+fspm = addsuffixtofilenames(dirStats, 'SPM.mat');
 
 clear par
 par.run = 0;
 par.sge = 1;
 par.sge_queu = 'normal,bigmem';
-par.jobname  = 'spm_first_level_est_RS_wbet';
+par.jobname  = 'spm_first_level_ParaHipp_est_RS';
 job_first_level_estimate(fspm,par) ;
 
 %% Contrast estimation
@@ -249,24 +288,25 @@ par.sge_queu = 'normal,bigmem';
 par.jobname = 'spm_first_level_con_RS_wbet';
 
 
-EffectsOfInterest= [1 0 0 0 0 0 0 0; ...
-                    0 1 0 0 0 0 0 0; ...
-                    0 0 1 0 0 0 0 0; ...
-                    0 0 0 1 0 0 0 0; ...
-                    0 0 0 0 1 0 0 0; ...
-                    0 0 0 0 0 1 0 0; ...
-                    0 0 0 0 0 0 1 0; ...
-                    0 0 0 0 0 0 0 1];
-PositiveEffectALFF = [1 1 1 1 1 1 1 1];
-NegativeEffectALFF = [1 1 1 1 1 1 1 1];
-PositiveLowFreq   = [1 1 1 1 0 0 0 0];
+EffectsOfInterest= [1 0 0 0 0 0 0 0 0; ...
+                    0 1 0 0 0 0 0 0 0; ...
+                    0 0 1 0 0 0 0 0 0; ...
+                    0 0 0 1 0 0 0 0 0; ...
+                    0 0 0 0 1 0 0 0 0; ...
+                    0 0 0 0 0 1 0 0 0; ...
+                    0 0 0 0 0 0 1 0 0; ...
+                    0 0 0 0 0 0 0 1 0; ...
+                    0 0 0 0 0 0 0 0 1];
+PositiveEffectALFF = [1 1 1 1 1 1 1 1 1];
+NegativeEffectALFF = [1 1 1 1 1 1 1 1 1];
+PositiveLowFreq   = [1 1 1 1 0 0 0 0 1];
 PositiveHighFreq   = [0 0 0 0 1 1 1 1];
 
 contrast.names={'Effects Of Interest','PositiveEffects','NegativeEffects','PositiveLowFreq','PositiveHighFreq'};
 contrast.values={EffectsOfInterest,PositiveEffectALFF,NegativeEffectALFF,PositiveLowFreq,PositiveHighFreq};
 contrast.types={'F','T','T','T','T'};
 
-par.delete_previous=1
+par.delete_previous=1;
 
 j=job_first_level_contrast(fspm,contrast,par)  ;
 
@@ -277,9 +317,8 @@ fmask = addsuffixtofilenames(StatDir, 'mask.nii');
 
 clear par
 %par.roi_dir = sprintf('%s/ROI_pariet_mot_premot_cereb_BG_PPN',main_dir);
-%network_dir = 'Tinnitus_Meta';
-network_dir = 'Alerting_effect';
-par.roi_dir = sprintf('%s/Networks_Masks/%s',project_dir,network_dir);
+network_dir = 'Tinnitus_Meta';
+par.roi_dir = sprintf('%s/Networks_masks/%s',project_dir,network_dir);
 par.jobname = 'spm_voi_ts_extract_atlas_tinnitus_moring';
 par.run = 1;
 par.sge = 0;
