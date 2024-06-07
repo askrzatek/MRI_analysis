@@ -9,58 +9,63 @@ cd (main_dir)
 load('e_nonchir.mat'); 
 
 
-%% Faire tourner les calculs de connnectivité
+%% Step 1: faire tourner les calculs de connnectivité
 
 % define input volumes and confounds
 clear par
-par.run = 1;
-par.sge = 0;
-par.jobname = 'timeseries_extract_AUDICOG_with_LC';
-par.display = 0;
-par.redo = 0;
-par.volume   =  e.getSerie('run_RS').getVolume('s5wts_OC') ;  % Choisir le s5 ou s8 (en fonction de la taille des structures etudiees par exemple...)
-par.confound =  e.getSerie('run_RS').getRP('multiple_regressors');
-par.mask_threshold = 0.001;
+par.run             = 0;
+par.sge             = 1;
+par.mem             = '16G';
+par.jobname         = 'timeseries_extract_AUDICOG_salience_tinnitus';
+par.display         = 0;
+par.redo            = 0;
+par.volume          =  e.getSerie('run_RS').getVolume('s5wts_OC') ;  % Choisir le s5 ou s8 (en fonction de la taille des structures etudiees par exemple...)
+par.confound        =  e.getSerie('run_RS').getRP('multiple_regressors');
+par.mask_threshold  = 0.001;
 
-% define ROI, using several methods
-%par.roi_type.atlas_cat12 = 'aal3';
+%% define ROI, using several methods
 
-% path_masks_nback= '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/NBack/Masks_positive_effect_2back' ;
-path_masks_audio= '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/Audio/2023_01_27 - Audio' ;
-% path_masks_yeo_aal3 = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/Yeo_networks_with_aal3_masks' ; 
-path_masks_Tinnitus = get_subdir_regex(ROI_dir, 'Tinnitus_Meta');
-path_masks_Alert    = get_subdir_regex(ROI_dir, 'Alerting_effect');
+% par.roi_type.atlas_cat12 = 'aal3';
 
-par.roi_type.mask_global = {
+path_masks_audio          = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/Audio/2023_01_27 - Audio' ;
+path_masks_Tinnitus       = get_subdir_regex(ROI_dir, 'Tinnitus_Meta');
+path_masks_Alert          = get_subdir_regex(ROI_dir, 'Alerting_effect');
+path_masks_Salience_CAREN = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/CAREN/RSN01';
+
+%% get labels for CAREN ROIs from table according to RSN we are interested in : in this case Salience = RSN01
+
+tab          = readtable(fullfile(ROI_dir,'aal_id_labels_abbrevs_CAREN.csv'));
+salience_net.labels  = tab.label_AAL(tab.salience(~isnan(tab.salience)));
+salience_net.abbrevs = tab.abbrev_AAL(tab.salience(~isnan(tab.salience)));
+atlas_rois_list = [];
+% salience_net.rois    = get_subdir_regex_files(path_masks_Salience_CAREN,'.*');
+
+for iroi = 1 : length(salience_net.labels)
+                                %     % path                                                                                                abbrev                      description
+    atlas_rois_list = [atlas_rois_list; char(get_subdir_regex_files(path_masks_Salience_CAREN,sprintf('.*Reg%d.nii$',tab.salience(iroi)))), salience_net.abbrevs(iroi), salience_net.labels(iroi)];
+end
+
+%% we could do the same for other networks : just to have the timeseries extracted per network if we want to compare
+
+
+%% define all ROIs independently from the atlas
+
+par.roi_type.mask_global = vertcat(atlas_rois_list,{
 %     % path                                                           abbrev          description
        char(get_subdir_regex_files(path_masks_Tinnitus, 'ParaHipp')), 'ParaHipp',  'Bilateral_ParaHippocampus'
-%        char(get_subdir_regex_files(path_masks_Tinnitus, 'BA_31')),    'BA_31',     'Brodmann_Area_31'
-% NOT ENOUGH SIGNAL IN 3T BOLD ACQUISITIONS SO AFTER RESLICING THE MASK, THE
-% MASK BECOMES EMPTY FOR MIDBRAIN STRUCTURES LIKE LC
+       fullfile( path_masks_audio,  'Left_Auditory_activation_fwe05_0v_50subj.nii'), 'lAudio'   ,  'Left_Loca_Audio_activation'   
+       fullfile( path_masks_audio,  'Right_Auditory_activation_fwe05_0v_50subj.nii'), 'rAudio'   ,  'Right_Loca_Audio_activation'   
+
+%        char(get_subdir_regex_files(path_masks_Alert, 'Frontal_Orb')),          'Orb_PFC',        'Combined_Orbital_Prefrontal_Cortex'
+
+% NOT ENOUGH SIGNAL IN 3T BOLD ACQUISITIONS SO AFTER RESLICING THE MASK, THE MASK BECOMES EMPTY FOR MIDBRAIN STRUCTURES LIKE LC
 %        char(get_subdir_regex_files(path_masks_Alert, 'LC_l')),          'LC_l',        'Left_Locus_Coereleus'
 %        char(get_subdir_regex_files(path_masks_Alert, 'LC_r')),          'LC_r',        'Right_Locus_Coereleus'
 %        char(get_subdir_regex_files(path_masks_Alert, 'LC.nii')),          'LC',        'Bilateral_Locus_Coereleus'
-%        char(get_subdir_regex_files(path_masks_Alert, 'Frontal_Orb')),          'Orb_PFC',        'Combined_Orbital_Prefrontal_Cortex'
 
-       fullfile( path_masks_audio,  'Left_Auditory_activation_fwe05_0v_50subj.nii'), 'lAudio'   ,  'Left_Loca_Audio_activation'   
-       fullfile( path_masks_audio,  'Right_Auditory_activation_fwe05_0v_50subj.nii'), 'rAudio'   ,  'Right_Loca_Audio_activation'   
-%      fullfile(path_masks_nback, 'L_Parietal_fwe05.nii') , 'l_parietal_nback', 'Left_activation_nback_parietal'
-%      fullfile(path_masks_nback, 'R_Parietal_fwe05.nii') , 'r_parietal_nback', 'Right_activation_nback_parietal'
-%      fullfile(path_masks_nback, 'L_MFG_fwe05.nii')      , 'l_MedialFG_nback', 'Left_activation_nback_frontal'
-%      fullfile(path_masks_nback, 'R_MFG_fwe05.nii')      , 'r_MedialFG_nback', 'Right_activation_nback_frontal'
-%      fullfile(path_masks_yeo_aal3, 'lAG.nii')           , 'lAG_yeo'             , 'Left_AG_Yeo'
-%      fullfile(path_masks_yeo_aal3, 'rAG.nii')           , 'rAG_yeo'             , 'Right_AG_Yeo'
-%      fullfile(path_masks_yeo_aal3, 'lIFG.nii')          , 'lIFG_yeo'            , 'Left_IFG_Yeo'
-%      fullfile(path_masks_yeo_aal3, 'rIFG.nii')          , 'rIFG_yeo'            , 'Rigth_IFG_Yeo'
-%      fullfile(path_masks_yeo_aal3, 'lMFG.nii')          , 'lMFG_yeo'            , 'Left_MFG_Yeo'
-%      fullfile(path_masks_yeo_aal3, 'rMFG.nii')          , 'rMFG_yeo'            , 'Right_IFG_Yeo'
-%      fullfile(path_masks_yeo_aal3, 'lMPFC.nii')         , 'lMPFC_yeo'           , 'Left_MPFC_Yeo'
-%      fullfile(path_masks_yeo_aal3, 'rMPFC.nii')         , 'rMPFC_yeo'           , 'Right_MPFC_Yeo'
-%      fullfile(path_masks_yeo_aal3, 'lMTC.nii')          , 'lMTC_yeo'            , 'Left_MTC_Yeo'
-%      fullfile(path_masks_yeo_aal3, 'rMTC.nii')          , 'rMTC_yeo'            , 'Right_MTC_Yeo'
-%      fullfile(path_masks_yeo_aal3, 'lPMC.nii')          , 'lPMC_yeo'            , 'Left_PMC_Yeo'
-%      fullfile(path_masks_yeo_aal3, 'rPMC.nii')          , 'rPMC_yeo'            , 'Right_PMC_Yeo'
-   } ;
+   }) ;
+
+%% define ROIs accordingly to the coordinates from the literature
 
 par.roi_type.sphere_global = {
 %     % [x y z]mm      radius(mm)   abbrev    fullname
@@ -70,12 +75,13 @@ par.roi_type.sphere_global = {
 %     [ -15,-2,-4 ],   2,          's2lGPi', 's2 left GPi'
     };
 
-% perform the extraction
+%% Perform the timeseries' extraction
 
 TS = job_extract_timeseries(par);
 
-%%
-% % define some networks : not mandatory
+%% Step 2: create correlation matrix
+
+%% Define some networks : not mandatory
 
 
 % par.network.DMN = {'lSFGmedial', 'rSFGmedial','lPFCventmed', 'rPFCventmed','lREC', 'rREC','lPCC', 'rPCC', 'lTPOsup', 'rTPOsup', 'lTPOmid', 'rTPOmid', ...
@@ -95,18 +101,18 @@ TS = job_extract_timeseries(par);
 
 
 
-% perform connectivity matrix
+%% Create connectivity matrix
 TS = job_timeseries_to_connectivity_matrix(TS,par);
 
 %% plot
 guidata = plot_resting_state_connectivity_matrix(TS, {e.getSerie('run_RS').getExam().name});
 
-%% perfrom seed-to-voxel correlation (seed == ROI)
+%% Step 3: Perfrom seed-to-voxel correlation (seed == ROI)
 par.jobname = 'seed2brain_analysis_AUDICOG';
 TS = job_timeseries_to_connectivity_seedbased(TS,par);
 % 
 
-%% Sauvegarder les matrices sur owncloud pour pouvoir les récupérer sur mac
+%% Step 4: Sauvegarder les matrices sur owncloud pour pouvoir les récupérer sur mac
 
 output_dir = '/home/lise.hobeika/ownCloud/Postdoc_acouphènes/Manips/Imagerie/Data/Matrices_correlations'; 
 

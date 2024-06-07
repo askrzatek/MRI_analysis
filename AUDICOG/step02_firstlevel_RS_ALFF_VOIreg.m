@@ -43,12 +43,14 @@ dir_RS   = e.getSerie('run_RS$').removeEmpty. toJob(0);
 %dirStats = e.getSerie('run_RS$').mkdir('model','ALFF_VOIreg_LC'); % basic model ALFF %better denoising from tapas resliced masks
 %dirStats = e.getSerie('run_RS$').mkdir('model','ALFF_VOIreg_Alert'); % basic model ALFF %better denoising from tapas resliced masks
 %dirStats = e.getSerie('run_RS$').mkdir('model','ALFF_VOIreg_Audio'); % basic model ALFF %better denoising from tapas resliced masks
+% dirStats = e.getSerie('run_RS$').mkdir('model','ALFF_VOIreg_CSF_Lateral_Ventricle'); % basic model ALFF %better denoising from tapas resliced masks
 
 dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'model','ALFF_VOIreg_BA31');
 %dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'model','ALFF_VOIreg_ParaHipp');
 %dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'model','ALFF_VOIreg_LC');
 %dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'model','ALFF_VOIreg_Alert');
 %dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'model','ALFF_VOIreg_Audio');
+% dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'model','ALFF_VOIreg_CSF_Lateral_Ventricle');
 %dirStats = get_subdir_regex(e.getSerie('run_RS$').gpath,'ALFF');
 
 %% Make symbolic links from tedana_vtd_mle dir to run dir based on job_meica_afni symbolic link creation 
@@ -197,25 +199,26 @@ for subj = 1 : nrSubject
             else
                 jobs{subj}.spm.stats.fmri_spec.sess(run).multi_reg = {''};
             end
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(1).name = user_reg1{subj}{run}.name;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(1).val = user_reg1{subj}{run}.val;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(2).name = user_reg2{subj}{run}.name;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(2).val = user_reg2{subj}{run}.val;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(3).name = user_reg3{subj}{run}.name;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(3).val = user_reg3{subj}{run}.val;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(4).name = user_reg4{subj}{run}.name;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(4).val = user_reg4{subj}{run}.val;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(5).name = user_reg5{subj}{run}.name;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(5).val = user_reg5{subj}{run}.val;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(6).name = user_reg6{subj}{run}.name;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(6).val = user_reg6{subj}{run}.val;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(7).name = user_reg7{subj}{run}.name;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(7).val = user_reg7{subj}{run}.val;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(8).name = user_reg8{subj}{run}.name;
-            jobs{subj}.spm.stats.fmri_spec.sess(run).regress(8).val = user_reg8{subj}{run}.val;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(1).name = user_reg1{subj}{run}.name;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(1).val = user_reg1{subj}{run}.val;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(2).name = user_reg2{subj}{run}.name;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(2).val = user_reg2{subj}{run}.val;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(3).name = user_reg3{subj}{run}.name;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(3).val = user_reg3{subj}{run}.val;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(4).name = user_reg4{subj}{run}.name;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(4).val = user_reg4{subj}{run}.val;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(5).name = user_reg5{subj}{run}.name;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(5).val = user_reg5{subj}{run}.val;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(6).name = user_reg6{subj}{run}.name;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(6).val = user_reg6{subj}{run}.val;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(7).name = user_reg7{subj}{run}.name;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(7).val = user_reg7{subj}{run}.val;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(8).name = user_reg8{subj}{run}.name;
+%             jobs{subj}.spm.stats.fmri_spec.sess(run).regress(8).val = user_reg8{subj}{run}.val;
+            nreg = length(jobs{subj}.spm.stats.fmri_spec.sess(run).regress); % to be tested
             if par.covars == 1
-                jobs{subj}.spm.stats.fmri_spec.sess(run).regress(9).name = par.covname;
-                jobs{subj}.spm.stats.fmri_spec.sess(run).regress(9).val = par.covval{subj};
+                jobs{subj}.spm.stats.fmri_spec.sess(run).regress(nreg+1).name = par.covname;
+                jobs{subj}.spm.stats.fmri_spec.sess(run).regress(nreg+1).val = par.covval{subj};
             else
                 jobs{subj}.spm.stats.fmri_spec.sess(run).regress = struct('name', {}, 'val', {});
             end
@@ -317,8 +320,8 @@ fmask = addsuffixtofilenames(StatDir, 'mask.nii');
 
 clear par
 %par.roi_dir = sprintf('%s/ROI_pariet_mot_premot_cereb_BG_PPN',main_dir);
-network_dir = 'Tinnitus_Meta';
-par.roi_dir = sprintf('%s/Networks_masks/%s',project_dir,network_dir);
+network_dir = 'Control';
+par.roi_dir = sprintf('%s/Networks_Masks/%s',project_dir,network_dir);
 par.jobname = 'spm_voi_ts_extract_atlas_tinnitus_moring';
 par.run = 1;
 par.sge = 0;

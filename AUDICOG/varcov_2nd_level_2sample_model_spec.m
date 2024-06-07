@@ -43,7 +43,12 @@ par = complet_struct(par, defpar);
 
 %%
 ijob = 1;
-    
+%     if iscell (groups{1}) == 1
+%         groups{1} = char(groups{1}) 
+%     end
+%     if iscell (groups{2}) == 1
+%         groups{2} = char(groups{2}) 
+%     end
     jobs{ijob}.spm.stats.factorial_design.dir = outdirs(1);
     jobs{ijob}.spm.stats.factorial_design.des.t2.scans1 = spm_select('expand',groups{1});
     jobs{ijob}.spm.stats.factorial_design.des.t2.scans2 = spm_select('expand',groups{2});
