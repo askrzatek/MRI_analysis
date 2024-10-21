@@ -7,6 +7,8 @@ addpath /home/anna.skrzatek/MRI_analysis/AUDICOG/
 main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
 project_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG';
 
+cd(project_dir)
+
 load('e_nonchir.mat');
 
 d = readtable( [ './DATA/' , 'Correspondance_Numero_Comportement_IRM.csv' ])  ;
@@ -205,6 +207,7 @@ line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 title('Alert x FC (Cingulate/BA 31 x Crus II L) across groups')
+title(sprintf('Alert x FC (Cingulate/BA 31 x Crus II L) r-tin=%d r-con=%d',rcor_tinnitus, rcor_control))
 
 %% Hearing Loss effect
 x = covars.val{3};
@@ -295,7 +298,7 @@ line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 
 title('Hearing Loss x FC (ParaHippocampus x Frontal Sup L) across groups')
-
+title(sprintf('Hearing Loss x FC (ParaHippocampus x Frontal Sup L  r-tin=%d r-con=%d',rcor_tinnitus, rcor_control))
 
 %% ParaHipp x Lingual gyrus R
 y = [-0.110268036270787
@@ -383,7 +386,7 @@ line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 
 title('Hearing Loss x FC (ParaHippocampus x Lingual Gyrus R) across groups')
-
+title(sprintf('Hearing Loss x FC (ParaHippocampus x Lingual Gyrus R)  r-tin=%d r-con=%d',rcor_tinnitus, rcor_control))
 
 %% ParaHipp x Cingulum Mid L : trend
 y = [0.0634648952722806
@@ -471,7 +474,7 @@ line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 
 title('Hearing Loss x FC (ParaHippocampus x Cingulum Mid L) across groups - trend')
-
+title(sprintf('Hearing Loss x FC (ParaHippocampus x Cingulum Mid L) -trend  r-tin=%d r-con=%d',rcor_tinnitus, rcor_control))
 %% Main effect of Age
 x = covars.val{1};
 
@@ -961,7 +964,7 @@ line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 
 title('RT STD ANT x FC (Cingulate/BA 31 x BA 39 R) across groups')
-
+title(sprintf('RT STD ANT x FC (Cingulate/BA 31 x BA 39 R)  r-tin=%d r-con=%d',rcor_tinnitus, rcor_control))
 %% ParaHipp x Parietal Inf/BA 40 R
 
 y = [-0.00764584284560689
@@ -1049,6 +1052,7 @@ line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 
 title('RT STD ANT x FC (ParaHippocampus x Parietal Inf/BA 40 R) across groups')
+title(sprintf('RT STD ANT x FC (ParaHippocampus x Parietal Inf/BA 40 R) r-tin=%d r-con=%d',rcor_tinnitus, rcor_control))
 
 %% Differential Interaction Group x RT STD ANT
 
@@ -1139,7 +1143,7 @@ line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 
 title('Differential RT STD ANT x FC (Cingulate/BA 31 x Temporal Mid R) across groups')
-
+title(sprintf('Differential RT STD ANT x FC (Cingulate/BA 31 x Temporal Mid R) r-tin=%d r-con=%d',rcor_tinnitus, rcor_control))
 %% Hearing Loss main effect
 
 %% ParaHippocampus x Cluster 1

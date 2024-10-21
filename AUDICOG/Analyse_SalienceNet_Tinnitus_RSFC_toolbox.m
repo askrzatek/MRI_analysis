@@ -114,17 +114,43 @@ TS = job_timeseries_to_connectivity_seedbased(TS,par);
 
 %% Step 4: Sauvegarder les matrices sur owncloud pour pouvoir les récupérer sur mac
 
-output_dir = '/home/lise.hobeika/ownCloud/Postdoc_acouphènes/Manips/Imagerie/Data/Matrices_correlations'; 
+output_dir = '/home/anna.skrzatek/AUDICOG_backup/Correl_Matrix'; 
 
 for isubj = 1:length(e)
 
-    ifile =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/connectivity__DMN_salience_auditory_limbic_attention__timeseries__aal3__lrlrlrlrlrlrlrlrlr.mat') ;
-    load(ifile)   ;
-
-    ifile_out = ['S' , num2str(isubj) ,'_connectivity_RS.mat' ]; 
-
+    src =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__ppfffffffffrrSSfiiMMpppssppppttttAAPlr__CO.mat') ;
+    dst = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries_Salience_Tinnitus_Alert_Audio.mat') ;
+    src2 =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/static_conn__timeseries__ppfffffffffrrSSfiiMMpppssppppttttAAPlr__CO.mat') ;
+    dst2 = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/static_conn_timeseries_Salience_Tinnitus_Alert_Audio.mat') ;
     
-copyfile( ifile,  fullfile( output_dir, ifile_out ) ) ; 
+    if exist(src, 'file')
+        movefile(src, dst);
+        movefile(src2, dst2);
+    else
+        fprintf('expected file "%s" not found\n', src);
+        fprintf('expected file "%s" not found\n', src2);
+    end
+    
+    %% timeseries matrix
+    ifile = dst;
+    rs_cmat = load(ifile)   ;
+
+    ifile_out = ['AUDICOG_Sujet' , num2str(isubj) ,'_connectivity_RS_Salience_CAREN_Tinnitus_timeseries.csv' ]; 
+    dlmwrite(addprefixtofilenames(ifile_out,'/home/anna.skrzatek/AUDICOG_backup/Analyses/Correl_Matrix/'), rs_cmat.timeseries)
+
+    %% static conn    
+    ifile = dst2;
+    rs_cmat = load(ifile)   ;
+
+    ifile_out = ['AUDICOG_Sujet' , num2str(isubj) ,'_connectivity_RS_Salience_CAREN_Tinnitus_static_conn.csv' ]; 
+    dlmwrite(addprefixtofilenames(ifile_out,'/home/anna.skrzatek/AUDICOG_backup/Analyses/Correl_Matrix/'), rs_cmat.static_connectivity_matrix)
+    
+    ifile_out = 'Connectivity_RS_Salience_CAREN_Tinnitus_labels.csv';
+    writetable(rs_cmat.ts_table, addprefixtofilenames(ifile_out,'/home/anna.skrzatek/AUDICOG_backup/Analyses/Correl_Matrix/'));
+
+    %writematrix(rs_cmat,addprefixtofilenames(ifile_out,'/home/anna.skrzatek/AUDICOG_backup/Analyses/Correl_Matrix'))
+    %%% only available on Matlab 2019b
+%    copyfile( ifile,  fullfile( output_dir, ifile_out )) ;
 
 %     ifile_out = ['S' , num2str(isubj) ,'_connectivity_timeseries_aal3.xlsx' ]; 
 %     writematrix(  connectivity_matrix, fullfile( output_dir, ifile_out )  ) ; % , 'conn_network',  )  ;
