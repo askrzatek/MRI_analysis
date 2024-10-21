@@ -120,11 +120,13 @@ patients_dir = get_subdir_regex(Input, patient_list); %%outdirs
 
 %% ONCE THE INPUT STRUCTURE EXISTS
 % separate files in analysis groups : V1_all, PARK_c, PARK_a
-Sessions = exam(Input,'^PARKGAMEII.*');
+Sessions = exam(Input,'^PARKGAMEII.*[a,c,DD]$');
 Sessions.addSerie('report','TIV',1);
-Sessions.addSerie('mri','mri',1);
+Sessions.addSerie('mri','mri_V1',1);
+Sessions.addSerie('mri','mri_V2',1);
 
-Sessions.gser('mri').addVolume('^swp1v_V1.*.nii$','smwp1',1);
+Sessions.gser('mri_V1').addVolume('^smwp1v.*_V1.*.nii$','smwp1',1);
+Sessions.gser('mri_V2').addVolume('^smwp1v.*_V2.*.nii$','smwp1',1);
 Sessions.gser('TIV').addVolume('^cat_v.*.xml','TIV',1);
 
 addpath('/home/anna.skrzatek/MRI_analysis/')
@@ -136,7 +138,7 @@ addpath('/home/anna.skrzatek/MRI_analysis/')
 catreport_xml   = cellstr(char(Sessions.gser('TIV').gvol('TIV').toJob));
 
 clear par
-par.fname       = 'TIV_V1';
+par.fname       = 'TIV_V1';cellstr(char(Sessions(1).gser('mri_V1').gvol('smwp1_a').toJob))
 par.foutdir     = main_dir;
 par.run         = 1;
 
@@ -222,10 +224,10 @@ covars{2,2} = [1               % 003_SM_c
 
 %% Standard analysis paired t-test, 2 sample t-test and regression to come
 
-VBM_a_V1 = cellstr(char(Sessions(1).gser('mri').gvol('smwp1_a').toJob));  
-VBM_a_V2 = cellstr(char(Sessions(2).gser('mri').gvol('smwp1_a').toJob));  
-VBM_c_V1 = cellstr(char(Sessions(1).gser('mri').gvol('smwp1_c').toJob));  
-VBM_c_V2 = cellstr(char(Sessions(2).gser('mri').gvol('smwp1_c').toJob));  
+VBM_a_V1 = cellstr(char(Sessions(1).gser('mri_V1').gvol('smwp1').toJob));  
+VBM_a_V2 = cellstr(char(Sessions(2).gser('mri_V2').gvol('smwp1').toJob));  
+VBM_c_V1 = cellstr(char(Sessions(1).gser('mri_V1').gvol('smwp1').toJob));  
+VBM_c_V2 = cellstr(char(Sessions(2).gser('mri_V2').gvol('smwp1').toJob));  
 
 for i = 1 : length(VBM_a_V1)
    VBM_a{i} = {VBM_a_V1{i}, VBM_a_V2{i}};
@@ -356,7 +358,7 @@ firstlevel_2s_vbm_matlabbatch(subj,cooutdir,cocovars_double,par)
 
 %% Single paired t-test model estimate
 
-for iout = 10 : length(cooutdir)
+for iout = 1 : length(cooutdir)
     
     fspm = addsuffixtofilenames(cooutdir(iout), '/SPM.mat');
 

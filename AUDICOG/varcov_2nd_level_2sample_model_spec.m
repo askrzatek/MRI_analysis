@@ -35,7 +35,7 @@ defpar.paired                             = 0;
 defpar.ancova                             = 0;
 defpar.covars                             = 0;
 if defpar.covars == 1
-    defpar.intercov                           = cat(1,repmat(1,[1,length(covars.name)]));
+    defpar.intercov                       = cat(1,repmat(1,[1,length(covars.name)]));
 end
 defpar.multicov                           = struct('files', {}, 'iCFI', {}, 'iCC', {});
 
@@ -61,7 +61,10 @@ ijob = 1;
         jobs{ijob}.spm.stats.factorial_design.cov = struct('c', {}, 'cname', {}, 'iCFI', {}, 'iCC', {});
     else
         for icov = 1:length(covars.name)
-            jobs{ijob}.spm.stats.factorial_design.cov(icov).c = vertcat(covars.val{icov,:});
+%             jobs{ijob}.spm.stats.factorial_design.cov(icov).c =
+%             vertcat(covars.val{icov,:}); %% errors in the order from my
+%             input - this detail to be put in the doc in the doc
+            jobs{ijob}.spm.stats.factorial_design.cov(icov).c = vertcat(covars.val{:,icov});
         %%
             jobs{ijob}.spm.stats.factorial_design.cov(icov).cname = covars.name{icov};
             jobs{ijob}.spm.stats.factorial_design.cov(icov).iCFI = par.intercov(icov);
