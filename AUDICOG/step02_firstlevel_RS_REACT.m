@@ -7,7 +7,7 @@
 %%% e.mat
 %%% bp_clean.nii 
 clc
-clear
+clear all
 
 addpath('/network/lustre/iss02/cenir/analyse/irm/users/salim.ouarab/dev_matvol/')
 addpath('/network/lustre/iss02/cenir/analyse/irm/users/salim.ouarab/MNI/pet_atlas/')
@@ -155,7 +155,7 @@ par.file_reg = '^bp_clean.*nii';
 par.user_regressor = ftxt_na; 
 par.TR  = 1.6;
 
-par.redo = 0;
+par.redo = 1;
 par.run = 1;
 par.sge = 0;
 par.jobname = 'GLM_NA'
@@ -224,11 +224,25 @@ job_first_level_estimate(fspm,par)
 %% Stats :
 
 %% A.SKRZATEK
+clear par
 project_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG';
 
 d = readtable( [ './DATA/' , 'Correspondance_Numero_Comportement_IRM.csv' ])  ;
 tab = readtable(fullfile(project_dir,'DATA/ANT_Alerting_RT_multiregression.csv'));
-covars.name = {'Age','Sex','Hearing_loss','Emotion','Alert_score_ANT'};
+tab = readtable(fullfile(project_dir,'DATA/AUDICOG_behavioral_data_Groups1_2.csv')); % behavioral data verified and up to date for group 1 & 2
+
+% covars.name = {'Age','Sex','Hearing_loss','Emotion','Alert_score_ANT'};
+models.names = {    '2s_ttest_REACT_NA_verif_ANT_RT_STD_pca',                     '2s_ttest_REACT_NA_verif_Alert_pca',                                '2s_ttest_REACT_NA_verif_ANT_RT_STD_wo_pca','2s_ttest_REACT_NA_verif_Alert_wo_pca', '2s_ttest_REACT_NA_verif_double_pca',                             '2s_ttest_REACT_NA_verif_double_wo_pca'};
+models.covarnames = {{'Age','Genre','pca_audio1','pca_emotionnel1','STD_RT_ANT'},{'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting'},{'Age','Genre','STD_RT_ANT'},                 {'Age','Genre','log_ANT_RT_Alerting'},{'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting','STD_RT_ANT'},{'Age','Genre','log_ANT_RT_Alerting','STD_RT_ANT'}};
+    
+cd (project_dir)
+
+for imodel = 1:length(models.names)
+    model_outdir = fullfile(project_dir,'/Results/REACT/',models.names{imodel});
+    mkdir(model_outdir)
+    models.outdirs{imodel} = model_outdir;
+end
+clear imodel    
 
 groups.name = {'Control' 'Tinnitus'};
 pathway_contrasts = {'/GLM_NA/'};
@@ -236,6 +250,16 @@ pathway_contrasts = {'/GLM_NA/'};
 contrast_names = {'beta.*01.nii$'};
 
 %% getting scans & covariates organised per group
+%% Choose  the model you want to apply : accordingly to the desired number of covariates
+imodel = 1; % 1:REACT_NA_verif_ANT_RT_STD_pca 2:REACT_NA_verif_Alert_pca 3:REACT_NA_verif_ANT_RT_STD_wo_pca 4:REACT_NA_verif_Alert_wo_pca 5:REACT_NA_verif_double_pca 6:REACT_NA_verif_double_wo_pca
+sprintf('Model %s chosen',models.names{imodel})
+sprintf('Covariates to be used are %s %s %s %s %s %s', models.covarnames{imodel}{:})
+
+clear par
+par.sge = 0;
+par.run = 1;
+par.covars = 1;
+
 scans = cell(1,length(groups.name));
 for igroup = 1:length(groups.name)
     j = 0 ;
@@ -247,71 +271,103 @@ for igroup = 1:length(groups.name)
         
         if subj_group == igroup
             j = j + 1 ;
-            for icov = 1:length(covars.name)
+            for icov = 1:length(models.covarnames{imodel})
                 scans{igroup}.cov{j,1} = tab.Age(tab.code_IRM == id);
                 scans{igroup}.cov{j,2} = tab.Genre(tab.code_IRM == id);
-                scans{igroup}.cov{j,3} = tab.pca_audio1(tab.code_IRM == id);
-                scans{igroup}.cov{j,4} = str2double(tab.pca_emotionnel1(tab.code_IRM == id));
-                scans{igroup}.cov{j,5} = tab.log_ANT_RT_Alerting(tab.code_IRM == id);
-                scans{igroup}.cov{j,6} = tab.ANT_STD_mean(tab.code_IRM == id);
-%                 scans{igroup}.cov{j,5} = tab.ANT_STD_mean(tab.code_IRM == id);
+                if imodel == 1 || imodel ==2 || imodel == 5 % PCA covars included
+                    scans{igroup}.cov{j,3} = tab.pca_audio1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,4} = tab.pca_emotion1(tab.code_IRM == id);
+                    if imodel == 1
+                        scans{igroup}.cov{j,5} = tab.RT_STD(tab.code_IRM == id);
+                        par.intercov = [1,1,1,1,2];
+                    elseif imodel == 2
+                        scans{igroup}.cov{j,5} = tab.ANT_Alert_Score(tab.code_IRM == id);
+                        par.intercov = [1,1,1,1,2];
+                    elseif imodel == 5
+                        scans{igroup}.cov{j,5} = tab.ANT_Alert_Score(tab.code_IRM == id);
+                        scans{igroup}.cov{j,6} = tab.RT_STD(tab.code_IRM == id);
+                        par.intercov = [1,1,1,1,2,2];
+                    end
+                elseif imodel == 3 % No PCA covars included
+                    scans{igroup}.cov{j,3} = tab.RT_STD(tab.code_IRM == id);
+                    par.intercov = [1,1,2];
+                elseif imodel == 4
+                    scans{igroup}.cov{j,3} = tab.ANT_Alert_Score(tab.code_IRM == id);
+                    par.intercov = [1,1,2];
+                else
+                    scans{igroup}.cov{j,3} = tab.ANT_Alert_Score(tab.code_IRM == id);
+                    scans{igroup}.cov{j,4} = tab.RT_STD(tab.code_IRM == id);
+                    par.intercov = [1,1,2,2];
+                end
+%                 scans{igroup}.cov{j,3} = tab.pca_audio1(tab.code_IRM == id);
+%                 scans{igroup}.cov{j,4} = str2double(tab.pca_emotionnel1(tab.code_IRM == id));
+%                 scans{igroup}.cov{j,5} = tab.log_ANT_RT_Alerting(tab.code_IRM == id);
+%                 scans{igroup}.cov{j,6} = tab.ANT_STD_mean(tab.code_IRM == id);
             end
             scans{igroup}.contrast{j} = char(get_subdir_regex_files(fullfile(dreact{iSubj}, pathway_contrasts{1}), contrast_names{1})) ; % if multiple pathway_contrasts then change 1 to icontr
         end
     end
 end
 
-%% NA contrast
+for icov = 1:length(models.covarnames{imodel})
+    models.covarvals{imodel}(icov) = {vertcat(scans{1}.cov{:,icov},scans{2}.cov{:,icov})};
+end
+
+% NA contrast
 
 groups.val = {scans{1}.contrast(1,:), scans{2}.contrast(1,:)}; % NA
 
 %% 2-sample t-test model specification
+covars.val = models.covarvals{imodel};
+covars.name = models.covarnames{imodel};
 
-jobnames = {'2sample_ttest_RS_pca','2sample_ttest_RS_Alert_RT_STD_inter_pca', '2sample_ttest_RS_Alert_pca_model', '2sample_ttest_RS_RT_STD_pca_model','2sample_ttest_RS_Alert_wo_PCA_RT_STD_covar'};
-outdirs = {'/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_pca', '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_mixed_interaction_pca', '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_Alert_pca', '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_RT_STD_pca', '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_Alert_covar_RT_STD_wo_pca'};
+varcov_2nd_level_2sample_model_spec(groups.val,models.outdirs(imodel),covars,par);
 
-clear par
-par.sge = 0;
-par.run = 1;
-
-for ijob = 1: length(jobnames)
-    par.jobname = jobnames{ijob};
-    
-    % covars according to the model tested : Alert or RT_STD (or mixed in
-    % the future)
-    if ijob == 1
-        par.covars = 1;
-        par.intercov = [1,1,1,1,1,1];
-        covars.name = {'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting', 'STD_RT_ANT'};
-        covars.val = {vertcat(scans{1}.cov{:,1},scans{2}.cov{:,1});vertcat(scans{1}.cov{:,2},scans{2}.cov{:,2});vertcat(scans{1}.cov{:,3},scans{2}.cov{:,3});vertcat(scans{1}.cov{:,4},scans{2}.cov{:,4});vertcat(scans{1}.cov{:,5},scans{2}.cov{:,5});vertcat(scans{1}.cov{:,6},scans{2}.cov{:,6})};
-        
-%         par.intercov = [1,1,1,1];
-%         covars.name = {'Age','Genre','pca_audio1','pca_emotionnel1'};
-%         covars.val = {vertcat(scans{1}.cov{:,1},scans{2}.cov{:,1});vertcat(scans{1}.cov{:,2},scans{2}.cov{:,2});vertcat(scans{1}.cov{:,3},scans{2}.cov{:,3});vertcat(scans{1}.cov{:,4},scans{2}.cov{:,4})};    
-    elseif ijob == 2
-        par.covars = 1;
-        par.intercov = [1,1,1,1,2,2];
-        covars.name = {'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting', 'STD_RT_ANT'};
-        covars.val = {vertcat(scans{1}.cov{:,1},scans{2}.cov{:,1});vertcat(scans{1}.cov{:,2},scans{2}.cov{:,2});vertcat(scans{1}.cov{:,3},scans{2}.cov{:,3});vertcat(scans{1}.cov{:,4},scans{2}.cov{:,4});vertcat(scans{1}.cov{:,5},scans{2}.cov{:,5});vertcat(scans{1}.cov{:,6},scans{2}.cov{:,6})};
-    elseif ijob == 3
-        par.covars = 1;
-        par.intercov = [1,1,1,1,2];
-        covars.name = {'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting'};
-        covars.val = {vertcat(scans{1}.cov{:,1},scans{2}.cov{:,1});vertcat(scans{1}.cov{:,2},scans{2}.cov{:,2});vertcat(scans{1}.cov{:,3},scans{2}.cov{:,3});vertcat(scans{1}.cov{:,4},scans{2}.cov{:,4});vertcat(scans{1}.cov{:,5},scans{2}.cov{:,5})};
-    elseif ijob == 4
-        par.covars = 1;
-        par.intercov = [1,1,1,1,2];
-        covars.name = {'Age','Genre','pca_audio1','pca_emotionnel1','STD_RT_ANT'};
-        covars.val = {vertcat(scans{1}.cov{:,1},scans{2}.cov{:,1});vertcat(scans{1}.cov{:,2},scans{2}.cov{:,2});vertcat(scans{1}.cov{:,3},scans{2}.cov{:,3});vertcat(scans{1}.cov{:,4},scans{2}.cov{:,4});vertcat(scans{1}.cov{:,6},scans{2}.cov{:,6})};
-    else
-        par.covars = 1;
-        par.intercov = [1,1,1,2];
-        covars.name = {'Age','Genre','STD_RT_ANT','log_ANT_RT_Alerting'};
-        covars.val = {vertcat(scans{1}.cov{:,1},scans{2}.cov{:,1});vertcat(scans{1}.cov{:,2},scans{2}.cov{:,2});vertcat(scans{1}.cov{:,6},scans{2}.cov{:,6});vertcat(scans{1}.cov{:,5},scans{2}.cov{:,5})};
-    end
-    
-    varcov_2nd_level_2sample_model_spec(groups.val,outdirs(ijob),covars,par);
-end
+%% PART USED BEFORE MODELS-structure (combining all input info) & BEFORE IF-LOOP INCLUDED IN GROUP-SCANS SPEC
+% jobnames = {'2sample_ttest_RS_pca','2sample_ttest_RS_Alert_RT_STD_inter_pca', '2sample_ttest_RS_Alert_pca_model', '2sample_ttest_RS_RT_STD_pca_model','2sample_ttest_RS_Alert_wo_PCA_RT_STD_covar'};
+% outdirs = {'/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_pca', '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_mixed_interaction_pca', '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_Alert_pca', '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_RT_STD_pca', '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_Alert_covar_RT_STD_wo_pca'};
+% clear par
+% par.sge = 0;
+% par.run = 1;
+% 
+% for ijob = 1: length(jobnames)
+%     par.jobname = jobnames{ijob};
+%     
+%     % covars according to the model tested : Alert or RT_STD (or mixed in
+%     % the future)
+%     if ijob == 1
+%         par.covars = 1;
+%         par.intercov = [1,1,1,1,1,1];
+%         covars.name = {'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting', 'STD_RT_ANT'};
+%         covars.val = {vertcat(scans{1}.cov{:,1},scans{2}.cov{:,1});vertcat(scans{1}.cov{:,2},scans{2}.cov{:,2});vertcat(scans{1}.cov{:,3},scans{2}.cov{:,3});vertcat(scans{1}.cov{:,4},scans{2}.cov{:,4});vertcat(scans{1}.cov{:,5},scans{2}.cov{:,5});vertcat(scans{1}.cov{:,6},scans{2}.cov{:,6})};
+%         
+% %         par.intercov = [1,1,1,1];
+% %         covars.name = {'Age','Genre','pca_audio1','pca_emotionnel1'};
+% %         covars.val = {vertcat(scans{1}.cov{:,1},scans{2}.cov{:,1});vertcat(scans{1}.cov{:,2},scans{2}.cov{:,2});vertcat(scans{1}.cov{:,3},scans{2}.cov{:,3});vertcat(scans{1}.cov{:,4},scans{2}.cov{:,4})};    
+%     elseif ijob == 2
+%         par.covars = 1;
+%         par.intercov = [1,1,1,1,2,2];
+%         covars.name = {'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting', 'STD_RT_ANT'};
+%         covars.val = {vertcat(scans{1}.cov{:,1},scans{2}.cov{:,1});vertcat(scans{1}.cov{:,2},scans{2}.cov{:,2});vertcat(scans{1}.cov{:,3},scans{2}.cov{:,3});vertcat(scans{1}.cov{:,4},scans{2}.cov{:,4});vertcat(scans{1}.cov{:,5},scans{2}.cov{:,5});vertcat(scans{1}.cov{:,6},scans{2}.cov{:,6})};
+%     elseif ijob == 3
+%         par.covars = 1;
+%         par.intercov = [1,1,1,1,2];
+%         covars.name = {'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting'};
+%         covars.val = {vertcat(scans{1}.cov{:,1},scans{2}.cov{:,1});vertcat(scans{1}.cov{:,2},scans{2}.cov{:,2});vertcat(scans{1}.cov{:,3},scans{2}.cov{:,3});vertcat(scans{1}.cov{:,4},scans{2}.cov{:,4});vertcat(scans{1}.cov{:,5},scans{2}.cov{:,5})};
+%     elseif ijob == 4
+%         par.covars = 1;
+%         par.intercov = [1,1,1,1,2];
+%         covars.name = {'Age','Genre','pca_audio1','pca_emotionnel1','STD_RT_ANT'};
+%         covars.val = {vertcat(scans{1}.cov{:,1},scans{2}.cov{:,1});vertcat(scans{1}.cov{:,2},scans{2}.cov{:,2});vertcat(scans{1}.cov{:,3},scans{2}.cov{:,3});vertcat(scans{1}.cov{:,4},scans{2}.cov{:,4});vertcat(scans{1}.cov{:,6},scans{2}.cov{:,6})};
+%     else
+%         par.covars = 1;
+%         par.intercov = [1,1,1,2];
+%         covars.name = {'Age','Genre','STD_RT_ANT','log_ANT_RT_Alerting'};
+%         covars.val = {vertcat(scans{1}.cov{:,1},scans{2}.cov{:,1});vertcat(scans{1}.cov{:,2},scans{2}.cov{:,2});vertcat(scans{1}.cov{:,6},scans{2}.cov{:,6});vertcat(scans{1}.cov{:,5},scans{2}.cov{:,5})};
+%     end
+%     
+%     varcov_2nd_level_2sample_model_spec(groups.val,outdirs(ijob),covars,par);
+% end
 
 %% Estimation
 
