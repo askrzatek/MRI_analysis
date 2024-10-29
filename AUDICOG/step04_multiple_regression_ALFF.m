@@ -4,7 +4,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clc
-load e
 
 %% Initialise
 addpath /home/anna.skrzatek/MRI_analysis
@@ -14,44 +13,121 @@ project_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG'
 main_dir = fullfile(project_dir,'/DATA','/Non_chirurgicaux')
 
 cd (main_dir)
+load e
 
 sujDir = e.getPath();
 Input_RS = e.getSerie('run_RS').getVolume('s5wts_OC').getPath();
 e.addSerie('RS','tedana','tedana_RS')
-ALFF_InputDir = get_subdir_regex(e.getSerie('tedana_RS').gpath(),'rsfc');
-ALFF_Input = get_subdir_regex_files(ALFF_InputDir,'^ALFF_clean.nii');
-%mkdir(project_dir,'/Results/fALFF');
-ALFF_OutputDir = fullfile(project_dir,'Results/ALFF');
-
 
 %% Regressors definition
 % importing the table with multiple columns with patients characteristics
 % from CSV: filtered by IRM==1
+clear par
+par.rsfc = 0;
+par.ALFF = 1;
+
+if par.rsfc ==1
+    seeds = {'ParaHipp','lAudio','rAudio','Cingulate','OFC'};
+    pathway_contrasts = {'/tedana009a1_vt/rsfc/'};
+    contrast_names = {'seed2voxel_pearson_ParaHipp_lAudio_rAudio__Cingulate_OFC'};
+    ncon = length(seeds);
+    % contrast_names = {'seed2voxel_pearson_ParaHipp_BA_31_Orb_PFC_lAudio_rAudio__Cingulate'};
+end
+
+cd (project_dir)
 tab = readtable(fullfile(project_dir,'DATA/ANT_Alerting_RT_multiregression.csv'));
-tab_sel = ismember(tab.IRM, 1);
-group = tab.Group(tab_sel);
-age   = tab.Age(tab_sel);
-sex   = tab.Genre(tab_sel);
-ANT   = tab.log_ANT_RT_Alerting(tab_sel);
+tab = readtable(fullfile(project_dir,'DATA/AUDICOG_behavioral_data_Groups1_2.csv')); % behavioral data verified and up to date for group 1 & 2
+d = readtable( [ './DATA/' , 'Correspondance_Numero_Comportement_IRM.csv' ])  ;
+
+
+scans = cell(1,length(groups.name));
+for igroup = 1:length(groups.name)
+    j = 0 ;
+    for iSubj = 1:length(e)
+        
+        ifile = e(iSubj).name;
+        id = str2double(ifile(25:end)) ;
+        subj_group = d.Groupe( find (d.Num_IRM == id) )  ;
+        
+        if subj_group == igroup
+            j = j + 1 ;
+            
+        %% Adding Covariates and defining the model
+%         for icov = 1:length(models.covarnames{imodel})
+            scans{igroup}.cov{j,1} = tab.Age(tab.code_IRM == id);
+            scans{igroup}.cov{j,2} = tab.Genre(tab.code_IRM == id);
+            scans{igroup}.cov{j,3} = str2double(tab.Group(tab.code_IRM == id));
+            scans{igroup}.cov{j,4} = tab.pca_audio1(tab.code_IRM == id);
+            scans{igroup}.cov{j,5} = tab.pca_emotion1(tab.code_IRM == id);
+            scans{igroup}.cov{j,6} = tab.ANT_Alert_Score(tab.code_IRM == id);
+            scans{igroup}.cov{j,7} = tab.RT_STD(tab.code_IRM == id);
+            if par.rsfc == 1
+                pearson_map_rsfc = get_subdir_regex_files( fullfile(e(iSubj).getSerie('run_RS').path, pathway_contrasts{1}), contrast_names{1}) ; % if multiple pathway_contrasts then change 1 to icontr
+                for icon = 1: length(seeds)
+                    scans{igroup}.contrast{j, icon } = [char(pearson_map_rsfc), ',' num2str(icon) ] ;
+                end
+            elseif par.ALFF ==1
+                ALFF_InputDir = get_subdir_regex(e(iSubj).getSerie('tedana_RS').gpath(),'rsfc');
+                scans{igroup}.contrast{j, 1 } = get_subdir_regex_files(ALFF_InputDir,'^ALFF_clean.nii');
+            end
+        end
+    end
+end
+
+% tab_sel = ismember(tab.IRM, 1);
+
+age   = vertcat(scans{1}.cov{:,1},scans{2}.cov{:,1});
+sex   = vertcat(scans{1}.cov{:,2},scans{2}.cov{:,2});
+group = vertcat(scans{1}.cov{:,3},scans{2}.cov{:,3});
+Audio1   = vertcat(scans{1}.cov{:,4},scans{2}.cov{:,4});
+Emo1   = vertcat(scans{1}.cov{:,5},scans{2}.cov{:,5});
+Alert_ANT   = vertcat(scans{1}.cov{:,6},scans{2}.cov{:,6});
+RT_STD_ANT   = vertcat(scans{1}.cov{:,7},scans{2}.cov{:,7});
 
 %% Creating the par structure for multiple regression (both groups combined)
 clear par
+
+target_regressors.name  = {'Alerting_Score_ANT','RT_STD_ANT','Hearing_Loss','Emotion'};
+target_regressors.value = {Alert_ANT,RT_STD_ANT,Audio1,Emo1};
+covars.name = {'Age';'Sex';'Group'};
+covars.val = {age; sex; group};
+
+par.nb_cons = length(target_regressors.name);
+
+par.ALFF = 1;
+par.rsfc = 0;
+if par.ALFF == 1
+    par.nb_cond = 1;
+    par.jobname = 'ANT_ALFF_reg_model_spec';
+    input = {scans{1}.contrast{:,1},scans{2}.contrast{:,1}};
+elseif par.rsfc == 1
+    par.nb_cond = length(seeds);
+    par.jobname = 'rsfc_reg_model_spec';
+    input = {scans{1}.contrast,scans{2}.contrast};
+end
 par.run = 1;
 par.sge = 0;
 par.sge_queu = 'normal,bigmem';
-par.jobname = 'ANT_ALFF_reg_model_spec';
 par.mem = 10000;
-par.nb_cond = 1;
-par.nb_cons = length(ALFF_Input);
-target_regressors.name  = {'Alerting_ANT_RT_log'};
-%target_regressors.value = {targetsAPA1,targetsDA1,targetsSS1, targetAxial1,targetGabs1,targetUPDRS1,targetUPDRSIII_Axial1,targetUPDRSIII_Sup1}; % get variables from the variable name regex or get all variables in the same structure before and then just search by their name index (being the same as their index in the structure)
-target_regressors.value = {ANT};
-covars.name = {'Age';'Sex';'Group'};
-covars.val = {age; sex; group};
-%mkdir(ALFF_OutputDir,'Multireg_ANT');
-outputdir = fullfile(ALFF_OutputDir,'Multireg_ANT');
 
-varcov_multiregression_model_spec({cellstr(outputdir)}, {ALFF_Input(:)}, covars, target_regressors, par);
+
+mkdir(project_dir,'Results/Multireg')
+parent_dir = fullfile(project_dir,'Results/Multireg');
+for ireg = 1: par.nb_cons
+    mkdir(parent_dir,target_regressors.name{ireg})
+    for ir = 1: par.nb_cond
+        if par.rsfc == 1
+            mkdir(parent_dir,sprintf('%s/%s',target_regressors.name{ireg},seeds{ir}))
+            outputdir{ireg}{ir} = fullfile(parent_dir,sprintf('%s/%s',target_regressors.name{ireg},seeds{ir}));
+    %     mkdir(ALFF_OutputDir,sprintf('Multireg_%s',target_regressors.name{ireg}))
+        elseif par.ALFF == 1
+            mkdir(parent_dir,sprintf('%s/ALFF',target_regressors.name{ireg}))
+            outputdir{ireg}{ir} = fullfile(parent_dir,sprintf('%s/ALFF',target_regressors.name{ireg}));
+        end
+    end
+end
+
+varcov_multiregression_model_spec(outputdir, input , covars, target_regressors, par);
 
 %% Model estimation
 fspm = addsuffixtofilenames(outputdir,'/SPM.mat');
@@ -106,6 +182,11 @@ par.report          = 0;
 
 job_first_level_contrast({fspm},contrast,par);
     
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% IF connectivity has been done
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% IF connectivity hasn't been done yet
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

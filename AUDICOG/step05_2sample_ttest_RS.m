@@ -374,6 +374,8 @@ for imodel = 3:6
             Differential_group_RT_STD_effect = [0 0 0 0 0 0 0 0 1 -1];
             %Control_Tinnitus = [1 0 0 0 0 0 0 0 0 0 ; 0 -1 0 0 0 0 0 0 0 0];
             %Tinnitus_Control = [-1 0 0 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0 0 0];
+            Main_effect_Hearing_Loss = [0 0 0 0 1 0 0 0 0 0];
+            Main_effect_Emotion = [0 0 0 0 0 1 0 0 0 0];
             Main_effect_Age = [0 0 1 0 0 0];
             Main_effect_Sex = [0 0 0 1 0 0];
 
@@ -383,6 +385,8 @@ for imodel = 3:6
                 'Main_Group_x_Alert_Score_Interaction'
                 'Main_RT_STD_Effect'
                 'Main_Group_x_RT_STD_Interaction'
+                'Main_effect_Hearing_Loss'
+                'Main_effect_Emotion'
                 'Main_effect_Age'
                 'Main_effect_Sex'
                 }';
@@ -393,6 +397,8 @@ for imodel = 3:6
                 Differential_group_Alert_effect
                 Main_RT_STD_effect
                 Differential_group_RT_STD_effect
+                Main_effect_Hearing_Loss
+                Main_effect_Emotion
                 Main_effect_Age
                 Main_effect_Sex
                 }';

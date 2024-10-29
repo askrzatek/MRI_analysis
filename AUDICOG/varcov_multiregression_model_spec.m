@@ -16,7 +16,7 @@ defpar.nb_cons                            = 1;
 par = complet_struct(par, defpar);
 ijob = 1;
 for i = 1 : par.nb_cond % a loop for each target regressor
-    for iout = 1 : par.nb_cons % a loop for each contrast // con
+    for iout = 1 : par.nb_cons % a loop for each contrast // con // seed ?
 %         jobs{ijob}.spm.stats.factorial_design.dir = {'/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/test_multiple_regression/Axial_IL'};
 %         jobs{ijob}.spm.stats.factorial_design.des.mreg.scans = {
 %                                                                     '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_001_NB_a/con_0017.nii,1'
