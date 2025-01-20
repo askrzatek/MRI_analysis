@@ -5,8 +5,8 @@ clear
 clc
 
 
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
-project_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG';
+main_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
+project_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG';
 cd (project_dir)
 
 load e_nonchir
@@ -214,7 +214,7 @@ end
 
 %% Other routines
 % verifs
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
+main_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
 
 subj_dir = e.gpath;
 SessDir = gdir(subj_dir,'.*RS$');

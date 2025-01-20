@@ -429,8 +429,8 @@ model_contrast = { contrast_2x2Session,  contrast_2x2Session_CTL, contrast_2x2Ha
 
 %% fetch dirs for SPM
 %% Load files from multiple folders
-main_dir2 = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test','ben');
-main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
+main_dir2 = fullfile('/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test','ben');
+main_dir = fullfile('/network/iss/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
 cd (main_dir)
 % e_PARKGAME = exam(main_dir,'PARKGAME');
 % e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
@@ -517,7 +517,7 @@ par.verbose = 2;
                     l22 = e{session}.getSerie('contrasts').getVolume('IMA_L').toJob;
             end
             
-            addpath '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/'
+            addpath '/network/iss/cenir/analyse/irm/users/anna.skrzatek/'
         %% Job define model
 
             par.fake = 0;
@@ -556,4 +556,4 @@ par.verbose = 2;
 %%% Display
 %
 %%!linux command for mricrogl script
-%!/network/lustre/iss02/cenir/software/irm/mricrogl_lx/MRIcroGL '/home/anna.skrzatek/data/nifti/secondlevel_ACTIVATION/second_level_p001_auto.gls'
+%!/network/iss/cenir/software/irm/mricrogl_lx/MRIcroGL '/home/anna.skrzatek/data/nifti/secondlevel_ACTIVATION/second_level_p001_auto.gls'

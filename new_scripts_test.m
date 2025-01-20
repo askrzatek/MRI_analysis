@@ -12,7 +12,7 @@ clear all
 CLUSTER = 1;
 par.pct = 0;
 
-main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
+main_dir = fullfile('/network/iss/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
 
 e_PARKGAME = exam(main_dir,'PARKGAME.*._[a,c]$');
 

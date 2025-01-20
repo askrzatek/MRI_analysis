@@ -3,8 +3,8 @@ clc
 clear
 addpath /home/anna.skrzatek/MRI_analysis/AUDICOG/
 
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
-project_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG';
+main_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
+project_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG';
 rsfc = 1;
 % ROIs = {'ParaHipp','BA_31', 'Orb_PFC', 'lAudio', 'rAudio', 'Cingulate'};
 ROIs = {'ParaHipp','lAudio', 'rAudio', 'Cingulate', 'OFC'};
@@ -13,9 +13,9 @@ models.covarnames = {{'Age','Genre','pca_audio1','pca_emotionnel1','STD_RT_ANT'}
     
 cd (project_dir)
 
-% outdirs = {'/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/RS_2sample_ttest/ALFF','/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/RS_2sample_ttest/fALFF'} ;
-% outdirs = {'/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/RS_2sample_ttest/ALFF_BA31','/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/RS_2sample_ttest/ALFF_ParaHipp'} ;
-% outdirs = {'/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/RS_2sample_ttest/ALFF_BA31','/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/RS_2sample_ttest/ALFF_ParaHipp'} ;
+% outdirs = {'/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/RS_2sample_ttest/ALFF','/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/RS_2sample_ttest/fALFF'} ;
+% outdirs = {'/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/RS_2sample_ttest/ALFF_BA31','/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/RS_2sample_ttest/ALFF_ParaHipp'} ;
+% outdirs = {'/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/RS_2sample_ttest/ALFF_BA31','/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/RS_2sample_ttest/ALFF_ParaHipp'} ;
 for imodel = 1:length(models.names)
     model_outdir = fullfile(project_dir,'/Results/RS_2sample_ttest/',models.names{imodel});
 %     mkdir(model_outdir)

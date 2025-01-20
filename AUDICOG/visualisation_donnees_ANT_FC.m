@@ -4,8 +4,8 @@ clc
 clear
 addpath /home/anna.skrzatek/MRI_analysis/AUDICOG/
 
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
-project_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG';
+main_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
+project_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG';
 
 cd(project_dir)
 

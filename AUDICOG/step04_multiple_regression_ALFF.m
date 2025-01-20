@@ -9,7 +9,7 @@ clc
 addpath /home/anna.skrzatek/MRI_analysis
 addpath /home/anna.skrzatek/MRI_analysis/AUDICOG
 
-project_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG'
+project_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG'
 main_dir = fullfile(project_dir,'/DATA','/Non_chirurgicaux')
 
 cd (main_dir)
@@ -209,21 +209,21 @@ par.mask_threshold = 0.001;
 % define ROI, using several methods
 par.roi_type.atlas_cat12 = 'aal3';
 
-%path_masks_nback= '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/NBack/Masks_positive_effect_2back' ;
-%path_masks_audio= '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/Audio/2023_01_27 - Audio' ;
-%path_masks_yeo_aal3 = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/Yeo_networks_with_aal3_masks' ;
-masks_CAREN_SN = get_subdir_regex_files('/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/CAREN','RSN01') ;
+%path_masks_nback= '/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/NBack/Masks_positive_effect_2back' ;
+%path_masks_audio= '/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/Audio/2023_01_27 - Audio' ;
+%path_masks_yeo_aal3 = '/network/iss/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/Yeo_networks_with_aal3_masks' ;
+masks_CAREN_SN = get_subdir_regex_files('/network/iss/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/CAREN','RSN01') ;
 masks_CAREN_SN = cellstr(masks_CAREN_SN{:,1});
 
-masks_CAREN_CEN = get_subdir_regex_files('/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/CAREN','RSN02') ;
+masks_CAREN_CEN = get_subdir_regex_files('/network/iss/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/CAREN','RSN02') ;
 masks_CAREN_CEN = cellstr(masks_CAREN_CEN{:,1});
 
-masks_CAREN_DMN = get_subdir_regex_files('/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/CAREN','RSN04') ;
+masks_CAREN_DMN = get_subdir_regex_files('/network/iss/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/CAREN','RSN04') ;
 masks_CAREN_DMN = cellstr(masks_CAREN_DMN{:,1});
 
 %% descriptions inside AAL correspondance table, once it is adapted for use and create abbrevs
 
-[ids,labels,aal_caren_tab] = xlsread('/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/aal_id_labels_abbrevs_CAREN.xlsx');
+[ids,labels,aal_caren_tab] = xlsread('/network/iss/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/aal_id_labels_abbrevs_CAREN.xlsx');
 abbrev      = {aal_caren_tab{2:length(aal_caren_tab),3}};
 description = {aal_caren_tab{2:length(aal_caren_tab),2}};
 %SN_labels_id = ids(1:length(masks_CAREN_SN),4);

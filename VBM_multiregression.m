@@ -10,7 +10,7 @@ clear all
 %% Initialise
 addpath /home/anna.skrzatek/MRI_analysis/
 
-main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
+main_dir = fullfile('/network/iss/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
 cd (main_dir)
 
 % define input directory

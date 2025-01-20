@@ -12,7 +12,7 @@ clear all
 CLUSTER = 1;
 par.pct = 0;
 
-main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG','DATA/Non_chirurgicaux');
+main_dir = fullfile('/network/iss/cenir/analyse/irm/studies/AUDICOG','DATA/Non_chirurgicaux');
 cd (main_dir)
 
 suj = exam(main_dir,'20.*._AUDICOG_Sujet.*');
@@ -52,7 +52,7 @@ else
     par.sge     = 0;
 end
 
-% addpath('/network/lustre/iss02/cenir/analyse/irm/users/salim.ouarab/dev_matvol/iNprogress')
+% addpath('/network/iss/cenir/analyse/irm/users/salim.ouarab/dev_matvol/iNprogress')
 job_do_segmentCAT12(fanat,par)
 
 

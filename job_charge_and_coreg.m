@@ -3,7 +3,7 @@ clc
 clear all
 %load e
 
-main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
+main_dir = fullfile('/network/iss/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
 e_PARKGAME = exam(main_dir, 'PARKGAME');
 %e_REMINARY = exam(main_dir, 'REMINARY');
 

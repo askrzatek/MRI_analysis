@@ -53,7 +53,7 @@ for subj = 1:length(dir_func)
 
 %subj = 18;
     model_dir = char(addsuffixtofilenames(e(subj).path,'/model_meica'));
-    %fspm_path = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti/2019_02_27_REMINARY_HM_005_V2/meica_model/':
+    %fspm_path = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti/2019_02_27_REMINARY_HM_005_V2/meica_model/':
     fspm_path = char(addsuffixtofilenames(model_dir,'/SPM.mat')); % fspm subject's run model
     mkdir(model_dir,'figures_meica');
     output_dir = char(addsuffixtofilenames(model_dir,'/figures_meica'));
@@ -68,7 +68,7 @@ for subj = 1:length(dir_func)
 % % par = complet_struct(par,defpar);
 %     
     t1 = e(subj).getSerie('anat').getVolume('^wms').path;
-%     %t1 = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti/2019_02_27_REMINARY_HM_005_V2/S03_t1mpr_S256_0_8iso_p2/wms_S03_t1mpr_S256_0_8iso_p2.nii';
+%     %t1 = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti/2019_02_27_REMINARY_HM_005_V2/S03_t1mpr_S256_0_8iso_p2/wms_S03_t1mpr_S256_0_8iso_p2.nii';
 % 
 %     % job_contrast2jpeg(fspm, t1, SPM.xCon, SPM.xCon.name, list coordo, list noms coordo )
 

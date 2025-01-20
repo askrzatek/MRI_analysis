@@ -5,10 +5,10 @@
 clc
 clear
 
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
-cd '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG';
+main_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
+cd '/network/iss/cenir/analyse/irm/studies/AUDICOG';
 
-e = exam(main_dir, 'AUDICOG'); % all subjects with multi-echo
+e = exam(main_dir, 'AUDICOG_Suj'); % all subjects with multi-echo
 
 
 %% Get files paths #matvol
@@ -301,7 +301,7 @@ rp = fullfile(e.getSerie('run').getPath(),'rp_spm.txt');
 %% extract physio from special dicom
 
 % https://github.com/CMRR-C2P/MB
-addpath('/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/local_toolboxs/MB')
+addpath('/network/iss/cenir/analyse/irm/studies/AUDICOG/local_toolboxs/MB')
 
 e.getSerie('phy').getPhysio('dcm').extract()
 

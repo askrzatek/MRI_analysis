@@ -1,6 +1,6 @@
 [job] = doublerun_con_batch(fspm, par)
 
-matlabbatch{1}.spm.stats.con.spmmat = {'/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/2018_07_18_PARKGAMEII_001_NB_18_07_2018_V1_a/firstlevel_sts_tapas_doublerun_jan21/SPM.mat'};
+matlabbatch{1}.spm.stats.con.spmmat = {'/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/2018_07_18_PARKGAMEII_001_NB_18_07_2018_V1_a/firstlevel_sts_tapas_doublerun_jan21/SPM.mat'};
 matlabbatch{1}.spm.stats.con.consess{1}.fcon.name = 'F-all';
 matlabbatch{1}.spm.stats.con.consess{1}.fcon.weights = [1 0 0 0 0 0
                                                         0 1 0 0 0 0

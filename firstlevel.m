@@ -198,7 +198,7 @@ e.getSerie('model').addVolume('^spm[TF]_\d{4}','con',length(contrast.names));
 % Coordlist.names = {'centre'; 'RIGHT SM'; 'LEFT SM'; 'CEREBELLUM'; 'MOTOR BI'};
 % mkdir('/home/anna.skrzatek/Desktop','auto_figures_first_level_con4');
 % output_dir = '/home/anna.skrzatek/Desktop/auto_figures_first_level_con4/';
-% wd = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/';
+% wd = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/';
 % 
 % for n =1:length(fspm)
 %     mdir = e(n).getSerie('model').path;
@@ -207,7 +207,7 @@ e.getSerie('model').addVolume('^spm[TF]_\d{4}','con',length(contrast.names));
 %     job_spm_single_results_display({fspm{n}}, 4, t1(n).path, Coordlist,  output_dir, SPM, wd)
 % end
 % % 
-cd /network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/
+cd /network/iss/cenir/analyse/irm/users/anna.skrzatek/
 save e
 
 

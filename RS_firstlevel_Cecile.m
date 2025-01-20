@@ -3,12 +3,12 @@
 clear
 clc
 
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
+main_dir = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
 cd(main_dir)
 
 load e
 
-%addpath '/network/lustre/iss02/cenir/analyse/irm/users/cecile.gallea/ASYA/asyasuit/'
+%addpath '/network/iss/cenir/analyse/irm/users/cecile.gallea/ASYA/asyasuit/'
 
 %% Modeling low frequency fluctuations
 
@@ -273,7 +273,7 @@ end
 
 %% Other routines
 % verifs
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
+main_dir = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
 % subj_dir = gdir(main_dir,'^Subj|^___S')
 
 subj_dir = gdir(main_dir,'PARKGAME.*[a,c]$');
@@ -291,7 +291,7 @@ par.jobname = 'spm_first_level_spec_RS_wbet';
 [ jobs ] = job_ending_rountines( jobs, skip, par );
 %% Estimate
 
-% main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AMEDYST/RS/nifti';
+% main_dir = '/network/iss/cenir/analyse/irm/studies/AMEDYST/RS/nifti';
 % subj_dir = gdir(main_dir,'^Subj|^')
 %
 % spm_file = gfile(dirStats(subj),'SPM.mat'))
@@ -309,7 +309,7 @@ oSessDir = e.gser('run_RS').gpath;
 %change_spm_path(fspm,oSessDir,SessDir)
 %i = 4;
 %for i = 5 : length(fspm)
-%    change_spm_path(fspm(i),'/network/lustre/iss01/','/network/lustre/iss02/')
+%    change_spm_path(fspm(i),'/network/lustre/iss01/','/network/iss/')
 %end
 
 clear par

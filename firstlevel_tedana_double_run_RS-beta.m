@@ -7,10 +7,10 @@ clc
 addpath /home/anna.skrzatek/matvol/SPM/firstlevel/
 addpath('/home/anna.skrzatek/MRI_analysis/')
 
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
+main_dir = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test';
 cd(main_dir)
 
-%addpath '/network/lustre/iss02/cenir/analyse/irm/users/cecile.gallea/ASYA/asyasuit/'
+%addpath '/network/iss/cenir/analyse/irm/users/cecile.gallea/ASYA/asyasuit/'
 
 %% Modeling low frequency fluctuations
 
