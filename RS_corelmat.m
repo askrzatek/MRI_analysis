@@ -8,7 +8,7 @@
 clear all
 clc
 %% fetch Input & Output dirs
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/';
+main_dir = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/';
 cd (main_dir)
 
 %% either existing e-file from RS processing
@@ -34,18 +34,18 @@ input_dir = get_subdir_regex(first_dir,patient_list);
 
 % ROIs = {'Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R','Cuneus_L','Cuneus_R','Insula_L','Insula_R','Parietal_Inf_L','Parietal_Inf_R','Parietal_Sup_L','Parietal_Sup_R','Postcentral_L','Postcentral_R','Precentral_L','Precentral_R','Precuneus_L','Precuneus_R','SMA_Ant_L','SMA_Ant_R','SMA_Post_L','SMA_Post_R','Vermis1_2','Vermis3','Vermis4_5','Vermis6','Vermis7','Vermis8','Vermis9','Vermis10','Caudate_aal_L','Caudate_aal_R','Thalamus_aal_L','Thalamus_aal_R','Putamen_aal_L','Putamen_aal_R','Pallidum_aal_L','Pallidum_aal_R','PPN_YEB_L','PPN_YEB_R'};
 %ROIs = {'M1_face_L','M1_face_R','M1_foot_L','M1_foot_R','M1_hand_L','M1_hand_R'};
-%dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROI_pariet_mot_premot_cereb_BG_PPN';
+%dirROI  = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROI_pariet_mot_premot_cereb_BG_PPN';
 %fileROI = cellstr(char(gfile(dirROI,ROIs))); %fileROI = remove_regex(fileROI,'T1');
 
-dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/FOG_APA_network';
-dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Cognitive_circuit';
-dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Cueing';
-dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Kinect';
-dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Ordi';
+dirROI  = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/FOG_APA_network';
+dirROI  = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Cognitive_circuit';
+dirROI  = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Cueing';
+dirROI  = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Kinect';
+dirROI  = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Ordi';
 [~, roi_group] = fileparts(dirROI);
 fileROI = cellstr(char(gfile(dirROI,'.*.nii'))); %fileROI = remove_regex(fileROI,'T1');
 
-dirROI  = get_subdir_regex('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Grouped_ROIs/','.*');
+dirROI  = get_subdir_regex('/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Grouped_ROIs/','.*');
 roi_group = 'Basal_Ganglia-Cueing-Motor-AOT';
 fileROI = cellstr(char(vertcat(gfile(dirROI{3},'.*.nii'),gfile(dirROI{1},'.*.nii'),gfile(dirROI{8},'.*.nii'),gfile(dirROI{4},'.*.nii'),gfile(dirROI{7},'.*.nii'),gfile(dirROI{5},'.*.nii'),gfile(dirROI{2},'.*.nii'),gfile(dirROI{6},'.*.nii'))));
 
@@ -165,7 +165,7 @@ end
 %% CORELATION MATRIX PER ROIs DIRECTORY
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% fetch Input & Output dirs
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/';
+main_dir = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/';
 cd (main_dir)
 
 patient_regex_V1 = {'PARKGAMEII.*NB.*_a','PARKGAMEII.*BM.*_a','PARKGAMEII.*SM.*_c','PARKGAMEII.*SD.*_a','PARKGAMEII.*JR.*_a','PARKGAMEII.*LJ.*_c','PARKGAMEII.*CA.*_a','PARKGAMEII.*PC.*_c','PARKGAMEII.*DD.*','PARKGAMEII.*KM.*_a','PARKGAMEII.*PD.*_a','PARKGAMEII.*CK.*_c','PARKGAMEII.*BF.*_c','PARKGAMEII.*SB.*_a','PARKGAMEII_052.*HJ.*_c','PARKGAMEII_040.*RE.*_a$','PARKGAMEII_042.*RS.*_a$','PARKGAMEII_046.*HJ.*_c$','PARKGAMEII_053.*LM.*_a$'};
@@ -176,8 +176,8 @@ patient_list = {'PARKGAMEII_001_NB_a','PARKGAMEII_002_BM_a','PARKGAMEII_003_SM_c
 
 input_dir = get_subdir_regex(fullfile(main_dir,'/firstlevel_RS'),patient_list);
 
-dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks';
-%dirROI = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/FOG_APA_network';
+dirROI  = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks';
+%dirROI = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/FOG_APA_network';
 ROI_mask = get_subdir_regex(dirROI,roi_group);
 ROI_mask = roi_group;
 

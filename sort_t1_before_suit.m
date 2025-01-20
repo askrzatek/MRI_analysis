@@ -2,9 +2,9 @@ clearvars;
 clc;
 
 
-% suj_path = '/network/lustre/iss02/cenir/analyse/irm/users/asya.ekmen/AMEDYST/IRM/analyse';
+% suj_path = '/network/iss/cenir/analyse/irm/users/asya.ekmen/AMEDYST/IRM/analyse';
 
-suj_path = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/'
+suj_path = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/'
 
 suj = get_subdir_regex(suj_path);
 %e = exam(suj_path,'PARKGAME');
@@ -128,7 +128,7 @@ for i = 1 : length(suj)
 end
 
 
-jobdir = '/network/lustre/iss02/cenir/analyse/irm/users/cecile.gallea/ASYA/jobs_cluster';
+jobdir = '/network/iss/cenir/analyse/irm/users/cecile.gallea/ASYA/jobs_cluster';
 if ~exist(jobdir, 'dir'); mkdir(jobdir); end
 cd(jobdir);
 

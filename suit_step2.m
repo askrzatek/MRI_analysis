@@ -1,8 +1,8 @@
 clearvars;
 clc;
 
-suit_cerebellar_lobules = '/network/lustre/iss02/cenir/analyse/irm/users/cecile.gallea/ASYA/asyasuit/spm12/toolbox/suit/atlasesSUIT/Lobules-SUIT.nii';
-results_path = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/PARKGAMEIIsuit_results';
+suit_cerebellar_lobules = '/network/iss/cenir/analyse/irm/users/cecile.gallea/ASYA/asyasuit/spm12/toolbox/suit/atlasesSUIT/Lobules-SUIT.nii';
+results_path = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/PARKGAMEIIsuit_results';
 if ~exist(results_path, 'dir'), mkdir(results_path), end
 
 cerebellum_stats = fullfile(results_path, 'suit_cerebellar_lobules.csv');
@@ -17,7 +17,7 @@ if ~exist(cerebellum_stats, 'file')
 end
 
 
-suj_path = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/';
+suj_path = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/';
 
 suj = get_subdir_regex(suj_path);
 

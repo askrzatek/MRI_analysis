@@ -4,8 +4,8 @@ clc
 clear
 addpath /home/anna.skrzatek/MRI_analysis/AUDICOG/
 
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
-project_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG';
+main_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
+project_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG';
 
 cd(project_dir)
 
@@ -480,6 +480,9 @@ y = [0.0315670033084194
 
 [rcor_tinnitus,pvalcor_tinnitus] = corr(x(26:50),y(26:50))
 
+
+[rcor,pvalcor] = corr(x,y)
+
 px = polyfit(x(1:25),y(1:25),1);
 pxx = [min(x(1:25)) max(x(1:25))];
 pxy = polyval(px, pxx);
@@ -502,6 +505,31 @@ scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
               'LineWidth',1.5)
 hold on
 plot(pyx,pyy, 'LineWidth', 2, 'Color',[1,0.5,0])
+xlim([-0.1 0.1])
+ylim([-0.4 0.4])
+line(xlim,[0 0], 'Color','black', 'LineStyle','--')
+line([0 0],ylim, 'Color','black', 'LineStyle','--')
+
+title('Alert x FC dPC x Crus II L) across groups')
+title(sprintf('Main effect Alert x FC (dPC x Crus II L) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+
+% main effect fitted line
+px = polyfit(x(1:50),y(1:50),1);
+pxx = [min(x(1:50)) max(x(1:50))];
+pxy = polyval(px, pxx);
+
+figure
+scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+hold on
+scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
+              'MarkerFaceColor',[1 .5 .5],...
+              'LineWidth',1.5)
+hold on
+plot(pxx,pxy, 'LineWidth', 2, 'Color',[0.7,0,0])
+
+% end of main effect fit
 
 xlim([-0.1 0.1])
 ylim([-0.4 0.4])
@@ -509,7 +537,7 @@ line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 title('Alert x FC dPC x Crus II L) across groups')
-title(sprintf('Alert x FC (Cingulate/BA 31 x Crus II L) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+title(sprintf('Main effect Alert x FC (dPC x Crus II L) rcor=%.2f pval=%.2f', rcor, pvalcor))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% RT Standard Deviation Effects
@@ -572,6 +600,8 @@ y = [-0.150506396724123
 
 [rcor_tinnitus,pvalcor_tinnitus] = corr(x(26:50),y(26:50))
 
+[rcor,pvalcor] = corr(x,y)
+
 px = polyfit(x(1:25),y(1:25),1);
 pxx = [min(x(1:25)) max(x(1:25))];
 pxy = polyval(px, pxx);
@@ -601,6 +631,31 @@ line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 title(sprintf('RT STD x FC (Parahippocampus x BA25 L (Caudate)) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+
+% main effect fitted line
+px = polyfit(x(1:50),y(1:50),1);
+pxx = [min(x(1:50)) max(x(1:50))];
+pxy = polyval(px, pxx);
+
+figure
+scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+hold on
+scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
+              'MarkerFaceColor',[1 .5 .5],...
+              'LineWidth',1.5)
+hold on
+plot(pxx,pxy, 'LineWidth', 2, 'Color',[0.7,0,0])
+
+% end of main effect fit
+
+xlim([0 0.4])
+ylim([-0.35 0.35])
+line(xlim,[0 0], 'Color','black', 'LineStyle','--')
+line([0 0],ylim, 'Color','black', 'LineStyle','--')
+
+title(sprintf('RT STD x FC (Parahippocampus x BA25 L (Caudate)) r-cor=%.2f pval=%.2f', rcor, pvalcor))
 
 %% Parahippocampus x BA40 R (Parietal Inf) TREND
 
@@ -659,6 +714,8 @@ y = [-0.0159408775400055
 
 [rcor_tinnitus,pvalcor_tinnitus] = corr(x(26:50),y(26:50))
 
+[rcor,pvalcor] = corr(x,y)
+
 px = polyfit(x(1:25),y(1:25),1);
 pxx = [min(x(1:25)) max(x(1:25))];
 pxy = polyval(px, pxx);
@@ -688,6 +745,32 @@ line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 title(sprintf('RT STD x FC (Parahippocampus x BA40 R (Parietal Inf)) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+
+% main effect fitted line
+px = polyfit(x(1:50),y(1:50),1);
+pxx = [min(x(1:50)) max(x(1:50))];
+pxy = polyval(px, pxx);
+
+figure
+scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+hold on
+scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
+              'MarkerFaceColor',[1 .5 .5],...
+              'LineWidth',1.5)
+hold on
+plot(pxx,pxy, 'LineWidth', 2, 'Color',[0.7,0,0])
+
+% end of main effect fit
+
+
+xlim([0 0.4])
+ylim([-0.45 0.45])
+line(xlim,[0 0], 'Color','black', 'LineStyle','--')
+line([0 0],ylim, 'Color','black', 'LineStyle','--')
+
+title(sprintf('RT STD x FC (Parahippocampus x BA40 R (Parietal Inf)) r-cor=%.2f pval=%.2f', rcor, pvalcor))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% RT Standard Deviation x Group Interaction
@@ -841,6 +924,8 @@ y = [-0.107541346740233
 
 [rcor_tinnitus,pvalcor_tinnitus] = corr(x(26:50),y(26:50))
 
+[rcor,pvalcor] = corr(x,y)
+
 px = polyfit(x(1:25),y(1:25),1);
 pxx = [min(x(1:25)) max(x(1:25))];
 pxy = polyval(px, pxx);
@@ -870,6 +955,31 @@ line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 title(sprintf('PCA Audio x FC (Parahippocampus x BA18 R) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+
+% main effect fitted line
+px = polyfit(x(1:50),y(1:50),1);
+pxx = [min(x(1:50)) max(x(1:50))];
+pxy = polyval(px, pxx);
+
+figure
+scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+hold on
+scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
+              'MarkerFaceColor',[1 .5 .5],...
+              'LineWidth',1.5)
+hold on
+plot(pxx,pxy, 'LineWidth', 2, 'Color',[0.7,0,0])
+
+% end of main effect fit
+
+xlim([0 120])
+ylim([-0.5 0.5])
+line(xlim,[0 0], 'Color','black', 'LineStyle','--')
+line([0 0],ylim, 'Color','black', 'LineStyle','--')
+
+title(sprintf('PCA Audio x FC (Parahippocampus x BA18 R) r-cor=%.2f pval=%.2f', rcor, pvalcor))
 
 %% Parahippocampus x BA39 L (Temporal Mid)
 
@@ -928,6 +1038,8 @@ y = [0.0792627389009593
 
 [rcor_tinnitus,pvalcor_tinnitus] = corr(x(26:50),y(26:50))
 
+[rcor,pvalcor] = corr(x,y)
+
 px = polyfit(x(1:25),y(1:25),1);
 pxx = [min(x(1:25)) max(x(1:25))];
 pxy = polyval(px, pxx);
@@ -957,6 +1069,31 @@ line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 title(sprintf('PCA Audio x FC (Parahippocampus x Temp Mid R) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+
+% main effect fitted line
+px = polyfit(x(1:50),y(1:50),1);
+pxx = [min(x(1:50)) max(x(1:50))];
+pxy = polyval(px, pxx);
+
+figure
+scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+hold on
+scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
+              'MarkerFaceColor',[1 .5 .5],...
+              'LineWidth',1.5)
+hold on
+plot(pxx,pxy, 'LineWidth', 2, 'Color',[0.7,0,0])
+
+% end of main effect fit
+
+xlim([0 120])
+ylim([-0.4 0.4])
+line(xlim,[0 0], 'Color','black', 'LineStyle','--')
+line([0 0],ylim, 'Color','black', 'LineStyle','--')
+
+title(sprintf('PCA Audio x FC (Parahippocampus x Temp Mid R) r-cor=%.2f pval=%.2f', rcor, pvalcor))
 
 %% Parahippocampus x Occipital Mid R)
 
@@ -1015,6 +1152,8 @@ y = [0.168342148345416
 
 [rcor_tinnitus,pvalcor_tinnitus] = corr(x(26:50),y(26:50))
 
+[rcor,pvalcor] = corr(x,y)
+
 px = polyfit(x(1:25),y(1:25),1);
 pxx = [min(x(1:25)) max(x(1:25))];
 pxy = polyval(px, pxx);
@@ -1044,6 +1183,31 @@ line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 title(sprintf('PCA Audio x FC (Parahippocampus x Occipital Mid R) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+
+% main effect fitted line
+px = polyfit(x(1:50),y(1:50),1);
+pxx = [min(x(1:50)) max(x(1:50))];
+pxy = polyval(px, pxx);
+
+figure
+scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+hold on
+scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
+              'MarkerFaceColor',[1 .5 .5],...
+              'LineWidth',1.5)
+hold on
+plot(pxx,pxy, 'LineWidth', 2, 'Color',[0.7,0,0])
+
+% end of main effect fit
+
+xlim([0 120])
+ylim([-0.4 0.4])
+line(xlim,[0 0], 'Color','black', 'LineStyle','--')
+line([0 0],ylim, 'Color','black', 'LineStyle','--')
+
+title(sprintf('PCA Audio x FC (Parahippocampus x Occipital Mid R) r-cor=%.2f pval=%.2f', rcor, pvalcor))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% PCA Emo Effects
@@ -1107,6 +1271,8 @@ y = [-0.0456209934838416
 
 [rcor_tinnitus,pvalcor_tinnitus] = corr(x(26:50),y(26:50))
 
+[rcor, pvalcor] =  corr(x,y);
+
 px = polyfit(x(1:25),y(1:25),1);
 pxx = [min(x(1:25)) max(x(1:25))];
 pxy = polyval(px, pxx);
@@ -1136,6 +1302,31 @@ line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 title(sprintf('PCA Emo x FC (AC L x Frontal Mid R) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+
+% main effect fitted line
+px = polyfit(x(1:50),y(1:50),1);
+pxx = [min(x(1:50)) max(x(1:50))];
+pxy = polyval(px, pxx);
+
+figure
+scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+hold on
+scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
+              'MarkerFaceColor',[1 .5 .5],...
+              'LineWidth',1.5)
+hold on
+plot(pxx,pxy, 'LineWidth', 2, 'Color',[0.7,0,0])
+
+% end of main effect fit
+
+xlim([0 120])
+ylim([-0.4 0.4])
+line(xlim,[0 0], 'Color','black', 'LineStyle','--')
+line([0 0],ylim, 'Color','black', 'LineStyle','--')
+
+title(sprintf('PCA Emo x FC (AC L x Frontal Mid R) rcor=%.2f pval=%.2f', rcor, pvalcor))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Sex Effects
@@ -1550,6 +1741,8 @@ y = [0.0694410576910031
 
 [rcor_tinnitus,pvalcor_tinnitus] = corr(x(26:50),y(26:50))
 
+[rcor,pvalcor] = corr(x,y)
+
 px = polyfit(x(1:25),y(1:25),1);
 pxx = [min(x(1:25)) max(x(1:25))];
 pxy = polyval(px, pxx);
@@ -1574,12 +1767,37 @@ hold on
 plot(pyx,pyy, 'LineWidth', 2, 'Color',[1,0.5,0])
 
 xlim([-0.2 0.2])
-ylim([-0.4 0.4])
+ylim([-0.45 0.45])
+line(xlim,[0 0], 'Color','black', 'LineStyle','--')
+line([0 0],ylim, 'Color','black', 'LineStyle','--')
+
+title(sprintf('Alert x FC (dPC x Crus II L) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+
+% main effect fitted line
+px = polyfit(x(1:50),y(1:50),1);
+pxx = [min(x(1:50)) max(x(1:50))];
+pxy = polyval(px, pxx);
+
+figure
+scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+hold on
+scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
+              'MarkerFaceColor',[1 .5 .5],...
+              'LineWidth',1.5)
+hold on
+plot(pxx,pxy, 'LineWidth', 2, 'Color',[0.7,0,0])
+
+% end of main effect fit
+
+xlim([-0.2 0.2])
+ylim([-0.45 0.45])
 line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 title('Alert x FC dPC x Crus II L) across groups')
-title(sprintf('Alert x FC (dPC x Crus II L) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+title(sprintf('Alert x FC (dPC x Crus II L) r-cor=%.2f pval=%.2f', rcor, pvalcor))
 
 %% Parahippocampus x Precuneus L
 y = [0.155200931026500
@@ -1637,6 +1855,8 @@ y = [0.155200931026500
 
 [rcor_tinnitus,pvalcor_tinnitus] = corr(x(26:50),y(26:50))
 
+[rcor,pvalcor] = corr(x,y)
+
 px = polyfit(x(1:25),y(1:25),1);
 pxx = [min(x(1:25)) max(x(1:25))];
 pxy = polyval(px, pxx);
@@ -1666,6 +1886,31 @@ line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 title(sprintf('Alert Score x FC (Parahippocampus x Precuneus L) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+
+% main effect fitted line
+px = polyfit(x(1:50),y(1:50),1);
+pxx = [min(x(1:50)) max(x(1:50))];
+pxy = polyval(px, pxx);
+
+figure
+scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+hold on
+scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
+              'MarkerFaceColor',[1 .5 .5],...
+              'LineWidth',1.5)
+hold on
+plot(pxx,pxy, 'LineWidth', 2, 'Color',[0.7,0,0])
+
+% end of main effect fit
+
+xlim([-0.2 0.2])
+ylim([-0.4 0.4])
+line(xlim,[0 0], 'Color','black', 'LineStyle','--')
+line([0 0],ylim, 'Color','black', 'LineStyle','--')
+
+title(sprintf('Alert Score x FC (Parahippocampus x Precuneus L) r-cor=%.2f pval=%.2f', rcor, pvalcor))
     
 %% Parahipocampus x Cingulum Mid L 2nd peak in the cluster
 y = [0.139838534104782
@@ -1723,6 +1968,8 @@ y = [0.139838534104782
 
 [rcor_tinnitus,pvalcor_tinnitus] = corr(x(26:50),y(26:50))
 
+[rcor,pvalcor] = corr(x,y)
+
 px = polyfit(x(1:25),y(1:25),1);
 pxx = [min(x(1:25)) max(x(1:25))];
 pxy = polyval(px, pxx);
@@ -1752,6 +1999,31 @@ line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 title(sprintf('Alert Score x FC (Parahippocampus x Cingulum Mid L) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+
+% main effect fitted line
+px = polyfit(x(1:50),y(1:50),1);
+pxx = [min(x(1:50)) max(x(1:50))];
+pxy = polyval(px, pxx);
+
+figure
+scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+hold on
+scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
+              'MarkerFaceColor',[1 .5 .5],...
+              'LineWidth',1.5)
+hold on
+plot(pxx,pxy, 'LineWidth', 2, 'Color',[0.7,0,0])
+
+% end of main effect fit
+
+xlim([-0.25 0.25])
+ylim([-0.4 0.4])
+line(xlim,[0 0], 'Color','black', 'LineStyle','--')
+line([0 0],ylim, 'Color','black', 'LineStyle','--')
+
+title(sprintf('Alert Score x FC (Parahippocampus x Cingulum Mid L) r-cor=%.2f pval=%.2f', rcor, pvalcor))
     
 %% Parahippocampus x BA40 L (Angular)
 y = [0.116695844223369
@@ -1809,6 +2081,8 @@ y = [0.116695844223369
 
 [rcor_tinnitus,pvalcor_tinnitus] = corr(x(26:50),y(26:50))
 
+[rcor,pvalcor] = corr(x,y)
+
 px = polyfit(x(1:25),y(1:25),1);
 pxx = [min(x(1:25)) max(x(1:25))];
 pxy = polyval(px, pxx);
@@ -1838,6 +2112,31 @@ line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 title(sprintf('Alert Score x FC (Parahippocampus x BA40 (Angular) L) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+
+% main effect fitted line
+px = polyfit(x(1:50),y(1:50),1);
+pxx = [min(x(1:50)) max(x(1:50))];
+pxy = polyval(px, pxx);
+
+figure
+scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+hold on
+scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
+              'MarkerFaceColor',[1 .5 .5],...
+              'LineWidth',1.5)
+hold on
+plot(pxx,pxy, 'LineWidth', 2, 'Color',[0.7,0,0])
+
+% end of main effect fit
+
+xlim([-0.25 0.25])
+ylim([-0.4 0.4])
+line(xlim,[0 0], 'Color','black', 'LineStyle','--')
+line([0 0],ylim, 'Color','black', 'LineStyle','--')
+
+title(sprintf('Alert Score x FC (Parahippocampus x BA40 (Angular) L) r-cor=%.2f pval=%.2f', rcor, pvalcor))
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Alert Score x Group Interaction Effects
@@ -2074,6 +2373,8 @@ y = [-0.137231978547916
 
 [rcor_tinnitus,pvalcor_tinnitus] = corr(x(26:50),y(26:50))
 
+[rcor, pvalcor] = corr(x,y)
+
 px = polyfit(x(1:25),y(1:25),1);
 pxx = [min(x(1:25)) max(x(1:25))];
 pxy = polyval(px, pxx);
@@ -2103,6 +2404,31 @@ line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 title(sprintf('RT STD x FC (dPC x Temporal Mid R) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+
+% main effect fitted line
+px = polyfit(x(1:50),y(1:50),1);
+pxx = [min(x(1:50)) max(x(1:50))];
+pxy = polyval(px, pxx);
+
+figure
+scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+hold on
+scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
+              'MarkerFaceColor',[1 .5 .5],...
+              'LineWidth',1.5)
+hold on
+plot(pxx,pxy, 'LineWidth', 2, 'Color',[0.7,0,0])
+
+% end of main effect fit
+
+xlim([0 0.4])
+ylim([-0.7 0.7])
+line(xlim,[0 0], 'Color','black', 'LineStyle','--')
+line([0 0],ylim, 'Color','black', 'LineStyle','--')
+
+title(sprintf('RT STD x FC (dPC x Temporal Mid R) r-cor=%.2f pval=%.2f', rcor, pvalcor))
 
 %% Parahippocampus x BA40 R (Parietal Inf)
 y = [-0.00275632462213890
@@ -2160,6 +2486,8 @@ y = [-0.00275632462213890
 
 [rcor_tinnitus,pvalcor_tinnitus] = corr(x(26:50),y(26:50))
 
+[rcor, pvalcor] = corr(x,y)
+
 px = polyfit(x(1:25),y(1:25),1);
 pxx = [min(x(1:25)) max(x(1:25))];
 pxy = polyval(px, pxx);
@@ -2189,6 +2517,31 @@ line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
 title(sprintf('RT STD x FC (PH x BA40 R (Parietal Inf)) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+
+% main effect fitted line
+px = polyfit(x(1:50),y(1:50),1);
+pxx = [min(x(1:50)) max(x(1:50))];
+pxy = polyval(px, pxx);
+
+figure
+scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+hold on
+scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
+              'MarkerFaceColor',[1 .5 .5],...
+              'LineWidth',1.5)
+hold on
+plot(pxx,pxy, 'LineWidth', 2, 'Color',[0.7,0,0])
+
+% end of main effect fit
+
+xlim([0 0.4])
+ylim([-0.7 0.7])
+line(xlim,[0 0], 'Color','black', 'LineStyle','--')
+line([0 0],ylim, 'Color','black', 'LineStyle','--')
+
+title(sprintf('RT STD x FC (PH x BA40 R (Parietal Inf)) r-cor=%.2f pval=%.2f', rcor, pvalcor))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% RT Standard Deviation x Group Interaction
@@ -2273,8 +2626,8 @@ scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
 hold on
 plot(pyx,pyy, 'LineWidth', 2, 'Color',[1,0.5,0])
 
-xlim([-0.2 0.2])
-ylim([-0.45 0.45])
+xlim([0 0.4])
+ylim([-0.6 0.6])
 line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
@@ -2339,6 +2692,7 @@ y = [0.156700788887960
 [rcor_control,pvalcor_control] = corr(x(1:25),y(1:25))
 
 [rcor_tinnitus,pvalcor_tinnitus] = corr(x(26:50),y(26:50))
+[rcor, pval] = corr(x,y)
 
 px = polyfit(x(1:25),y(1:25),1);
 pxx = [min(x(1:25)) max(x(1:25))];
@@ -2347,7 +2701,6 @@ pxy = polyval(px, pxx);
 py = polyfit(x(26:50),y(26:50),1);
 pyx = [min(x(26:50)) max(x(26:50))];
 pyy = polyval(py,pyx);
-
 
 figure
 scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
@@ -2362,13 +2715,32 @@ scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
               'LineWidth',1.5)
 hold on
 plot(pyx,pyy, 'LineWidth', 2, 'Color',[1,0.5,0])
+title(sprintf('Age x FC (rAC x BA10 L (Frontal Mid)) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+
+% main effect fitted line
+px = polyfit(x(1:50),y(1:50),1);
+pxx = [min(x(1:50)) max(x(1:50))];
+pxy = polyval(px, pxx);
+
+figure
+scatter(x(1:25),y(1:25), 25, 'filled','MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+hold on
+scatter(x(26:50),y(26:50), 50, 'filled','MarkerEdgeColor',[0 .1 .1],...
+              'MarkerFaceColor',[1 .5 .5],...
+              'LineWidth',1.5)
+hold on
+plot(pxx,pxy, 'LineWidth', 2, 'Color',[0.7,0,0])
+
+% end of main effect fit
 
 xlim([20 60])
 ylim([-0.5 0.5])
 line(xlim,[0 0], 'Color','black', 'LineStyle','--')
 line([0 0],ylim, 'Color','black', 'LineStyle','--')
 
-title(sprintf('Age x FC (rAC x BA10 L (Frontal Mid)) r-tin=%.2f r-con=%.2f', rcor_tinnitus, rcor_control))
+title(sprintf('Age x FC (rAC x BA10 L (Frontal Mid)) r-cor=%.2f pval=%.2f', rcor, pval))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Sex Effects

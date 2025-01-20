@@ -3,12 +3,12 @@
 clear
 clc
 
-addpath /network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/StimTemplate
+addpath /network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/StimTemplate
 addpath /home/anna.skrzatek/matvol/SPM/firstlevel/
 addpath('/home/anna.skrzatek/MRI_analysis/')
 
 
-cd      /network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/
+cd      /network/iss/cenir/analyse/irm/users/anna.skrzatek/
 
 %main_dir = fullfile(pwd,'nifti');
 % 
@@ -369,7 +369,7 @@ end
 % Coordlist.names = {'centre'; 'RIGHT SM'; 'LEFT SM'; 'CEREBELLUM'; 'MOTOR BI'};
 % %mkdir('/home/anna.skrzatek/Desktop','auto_figures_first_level_con4');
 % output_dir = '/home/anna.skrzatek/Desktop/auto_figures_first_level_con4/';
-% wd = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/';
+% wd = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/';
 % 
 % for n =1:length(fspm)
 %     mdir = e(n).getSerie('model').path;
@@ -381,7 +381,7 @@ end
 
 %% Save the new e object
 
-%cd /network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/
+%cd /network/iss/cenir/analyse/irm/users/anna.skrzatek/
 %save e
 
 %% Create figures

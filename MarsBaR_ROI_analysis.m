@@ -29,14 +29,14 @@ clear all
 
 %%% #1 Start marsbar to make sure spm_get works
 
-addpath /network/lustre/iss02/cenir/software/irm/spm12/toolbox/marsbar/
+addpath /network/iss/cenir/software/irm/spm12/toolbox/marsbar/
 marsbar('on')
 % Set up the SPM defaults, just in case
 spm('defaults', 'fmri');
 
 %% #2 Initialisation
 
-main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
+main_dir = fullfile('/network/iss/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
 %roi_model_dir = fullfile(char(main_dir), 'secondlevel_ACTIVATION_PARK_S1');
 %roi_model_dir = fullfile(char(main_dir), 'secondlevel_tedana_ac_PARK');
 roi_model_dir = fullfile(char(main_dir), 'secondlevel_sts_tapas_PARK');

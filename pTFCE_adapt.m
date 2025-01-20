@@ -5,9 +5,9 @@
 %% INPUTS explanation and examples
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SPMpath   : char variable indicating the path to SPM.mat file
-%           SPMpath = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/full_resliced_multiple_regression/full_RS_clinic/AXIAL/Caudate_L/SPM.mat'
+%           SPMpath = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/full_resliced_multiple_regression/full_RS_clinic/AXIAL/Caudate_L/SPM.mat'
 % con       : char variable indicating the path to contrast file spmT_000#.nii in SPM.mat directory
-%           con = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/full_resliced_multiple_regression/full_RS_clinic/AXIAL/Caudate_L/spmT_0001.nii'
+%           con = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/full_resliced_multiple_regression/full_RS_clinic/AXIAL/Caudate_L/spmT_0001.nii'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [pTFCE_Z, pTFCE_p] = pTFCE_adapt(SPMpath, con)

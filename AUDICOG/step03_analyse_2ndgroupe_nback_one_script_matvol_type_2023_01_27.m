@@ -2,15 +2,15 @@
 clc
 clear
 
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
-cd '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG';
+main_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG/DATA/Non_chirurgicaux';
+cd '/network/iss/cenir/analyse/irm/studies/AUDICOG';
 
 load('e.mat');
 
 % fichier de correspondance numero IRM - comportement - groupe - age
 d = readtable( [ './DATA/' , 'Correspondance_Numero_Comportement_IRM.csv' ])  ;
 
-output_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/NBack' ;
+output_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/NBack' ;
 
 %% Pathway
 

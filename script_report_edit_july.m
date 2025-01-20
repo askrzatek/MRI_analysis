@@ -61,7 +61,7 @@ clear
 
     subj = 19;
         model_dir = char(addsuffixtofilenames(e(subj).path,'/model_meica'));
-        %fspm_path = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti/2019_02_27_REMINARY_HM_005_V2/meica_model/':
+        %fspm_path = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti/2019_02_27_REMINARY_HM_005_V2/meica_model/':
         fspm_path = char(addsuffixtofilenames(model_dir,'/SPM.mat')); % fspm subject's run model
 
         mkdir(model_dir,'figures_meica'); % add a condition if exists ask to overwrite

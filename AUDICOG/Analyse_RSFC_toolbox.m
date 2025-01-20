@@ -1,7 +1,7 @@
 %% connectivity
 clear
 clc
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG';
+main_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG';
 ROI_dir = fullfile(main_dir,'Networks_Masks');
 
 
@@ -25,9 +25,9 @@ par.mask_threshold = 0.001;
 % define ROI, using several methods
 %par.roi_type.atlas_cat12 = 'aal3';
 
-% path_masks_nback= '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/NBack/Masks_positive_effect_2back' ;
-path_masks_audio= '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/Audio/2023_01_27 - Audio' ;
-% path_masks_yeo_aal3 = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/Yeo_networks_with_aal3_masks' ; 
+% path_masks_nback= '/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/NBack/Masks_positive_effect_2back' ;
+path_masks_audio= '/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/Audio/2023_01_27 - Audio' ;
+% path_masks_yeo_aal3 = '/network/iss/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/Yeo_networks_with_aal3_masks' ; 
 path_masks_Tinnitus = get_subdir_regex(ROI_dir, 'Tinnitus_Meta');
 path_masks_Alert    = get_subdir_regex(ROI_dir, 'Alerting_effect');
 

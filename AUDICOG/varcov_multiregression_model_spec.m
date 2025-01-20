@@ -17,21 +17,21 @@ par = complet_struct(par, defpar);
 ijob = 1;
 for i = 1 : par.nb_cond % a loop for each target regressor
     for iout = 1 : par.nb_cons % a loop for each contrast // con // seed ?
-%         jobs{ijob}.spm.stats.factorial_design.dir = {'/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/test_multiple_regression/Axial_IL'};
+%         jobs{ijob}.spm.stats.factorial_design.dir = {'/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/test_multiple_regression/Axial_IL'};
 %         jobs{ijob}.spm.stats.factorial_design.des.mreg.scans = {
-%                                                                     '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_001_NB_a/con_0017.nii,1'
-%                                                                     '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_002_BM_a/con_0017.nii,1'
-%                                                                     '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_007_SD_a/con_0017.nii,1'
-%                                                                     '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_008_JR_a/con_0017.nii,1'
-%                                                                     '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_025_CA_a/con_0017.nii,1'
-%                                                                     '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_039_KM_a/con_0017.nii,1'
-%                                                                     '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_043_PD_a/con_0017.nii,1'
-%                                                                     '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_048_SB_a/con_0017.nii,1'
-%                                                                     '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_003_SM_c/con_0017.nii,1'
-%                                                                     '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_023_LJ_c/con_0017.nii,1'
-%                                                                     '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_028_PC_c/con_0017.nii,1'
-%                                                                     '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_033_DD/con_0017.nii,1'
-%                                                                     '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_044_CK_c/con_0017.nii,1'
+%                                                                     '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_001_NB_a/con_0017.nii,1'
+%                                                                     '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_002_BM_a/con_0017.nii,1'
+%                                                                     '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_007_SD_a/con_0017.nii,1'
+%                                                                     '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_008_JR_a/con_0017.nii,1'
+%                                                                     '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_025_CA_a/con_0017.nii,1'
+%                                                                     '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_039_KM_a/con_0017.nii,1'
+%                                                                     '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_043_PD_a/con_0017.nii,1'
+%                                                                     '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_048_SB_a/con_0017.nii,1'
+%                                                                     '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_003_SM_c/con_0017.nii,1'
+%                                                                     '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_023_LJ_c/con_0017.nii,1'
+%                                                                     '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_028_PC_c/con_0017.nii,1'
+%                                                                     '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_033_DD/con_0017.nii,1'
+%                                                                     '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/firstlevel_sts_tapas_doublerun_jan21/wbet_mask/PARKGAMEII_044_CK_c/con_0017.nii,1'
 %                                                                     };
 
         %%

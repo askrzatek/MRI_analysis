@@ -9,11 +9,11 @@
 clc
 clear all
 
-addpath('/network/lustre/iss02/cenir/analyse/irm/users/salim.ouarab/dev_matvol/')
-addpath('/network/lustre/iss02/cenir/analyse/irm/users/salim.ouarab/MNI/pet_atlas/')
-addpath('/network/lustre/iss02/cenir/analyse/irm/users/salim.ouarab/toolbox/')
+addpath('/network/iss/cenir/analyse/irm/users/salim.ouarab/dev_matvol/')
+addpath('/network/iss/cenir/analyse/irm/users/salim.ouarab/MNI/pet_atlas/')
+addpath('/network/iss/cenir/analyse/irm/users/salim.ouarab/toolbox/')
 
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG';
+main_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG';
 
 cd (main_dir)
 load('e_nonchir.mat');
@@ -34,9 +34,11 @@ fclean = gfile(dclean,'^bp_clean.nii');
 
 % for is = 1: length(dfunc)
 %     mkdir(dfunc{is},'React_Cecile_model')
+%     mkdir(dfunc{is},'Verif_React')
 % end
 
-dreact = get_subdir_regex(dfunc(:),'React$'); %.*Cecile');
+% dreact = get_subdir_regex(dfunc(:),'^React$');
+dreact = get_subdir_regex(dfunc(:),'Verif_React$'); %.*Cecile');
 
 r_movefile(fclean, dreact,'copy')
 r_movefile(rp_file,dreact,'copy')
@@ -47,11 +49,11 @@ frclean = gfile(dreact,'^bp_clean.nii');
 
 %% Noradrenaline map
 
-datlas = {'/network/lustre/iss02/cenir/analyse/irm/users/salim.ouarab/MNI/pet_atlas'}
+datlas = {'/network/iss/cenir/analyse/irm/users/salim.ouarab/MNI/pet_atlas'}
 ref_NA = gfile(datlas,'Atlas_NAT_IntensityNorm_1.nii');
 
 % %% original directory with masks
-% datlas = {'/network/lustre/iss02/cenir/analyse/irm/users/sandy.mournet/ToM_2021/IRM/ToM_BOLD/Scripts_Roxane/Réseaux/'};
+% datlas = {'/network/iss/cenir/analyse/irm/users/sandy.mournet/ToM_2021/IRM/ToM_BOLD/Scripts_Roxane/Réseaux/'};
 
 % %% Acetylcholine map
 % dace   = gdir(datlas,'_Acétylcholine')
@@ -64,13 +66,13 @@ ref_NA = gfile(datlas,'Atlas_NAT_IntensityNorm_1.nii');
 %% Reslicing grey matter mask to NT maps
 
 % cmd = 'python3
-% /network/lustre/iss02/cenir/analyse/irm/users/salim.ouarab/dev_matvol/python/react_masks.py
-% /network/lustre/iss02/cenir/analyse/irm/users/salim.ouarab/data/subject_list.txt
-% /network/lustre/iss02/cenir/analyse/irm/users/salim.ouarab/MNI/pet_atlas/pet_atlas_4d.nii
-% /network/lustre/iss02/cenir/analyse/irm/users/salim.ouarab/MNI/pet_atlas/rgm_mask.nii.gz
+% /network/iss/cenir/analyse/irm/users/salim.ouarab/dev_matvol/python/react_masks.py
+% /network/iss/cenir/analyse/irm/users/salim.ouarab/data/subject_list.txt
+% /network/iss/cenir/analyse/irm/users/salim.ouarab/MNI/pet_atlas/pet_atlas_4d.nii
+% /network/iss/cenir/analyse/irm/users/salim.ouarab/MNI/pet_atlas/rgm_mask.nii.gz
 % out_masks' % unused command ??
 
-mask = gfile({'/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/pet_atlas'},'^gm.*')
+mask = gfile({'/network/iss/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/pet_atlas'},'^gm.*')
 % mask = unzip_volume(mask)
 %%%%%%%%%
 clear par
@@ -84,10 +86,10 @@ job_reslice(mask,ref_NA,par)
 %% NORADRENALINE reference map bp_clean reslice
 
 clear par
-par.sge = 1;
-par.run = 0;
+par.sge = 0;
+par.run = 1;
 par.prefix = 'rNA_';
-par.jobname = 'rNA';
+par.jobname = 'verif_rNA';
 
 job_reslice(frclean,repmat(ref_NA,50,1),par)
 
@@ -117,9 +119,9 @@ end
 
 % JOB EXECUTE
 clear par
-par.sge = 1
-par.jobname = 'MaskReact_NA_job'
-par.walltime      = '05';
+par.sge = 1;
+par.jobname = 'Verif_MaskReact_NA_job'
+par.walltime      = '20';
 par.mem      = '100G';
 do_cmd_sge(jobs,par);
 
@@ -177,11 +179,11 @@ fspm = gfile(dirStats,'SPM.mat');
 clear par
 par.write_residuals = 0;
 
-par.run = 0;
-par.sge = 1;
-par.jobname = 'EstGlmNA'
+par.run = 1;
+par.sge = 0;
+par.jobname = 'EstGlmNA_matvolOld'
 par.mem      = '32G';
-job_first_level_estimate(fspm,par)
+job_first_level_estimate(fspm(1),par)
 
 % %% DA
 % 
@@ -225,7 +227,7 @@ job_first_level_estimate(fspm,par)
 
 %% A.SKRZATEK
 clear par
-project_dir = '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG';
+project_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG';
 
 d = readtable( [ './DATA/' , 'Correspondance_Numero_Comportement_IRM.csv' ])  ;
 tab = readtable(fullfile(project_dir,'DATA/ANT_Alerting_RT_multiregression.csv'));
@@ -325,7 +327,7 @@ varcov_2nd_level_2sample_model_spec(groups.val,models.outdirs(imodel),covars,par
 
 %% PART USED BEFORE MODELS-structure (combining all input info) & BEFORE IF-LOOP INCLUDED IN GROUP-SCANS SPEC
 % jobnames = {'2sample_ttest_RS_pca','2sample_ttest_RS_Alert_RT_STD_inter_pca', '2sample_ttest_RS_Alert_pca_model', '2sample_ttest_RS_RT_STD_pca_model','2sample_ttest_RS_Alert_wo_PCA_RT_STD_covar'};
-% outdirs = {'/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_pca', '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_mixed_interaction_pca', '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_Alert_pca', '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_RT_STD_pca', '/network/lustre/iss02/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_Alert_covar_RT_STD_wo_pca'};
+% outdirs = {'/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_pca', '/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_mixed_interaction_pca', '/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_Alert_pca', '/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_RT_STD_pca', '/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/REACT/2sample_ttest_NA_Alert_covar_RT_STD_wo_pca'};
 % clear par
 % par.sge = 0;
 % par.run = 1;
@@ -577,7 +579,7 @@ end
 % 
 % 
 % 
-% dirStat = {'/network/lustre/iss02/cenir/analyse/irm/users/salim.ouarab/data/crc_covid/fMRI_stats/react/Ach_out7suj'}
+% dirStat = {'/network/iss/cenir/analyse/irm/users/salim.ouarab/data/crc_covid/fMRI_stats/react/Ach_out7suj'}
 % 
 % clear par
 % 
@@ -613,7 +615,7 @@ end
 % 
 % 
 % 
-% dirStat = {'/network/lustre/iss02/cenir/analyse/irm/users/salim.ouarab/data/crc_covid/fMRI_stats/react/Da_out7suj'}
+% dirStat = {'/network/iss/cenir/analyse/irm/users/salim.ouarab/data/crc_covid/fMRI_stats/react/Da_out7suj'}
 % 
 % clear par
 % 

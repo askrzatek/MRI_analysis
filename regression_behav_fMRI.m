@@ -9,7 +9,7 @@ clear all
 
 %% Initialise
 
-main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
+main_dir = fullfile('/network/iss/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
 cd (main_dir)
 
 ACTION = 0;
@@ -848,7 +848,7 @@ for iout = 1 : length(outdirs)
         
         %% pTFCE toolbox for all con_001 & con_002 in our outdirs
 %% % sadly we still don't know how to transform variable to img - computation works, but no file is created
-        addpath /network/lustre/iss02/cenir/software/irm/spm12/toolbox/pTFCE/
+        addpath /network/iss/cenir/software/irm/spm12/toolbox/pTFCE/
         
         [MpTFCE_Z, MpTFCE_p] = pTFCE_adapt(modest{iroi}, char(mainef));
         [DpTFCE_Z, DpTFCE_p] = pTFCE_adapt(modest{iroi}, char(diffef));
@@ -912,7 +912,7 @@ for iout = 1 : length(multioutdirs)
         %% pTFCE toolbox for all con_001 & con_002 in our outdirs
 %% % sadly we still don't know how to transform variable to img - computation works, but no file is created
 
-        addpath /network/lustre/iss02/cenir/software/irm/spm12/toolbox/pTFCE/
+        addpath /network/iss/cenir/software/irm/spm12/toolbox/pTFCE/
         
         [PpTFCE_Z, PpTFCE_p] = pTFCE_adapt(modest{iroi}, char(poscorel));
         [NpTFCE_Z, NpTFCE_p] = pTFCE_adapt(modest{iroi}, char(negcorel));

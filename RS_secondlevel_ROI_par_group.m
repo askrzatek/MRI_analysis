@@ -3,7 +3,7 @@
 clc
 clear all
 
-main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
+main_dir = fullfile('/network/iss/cenir/analyse/irm/users/anna.skrzatek','/nifti_test');
 stat_dir = fullfile(main_dir,'full_secondlevel_RS');
 A_dir = fullfile(main_dir,'resliced_RS_ANOVA_V1V2');
 
@@ -32,12 +32,12 @@ RS_V1_all = exam( InputRS,'PARK.*a$') + exam(InputRS,'PARK.*a_V1') + exam(InputR
 %ROIs = {'SMA_Ant_L','SMA_Ant_R','SMA_Face_L','SMA_Face_R','SMA_Foot_L','SMA_Foot_R','SMA_Hand_L','SMA_Hand_R','SMA_Post_L','SMA_Post_R'};
 %ROIs = {'Cereb3_L','Cereb3_R','Cereb4_5_L','Cereb4_5_R','Cereb6_L','Cereb6_R','Cereb7b_L','Cereb7b_R','Cereb8_L','Cereb8_R','Cereb9_L','Cereb9_R','Cereb10_L','Cereb10_R','Cereb_Crus1_L','Cereb_Crus1_R','Cereb_Crus2_L','Cereb_Crus2_R'};
 
-dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/FOG_APA_network';
-dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Cortical_loco';
-dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Basal_Ganglia_loco';
-dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Cognitive_circuit';
-dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Cueing';
-dirROI  = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Ordi';
+dirROI  = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/FOG_APA_network';
+dirROI  = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Cortical_loco';
+dirROI  = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Basal_Ganglia_loco';
+dirROI  = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Cognitive_circuit';
+dirROI  = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Cueing';
+dirROI  = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/nifti_test/ROIs_masks/Ordi';
 
 fileROI = cellstr(char(gfile(dirROI,'.*.nii'))); %fileROI = remove_regex(fileROI,'T1');
 ROIs = cell(1,length(fileROI));

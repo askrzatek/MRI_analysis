@@ -5,8 +5,8 @@
 clear all
 %
 %% load data and dependencies
-addpath /network/lustre/iss02/cenir/software/irm/spm12b/
-addpath /network/lustre/iss02/cenir/analyse/irm/users/cecile.gallea/ASYA/asyasuit/
+addpath /network/iss/cenir/software/irm/spm12b/
+addpath /network/iss/cenir/analyse/irm/users/cecile.gallea/ASYA/asyasuit/
 addpath /home/anna.skrzatek/MRI_analysis/
 
 main_dir = '/home/anna.skrzatek/data/nifti_test/';

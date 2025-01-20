@@ -159,7 +159,7 @@ model_contrast = {contrast_2x2_LxT};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% fetch dirs for SPM
 %% Load files from multiple folders
-main_dir = fullfile('/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
+main_dir = fullfile('/network/iss/cenir/analyse/irm/users/anna.skrzatek','nifti_test');
 
 %e_PARKGAME = exam(main_dir,'PARKGAME');
 %e_REMINARY = exam(main_dir,'REMINARY_\w{2}_');
@@ -241,7 +241,7 @@ for imod=1:length(model_name)
     l12 = e{group}.getSerie('contrasts').getVolume('IMA_L').toJob; 
     l21 = e{group}.getSerie('contrasts').getVolume('REAL_R').toJob;
     l22 = e{group}.getSerie('contrasts').getVolume('IMA_R').toJob;
-    addpath '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/'
+    addpath '/network/iss/cenir/analyse/irm/users/anna.skrzatek/'
 %% Job define model
 
     par.fake = 0;
@@ -279,8 +279,8 @@ end
 %% Display
 
 %!linux command for mricrogl script
-%!/network/lustre/iss02/cenir/software/irm/mricrogl_lx/MRIcroGL '/home/anna.skrzatek/data/nifti/second_level_p001_auto_less.gls'
+%!/network/iss/cenir/software/irm/mricrogl_lx/MRIcroGL '/home/anna.skrzatek/data/nifti/second_level_p001_auto_less.gls'
 
-%addpath /network/lustre/iss02/cenir/software/irm/spm12/toolbox/marsbar/
+%addpath /network/iss/cenir/software/irm/spm12/toolbox/marsbar/
 
 

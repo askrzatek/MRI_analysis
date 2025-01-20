@@ -16,7 +16,7 @@ function change_spm_path(fSPMmat, oldpath, newpath)
 %
 %   fSPMmat = {'path to spm.mat'}
 %   change_spm_path(fSPMmat,{'/iss02/'},{'/iss02/'})
-%   change_spm_path(fSPMmat,{'/network/lustre/iss02/cenir'},{'/network/lustre/iss02/cenir'})
+%   change_spm_path(fSPMmat,{'/network/iss/cenir'},{'/network/iss/cenir'})
 
 %   Original SPM.mat will be overwritten, so it's better to make a copy.
 
