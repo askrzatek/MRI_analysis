@@ -2,19 +2,21 @@
 clear
 clc
 %main_dir = '/network/lustre/iss02/cenir/analyse/irm/users/cecile.gallea/AGENT10_Daniela';
-main_dir = '/network/lustre/iss02/cenir/analyse/irm/users/anna.skrzatek/DYS_PPN';
-ROI_dir = fullfile(main_dir,'DYS_PPN_ROIs/Cortical_Networks');
-data_dir = fullfile(main_dir,'AGENT_10');
+main_dir = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/DYS_PPN';
+ROI_dir = fullfile(main_dir,'ROI_PPN_Dys/Cortical_Networks');
+data_dir = fullfile(main_dir,'AGENT10');
 
 cd (main_dir)
+addpath(main_dir)
 
 %% Load the data & structure it
 
-e = exam(main_dir, ".*Subj.*")
-e.addSerie(".*RS","RS",1)
-e.getSerie("RS").addVolume('s5wts_OC','s5wts_OC',1)
-%load('e_nonchir.mat'); 
-
+e = exam(data_dir, '.*AGENT10.*')
+e.addSerie('.*MINEA.*','tedana.*','RS',1)
+e.getSerie('RS').addVolume('^s5wts_OC.nii','s5wts',1)
+%e.getSerie('RS').addVolume('rp_spm','rp',1)
+e.getSerie('RS').addRP('rp_spm','rp',1)
+e.explore
 
 %% Step 1: faire tourner les calculs de connnectivité
 
@@ -26,19 +28,19 @@ par.mem             = '16G';
 par.jobname         = 'timeseries_extract_DysFC';
 par.display         = 0;
 par.redo            = 0;
-par.volume          =  e.getSerie('run_RS').getVolume('s5wts_OC') ;  % Choisir le s5 ou s8 (en fonction de la taille des structures etudiees par exemple...)
-par.confound        =  e.getSerie('run_RS').getRP('multiple_regressors');
+par.volume          =  e.getSerie('RS').getVolume('s5wts') ;  % Choisir le s5 ou s8 (en fonction de la taille des structures etudiees par exemple...)
+par.confound        =  e.getSerie('RS').getRP('rp');
 par.mask_threshold  = 0.001;
 
 %% define ROI, using several methods
 
 % par.roi_type.atlas_cat12 = 'aal3';
-path_masks_PPN = get_subdir_regex(ROI_dir,"PPN")
+path_masks_PPN = get_subdir_regex(ROI_dir,'PPN');
 path_masks_SMN       = get_subdir_regex(ROI_dir, 'SMN');
 path_masks_Assoc_BG       = get_subdir_regex(ROI_dir, 'Assoc_BG');
 path_masks_Assoc_Post          = get_subdir_regex(ROI_dir, 'Assoc_Post');
-path_masks_Assoc_Ant              = get_subdir_regex(ROI_dir, 'Assoc_Post');
-path_masks_Limbic                   = get_subdir_regex(ROI_dir, 'Assoc_Ant');
+path_masks_Assoc_Ant              = get_subdir_regex(ROI_dir, 'Assoc_Ant');
+path_masks_Limbic                   = get_subdir_regex(ROI_dir, 'Limbic');
 path_masks_Primary                     = get_subdir_regex(ROI_dir, 'Primary');
 
 %% create file name table from the files list - search for FreeSurfer correspondance tables or complete manually
@@ -47,6 +49,10 @@ path_masks_Primary                     = get_subdir_regex(ROI_dir, 'Primary');
 %% get labels for CAREN ROIs from table according to RSN we are interested in : in this case Salience = RSN01
 
 tab          = readtable(fullfile(ROI_dir,'id_labels_abbrevs_AGEN10.csv'));
+
+PPN.labels  = tab.label(tab.PPN(~isnan(tab.PPN)));
+PPN.abbrevs = tab.abbrev(tab.PPN(~isnan(tab.PPN)));
+PPN.idx = tab.id(tab.PPN(~isnan(tab.PPN)));
 
 SMN.labels  = tab.label(tab.SMN(~isnan(tab.SMN)));
 SMN.abbrevs = tab.abbrev(tab.SMN(~isnan(tab.SMN)));
@@ -72,6 +78,7 @@ Primary.labels  = tab.label(tab.Primary(~isnan(tab.Primary)));
 Primary.abbrevs = tab.abbrev(tab.Primary(~isnan(tab.Primary)));
 Primary.idx = tab.id(tab.Primary(~isnan(tab.Primary)));
 
+PPN.skip = [];
 SMN.skip = [];
 AssBG.skip = [];
 AssAnt.skip = [];
@@ -79,6 +86,7 @@ AssPost.skip = [];
 Limbic.skip = [];
 Primary.skip = [];
 
+atlas_rois_list_PPN = [];
 atlas_rois_list_SMN = [];
 atlas_rois_list_AssBG = [];
 atlas_rois_list_AssAnt = [];
@@ -86,6 +94,16 @@ atlas_rois_list_AssPost = [];
 atlas_rois_list_Limbic = [];
 atlas_rois_list_Primary = [];
 
+for iroi = 1 : length(PPN.labels)
+% nroi = dir(path_masks_Salience_CAREN);
+% for iroi = 1: length(nroi)-2
+    if ~ismember(PPN.idx(iroi), PPN.skip)
+                                %     % path                                                                                                abbrev             description
+            atlas_rois_list_PPN = [atlas_rois_list_PPN; char(get_subdir_regex_files(path_masks_PPN,sprintf('.*Reg%d.nii$',PPN.idx(iroi)))), PPN.abbrevs(iroi), PPN.labels(iroi)];
+    else
+        sprintf('Skipped region %d - not enough signal left after minimal denoising', PPN.idx(iroi))
+    end
+end
 
 for iroi = 1 : length(SMN.labels)
 % nroi = dir(path_masks_Salience_CAREN);
@@ -163,7 +181,7 @@ end
 
 %% define all ROIs independently from the atlas
 
-par.roi_type.mask_global = vertcat(atlas_rois_list_SMN, atlas_rois_list_AssBG, atlas_rois_list_AssAnt, atlas_rois_list_AssPost, atlas_rois_list_Limbic, atlas_rois_list_Primary, {
+par.roi_type.mask_global = vertcat(atlas_rois_list_PPN, atlas_rois_list_SMN, atlas_rois_list_AssBG, atlas_rois_list_AssAnt, atlas_rois_list_AssPost, atlas_rois_list_Limbic, atlas_rois_list_Primary, {
 %     % path                                                           abbrev          description
    }) ;
 
@@ -175,7 +193,7 @@ TS = job_extract_timeseries(par);
 
 %% Define some networks : not mandatory
 
-
+par.network.PPN = PPN.abbrevs;
 par.network.SMN = SMN.abbrevs;
 par.network.AssBG = AssBG.abbrevs;
 par.network.AssAnt = AssAnt.abbrevs;
