@@ -34,14 +34,16 @@ rp = fullfile(e.getSerie('tedana').getPath(),'multiple_regressors.txt');
 
 % define input volumes and confounds
 clear par
-par.run             = 1;
-par.sge             = 0;
+par.run             = 0;
+par.sge             = 1;
 par.mem             = '16G';
 par.jobname         = 'timeseries_extract_AUDICOG_salience_tinnitus';
 par.jobname         = 'timeseries_extract_AUDICOG_cEx_tinnitus';
 par.jobname         = 'timeseries_extract_AUDICOG_DMN_tinnitus';
+par.jobname         = 'timeseries_extract_AUDICOG_SMN_VIS';
+par.jobname         = 'timeseries_extract_AUDICOG_CAREN_all_v2';
 par.display         = 0;
-par.redo            = 1;
+par.redo            = 0;
 par.volume          = e.getSerie('tedana').getVolume('s5wts');
 par.confound        = rp;
 % par.volume          =  e.getSerie('run_RS').getVolume('s5wts_OC') ;  % Choisir le s5 ou s8 (en fonction de la taille des structures etudiees par exemple...)
@@ -58,6 +60,8 @@ path_masks_Alert          = get_subdir_regex(ROI_dir, 'Alerting_effect');
 path_masks_Salience_CAREN = '/network/iss/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/CAREN/RSN01';
 path_masks_CEN_CAREN = '/network/iss/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/CAREN/RSN02';
 path_masks_DMN_CAREN = '/network/iss/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/CAREN/RSN04';
+path_masks_SMN_CAREN = '/network/iss/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/CAREN/RSN03';
+path_masks_VIS_CAREN = '/network/iss/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/CAREN/RSN05';
 
 %% get labels for CAREN ROIs from table according to RSN we are interested in : in this case Salience = RSN01
 
@@ -72,14 +76,25 @@ cEx_net.idx = tab.id_AAL(tab.cen(~isnan(tab.cen)));
 DM_net.labels  = strcat(tab.label_AAL(tab.dmn(~isnan(tab.dmn))),'_DMN');
 DM_net.abbrevs = strcat(tab.abbrev_AAL(tab.dmn(~isnan(tab.dmn))),'_DMN');
 DM_net.idx = tab.id_AAL(tab.dmn(~isnan(tab.dmn)));
+SM_net.labels  = strcat(tab.label_AAL(tab.smn(~isnan(tab.smn))),'_SMN');
+SM_net.abbrevs = strcat(tab.abbrev_AAL(tab.smn(~isnan(tab.smn))),'_SMN');
+SM_net.idx = tab.id_AAL(tab.smn(~isnan(tab.smn)));
+Vis_net.labels  = strcat(tab.label_AAL(tab.vis(~isnan(tab.vis))),'_VIS');
+Vis_net.abbrevs = strcat(tab.abbrev_AAL(tab.vis(~isnan(tab.vis))),'_VIS');
+Vis_net.idx = tab.id_AAL(tab.vis(~isnan(tab.vis)));
+
 
 salience_net.skip = [];
 cEx_net.skip = [57];
 DM_net.skip = [51,93];
+SM_net.skip = [6];
+Vis_net.skip = [93];
 
 atlas_rois_list_SN = [];
 atlas_rois_list_CEN = [];
 atlas_rois_list_DMN = [];
+atlas_rois_list_SMN = [];
+atlas_rois_list_Vis = [];
 
 % salience_net.rois    = get_subdir_regex_files(path_masks_Salience_CAREN,'.*');
 
@@ -136,12 +151,46 @@ for iroi = 1 : length(DM_net.labels)
     end
 end
 
+for iroi = 1 : length(SM_net.labels)
+
+    if ~ismember(SM_net.idx(iroi), SM_net.skip)
+        if SM_net.idx(iroi) < 10
+                                %     % path                                                                                                abbrev                      description
+            atlas_rois_list_SMN = [atlas_rois_list_SMN; char(get_subdir_regex_files(path_masks_SMN_CAREN,sprintf('.*Reg0%d.nii$',SM_net.idx(iroi)))), SM_net.abbrevs(iroi), SM_net.labels(iroi)];
+
+        else
+                                %     % path                                                                                                abbrev                      description
+            atlas_rois_list_SMN = [atlas_rois_list_SMN; char(get_subdir_regex_files(path_masks_SMN_CAREN,sprintf('.*Reg%d.nii$',SM_net.idx(iroi)))), SM_net.abbrevs(iroi), SM_net.labels(iroi)];
+        end
+    else
+        sprintf('Skipped region %d - not enough signal left after minimal denoising', SM_net.idx(iroi))
+    end
+end
+
+for iroi = 1 : length(Vis_net.labels)
+%nroi = dir(path_masks_DMN_CAREN);
+%for iroi = 1: length(nroi)-2
+
+    if ~ismember(Vis_net.idx(iroi), Vis_net.skip)
+        if Vis_net.idx(iroi) < 10
+                                %     % path                                                                                                abbrev                      description
+            atlas_rois_list_Vis = [atlas_rois_list_Vis; char(get_subdir_regex_files(path_masks_Vis_CAREN,sprintf('.*Reg0%d.nii$',Vis_net.idx(iroi)))), Vis_net.abbrevs(iroi), Vis_net.labels(iroi)];
+
+        else
+                                %     % path                                                                                                abbrev                      description
+            atlas_rois_list_Vis = [atlas_rois_list_Vis; char(get_subdir_regex_files(path_masks_VIS_CAREN,sprintf('.*Reg%d.nii$',Vis_net.idx(iroi)))), Vis_net.abbrevs(iroi), Vis_net.labels(iroi)];
+        end
+    else
+        sprintf('Skipped region %d - not enough signal left after minimal denoising', Vis_net.idx(iroi))
+    end
+end
+
 %% we could do the same for other networks : just to have the timeseries extracted per network if we want to compare
 
 
 %% define all ROIs independently from the atlas
 
-par.roi_type.mask_global = vertcat(atlas_rois_list_SN, atlas_rois_list_CEN, atlas_rois_list_DMN, {
+par.roi_type.mask_global = vertcat(atlas_rois_list_SN, atlas_rois_list_CEN, atlas_rois_list_DMN, atlas_rois_list_SMN, atlas_rois_list_Vis, {
 %     % path                                                           abbrev          description
        char(get_subdir_regex_files(path_masks_Tinnitus, 'ParaHipp')), 'ParaHipp',  'Bilateral_ParaHippocampus'
        fullfile( path_masks_audio,  'Left_Auditory_activation_fwe05_0v_50subj.nii'), 'lAudio'   ,  'Left_Loca_Audio_activation'   
@@ -171,6 +220,7 @@ par.outname = 'AUDICOG_CAREN_SN_CEN_DMN_AudioACT';
 par.outname = 'Salience_Tinnitus_Alert_Audio';
 par.outname = 'Executive_Tinnitus_Alert_Audio';
 par.outname = 'DMN_Tinnitus_Alert_Audio';
+par.outname = 'SN_CEN_DMN_SMN_VIS_CAREN';
 TS = job_extract_timeseries(par);
 
 %% Step 2: create correlation matrix
@@ -196,6 +246,8 @@ TS = job_extract_timeseries(par);
 par.network.SN = atlas_rois_list_SN(:,2);
 par.network.CEN = atlas_rois_list_CEN(:,2);
 par.network.DMN = atlas_rois_list_DMN(:,2);
+par.network.SMN = atlas_rois_list_SMN(:,2);
+par.network.Vis = atlas_rois_list_Vis(:,2);
 
 %% Create connectivity matrix
 TS = job_timeseries_to_connectivity_matrix(TS,par);
@@ -215,13 +267,19 @@ output_dir = '/home/anna.skrzatek/AUDICOG_backup/Correl_Matrix';
 for isubj = 1:length(e)
 %% part used to rename the files in the subject directories if one forgot to used the par.output_name in the rsfc - therefore for further copying we only need dst files
 %    src =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat') ;
-    dst_allnet = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat');
+    dst_allnet = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__SN_CEN_DMN_SMN_VIS_CAREN.mat');
+    
+    dst_tinnet = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat');
+    dst_controlnet = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__AUDICOG_CAREN_SM_Visual_Net_Tinnitus_Alert_Audio.mat');
     dst_SN = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__Salience_Tinnitus_Alert_Audio.mat') ;
     dst_CEN = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__Executive_Tinnitus_Alert_Audio.mat') ;
     dst_DMN = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__DMN_Tinnitus_Alert_Audio.mat') ;
 %     src2 =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/static_conn__timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat') ;
 %     src2 =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/static_conn__timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat') ;
-    dst2_allnet = fullfile(e(isubj).getSerie('run_RS').path,'tedana009a1_vt/rsfc/SN_CEN_DMN__static_conn__timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat');
+    dst2_allnet = fullfile(e(isubj).getSerie('run_RS').path,'tedana009a1_vt/rsfc/SN_CEN_DMN_SMN_Vis__static_conn__timeseries__SN_CEN_DMN_SMN_VIS_CAREN.mat');
+    
+    dst2_tinnet = fullfile(e(isubj).getSerie('run_RS').path,'tedana009a1_vt/rsfc/SN_CEN_DMN__static_conn__timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat');
+    dst2_controlnet = fullfile(e(isubj).getSerie('run_RS').path,'tedana009a1_vt/rsfc/SMN_Vis__static_conn__timeseries__AUDICOG_CAREN_SM_Visual_Net_Tinnitus_Alert_Audio.mat');
     dst2_SN = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/SN__static_conn__timeseries__Salience_Tinnitus_Alert_Audio.mat') ;
     dst2_CEN = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/CEN__static_conn__timeseries__Executive_Tinnitus_Alert_Audio.mat') ;
     dst2_DMN = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/DMN__static_conn__timeseries__DMN_Tinnitus_Alert_Audio.mat') ;
@@ -270,17 +328,18 @@ for isubj = 1:length(e)
     ifile = dst_allnet;
     rs_cmat = load(ifile)   ;
 
-    ifile_out = [e(isubj).name, '_idx' , num2str(isubj) ,'_connectivity_RS_SN_CEN_DMN_CAREN_AudioACT_timeseries.csv' ]; 
+    ifile_out = [e(isubj).name, '_idx' , num2str(isubj) ,'_connectivity_RS_SN_CEN_DMN_SMN_Visual_Net_CAREN_all_timeseries.csv' ]; 
     dlmwrite(addprefixtofilenames(ifile_out,'/home/anna.skrzatek/AUDICOG_backup/Analyses/Correl_Matrix/'), rs_cmat.timeseries)
 
     %% static conn    
     ifile = dst2_allnet;
     rs_cmat = load(ifile)   ;
 
-    ifile_out = [e(isubj).name , '_idx', num2str(isubj) ,'_connectivity_RS_SN_CEN_DMN_CAREN_AudioACT_static_conn.csv' ]; 
+    ifile_out = [e(isubj).name , '_idx', num2str(isubj) ,'_connectivity_RS_SN_CEN_DMN_SMN_Visual_Net_CAREN_all_static_conn.csv' ]; 
     dlmwrite(addprefixtofilenames(ifile_out,'/home/anna.skrzatek/AUDICOG_backup/Analyses/Correl_Matrix/'), rs_cmat.static_connectivity_matrix)
     
-    ifile_out = 'Connectivity_RS_SN_CEN_DMN_CAREN_AudioACT_labels.csv';
+    ifile_out = 'Connectivity_RS_SN_CEN_DMN_SMN_Vis_CAREN_labels.csv';
+    %ifile_out = 'Connectivity_RS_SM_Visual_Net_CAREN_Tinnitus_Alert_AudioACT_labels.csv';
     writetable(rs_cmat.ts_table, addprefixtofilenames(ifile_out,'/home/anna.skrzatek/AUDICOG_backup/Analyses/Correl_Matrix/'));
 
 

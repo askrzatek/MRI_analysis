@@ -255,12 +255,12 @@ img = e.getSerie('run_RS').getVolume('wts').removeEmpty();
 par.smooth   = [5 5 5];
 par.prefix   = 's5';
 job_smooth(img,par);
-%e.getSerie('tedana_RS').addVolume('^s5wts_OC','s5wts') %% autoadd job
+% e.getSerie('tedana_RS').addVolume('^s5wts_OC','s5wts') %% autoadd job
 
 par.smooth   = [8 8 8];
 par.prefix   = 's8';
 job_smooth(img,par);
-%e.getSerie('tedana_RS').addVolume('^s8wts_OC','s8wts') %% autoadd job
+% e.getSerie('tedana_RS').addVolume('^s8wts_OC','s8wts') %% autoadd job
 
 
 %% coregister WM & CSF on functionnal (using the warped mean) #SPM12
@@ -435,4 +435,4 @@ job_physio_tapas( par );
 
 %% Save examArray
 
-save e e
+save e_nChir_iss_cenir e

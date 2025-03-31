@@ -102,7 +102,7 @@ par.jobname      = 'Dartel_Normalize_CAT12';
 job_dartel_normalize(template,ffield,mg,par)
 
 
-%%%% ===> Check normalized data with "chekreg"
+%%%% ===> Check normalized data with "checkreg"
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% GET INSPIRATION FROM RS_secondlevel_ROI_par_group.m

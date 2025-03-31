@@ -6,9 +6,14 @@ ROI_dir = fullfile(main_dir,'Networks_Masks');
 
 
 cd (main_dir)
-load('e_nonchir.mat'); 
+% load('e_nonchir.mat');
+data_dir = fullfile(main_dir,'/DATA/Non_chirurgicaux')
 
-
+e = exam(data_dir, 'AUDICOG_Suj'); % all subjects with multi-echo
+e.addSerie('RS$','tedana', 'run_RS', 1 );
+e.getSerie('run_RS').addVolume('^s5wts_OC.nii$','s5wts_OC',1);
+e.getSerie('run_RS').addRP('multiple_regressors','multiple_regressors',1)
+e.explore
 %% Faire tourner les calculs de connnectivité
 
 % define input volumes and confounds

@@ -1,9 +1,9 @@
-%% DysPPN connectivity : PPN x Cortical-SubCortical
+%% DysPPN connectivity : PPN x Cerebellar-SubCortical
 clear
 clc
 %main_dir = '/network/lustre/iss02/cenir/analyse/irm/users/cecile.gallea/AGENT10_Daniela';
 main_dir = '/network/iss/cenir/analyse/irm/users/anna.skrzatek/DYS_PPN';
-ROI_dir = fullfile(main_dir,'ROI_PPN_Dys/Cortical_Networks');
+ROI_dir = fullfile(main_dir,'ROI_PPN_Dys/Cerebellar_Networks');
 data_dir = fullfile(main_dir,'AGENT10');
 
 cd (main_dir)
@@ -36,12 +36,10 @@ par.mask_threshold  = 0.001;
 
 % par.roi_type.atlas_cat12 = 'aal3';
 path_masks_PPN = get_subdir_regex(ROI_dir,'PPN');
-path_masks_SMN       = get_subdir_regex(ROI_dir, 'SMN');
+path_masks_SMN       = get_subdir_regex(ROI_dir, 'SMN_Cereb');
 path_masks_Assoc_BG       = get_subdir_regex(ROI_dir, 'Assoc_BG');
-path_masks_Assoc_Post          = get_subdir_regex(ROI_dir, 'Assoc_Post');
-path_masks_Assoc_Ant              = get_subdir_regex(ROI_dir, 'Assoc_Ant');
-path_masks_Limbic                   = get_subdir_regex(ROI_dir, 'Limbic');
-path_masks_Primary                     = get_subdir_regex(ROI_dir, 'Primary');
+path_masks_Assoc_Post          = get_subdir_regex(ROI_dir, 'Assoc_Cereb');
+path_masks_Limbic                   = get_subdir_regex(ROI_dir, 'Limbic_Cereb');
 
 %% create file name table from the files list - search for FreeSurfer correspondance tables or complete manually
 
@@ -54,45 +52,34 @@ PPN.labels  = tab.label(tab.PPN(~isnan(tab.PPN)));
 PPN.abbrevs = tab.abbrev(tab.PPN(~isnan(tab.PPN)));
 PPN.idx = tab.id(tab.PPN(~isnan(tab.PPN)));
 
-SMN.labels  = tab.label(tab.SMN(~isnan(tab.SMN)));
-SMN.abbrevs = tab.abbrev(tab.SMN(~isnan(tab.SMN)));
-SMN.idx = tab.id(tab.SMN(~isnan(tab.SMN)));
+SMN_Cereb.labels  = tab.label(tab.SMN_Cereb(~isnan(tab.SMN_Cereb)));
+SMN_Cereb.abbrevs = tab.abbrev(tab.SMN_Cereb(~isnan(tab.SMN_Cereb)));
+SMN_Cereb.idx = tab.id(tab.SMN_Cereb(~isnan(tab.SMN_Cereb)));
 
 AssBG.labels  = tab.label(tab.Assoc_BG(~isnan(tab.Assoc_BG)));
 AssBG.abbrevs = tab.abbrev(tab.Assoc_BG(~isnan(tab.Assoc_BG)));
 AssBG.idx = tab.id(tab.Assoc_BG(~isnan(tab.Assoc_BG)));
 
-AssPost.labels  = tab.label(tab.Assoc_Post(~isnan(tab.Assoc_Post)));
-AssPost.abbrevs = tab.abbrev(tab.Assoc_Post(~isnan(tab.Assoc_Post)));
-AssPost.idx = tab.id(tab.Assoc_Post(~isnan(tab.Assoc_Post)));
+AssCereb.labels  = tab.label(tab.Assoc_Cereb(~isnan(tab.Assoc_Cereb)));
+AssCereb.abbrevs = tab.abbrev(tab.Assoc_Cereb(~isnan(tab.Assoc_Cereb)));
+AssCereb.idx = tab.id(tab.Assoc_Cereb(~isnan(tab.Assoc_Cereb)));
 
-AssAnt.labels  = tab.label(tab.Assoc_Ant(~isnan(tab.Assoc_Ant)));
-AssAnt.abbrevs = tab.abbrev(tab.Assoc_Ant(~isnan(tab.Assoc_Ant)));
-AssAnt.idx = tab.id(tab.Assoc_Ant(~isnan(tab.Assoc_Ant)));
+Limbic_Cereb.labels  = tab.label(tab.Limbic_Cereb(~isnan(tab.Limbic_Cereb)));
+Limbic_Cereb.abbrevs = tab.abbrev(tab.Limbic_Cereb(~isnan(tab.Limbic_Cereb)));
+Limbic_Cereb.idx = tab.id(tab.Limbic_Cereb(~isnan(tab.Limbic_Cereb)));
 
-Limbic.labels  = tab.label(tab.Limbic(~isnan(tab.Limbic)));
-Limbic.abbrevs = tab.abbrev(tab.Limbic(~isnan(tab.Limbic)));
-Limbic.idx = tab.id(tab.Limbic(~isnan(tab.Limbic)));
-
-Primary.labels  = tab.label(tab.Primary(~isnan(tab.Primary)));
-Primary.abbrevs = tab.abbrev(tab.Primary(~isnan(tab.Primary)));
-Primary.idx = tab.id(tab.Primary(~isnan(tab.Primary)));
 
 PPN.skip = [];
-SMN.skip = [];
+SMN_Cereb.skip = [];
 AssBG.skip = [];
-AssAnt.skip = [];
-AssPost.skip = [];
-Limbic.skip = [];
-Primary.skip = [];
+AssCereb.skip = [];
+Limbic_Cereb.skip = [153,154];
 
 atlas_rois_list_PPN = [];
-atlas_rois_list_SMN = [];
+atlas_rois_list_SMN_Cereb = [];
 atlas_rois_list_AssBG = [];
-atlas_rois_list_AssAnt = [];
-atlas_rois_list_AssPost = [];
-atlas_rois_list_Limbic = [];
-atlas_rois_list_Primary = [];
+atlas_rois_list_AssCereb = [];
+atlas_rois_list_Limbic_Cereb = [];
 
 for iroi = 1 : length(PPN.labels)
 % nroi = dir(path_masks_Salience_CAREN);
@@ -105,14 +92,14 @@ for iroi = 1 : length(PPN.labels)
     end
 end
 
-for iroi = 1 : length(SMN.labels)
+for iroi = 1 : length(SMN_Cereb.labels)
 % nroi = dir(path_masks_Salience_CAREN);
 % for iroi = 1: length(nroi)-2
-    if ~ismember(SMN.idx(iroi), SMN.skip)
+    if ~ismember(SMN_Cereb.idx(iroi), SMN_Cereb.skip)
                                 %     % path                                                                                                abbrev             description
-            atlas_rois_list_SMN = [atlas_rois_list_SMN; char(get_subdir_regex_files(path_masks_SMN,sprintf('.*Reg%d.nii$',SMN.idx(iroi)))), SMN.abbrevs(iroi), SMN.labels(iroi)];
+            atlas_rois_list_SMN_Cereb = [atlas_rois_list_SMN_Cereb; char(get_subdir_regex_files(path_masks_SMN,sprintf('.*Reg%d.nii$',SMN_Cereb.idx(iroi)))), SMN_Cereb.abbrevs(iroi), SMN_Cereb.labels(iroi)];
     else
-        sprintf('Skipped region %d - not enough signal left after minimal denoising', SMN.idx(iroi))
+        sprintf('Skipped region %d - not enough signal left after minimal denoising', SMN_Cereb.idx(iroi))
     end
 end
 
@@ -128,51 +115,27 @@ for iroi = 1 : length(AssBG.labels)
     end
 end
 
-for iroi = 1 : length(AssAnt.labels)
+for iroi = 1 : length(AssCereb.labels)
 %nroi = dir(path_masks_CEN_CAREN);
 %for iroi = 1: length(nroi)-2
 
-    if ~ismember(AssAnt.idx(iroi), AssAnt.skip)
-                                %     % path                                                                                                               abbrev                description
-            atlas_rois_list_AssAnt = [atlas_rois_list_AssAnt; char(get_subdir_regex_files(path_masks_Assoc_Ant,sprintf('.*Reg%d.nii$',AssAnt.idx(iroi)))), AssAnt.abbrevs(iroi), AssAnt.labels(iroi)];
-    else
-        sprintf('Skipped region %d - not enough signal left after minimal denoising', AssAnt.idx(iroi))
-    end
-end
-
-for iroi = 1 : length(AssPost.labels)
-%nroi = dir(path_masks_CEN_CAREN);
-%for iroi = 1: length(nroi)-2
-
-    if ~ismember(AssPost.idx(iroi), AssPost.skip)
+    if ~ismember(AssCereb.idx(iroi), AssCereb.skip)
                                 %     % path                                                                                                                   abbrev                 description
-            atlas_rois_list_AssPost = [atlas_rois_list_AssPost; char(get_subdir_regex_files(path_masks_Assoc_Post,sprintf('.*Reg%d.nii$',AssPost.idx(iroi)))), AssPost.abbrevs(iroi), AssPost.labels(iroi)];
+            atlas_rois_list_AssCereb = [atlas_rois_list_AssCereb; char(get_subdir_regex_files(path_masks_Assoc_Post,sprintf('.*Reg%d.nii$',AssCereb.idx(iroi)))), AssCereb.abbrevs(iroi), AssCereb.labels(iroi)];
     else
-        sprintf('Skipped region %d - not enough signal left after minimal denoising', AssPost.idx(iroi))
+        sprintf('Skipped region %d - not enough signal left after minimal denoising', AssCereb.idx(iroi))
     end
 end
 
-for iroi = 1 : length(Limbic.labels)
+for iroi = 1 : length(Limbic_Cereb.labels)
 %nroi = dir(path_masks_CEN_CAREN);
 %for iroi = 1: length(nroi)-2
 
-    if ~ismember(Limbic.idx(iroi), Limbic.skip)
+    if ~ismember(Limbic_Cereb.idx(iroi), Limbic_Cereb.skip)
                                 %     % path                                                                                                            abbrev                description
-            atlas_rois_list_Limbic = [atlas_rois_list_Limbic; char(get_subdir_regex_files(path_masks_Limbic,sprintf('.*Reg%d.nii$',Limbic.idx(iroi)))), Limbic.abbrevs(iroi), Limbic.labels(iroi)];
+            atlas_rois_list_Limbic_Cereb = [atlas_rois_list_Limbic_Cereb; char(get_subdir_regex_files(path_masks_Limbic,sprintf('.*Reg%d.nii$',Limbic_Cereb.idx(iroi)))), Limbic_Cereb.abbrevs(iroi), Limbic_Cereb.labels(iroi)];
     else
-        sprintf('Skipped region %d - not enough signal left after minimal denoising', Limbic.idx(iroi))
-    end
-end
-
-for iroi = 1 : length(Primary.labels)
-%nroi = dir(path_masks_CEN_CAREN);
-%for iroi = 1: length(nroi)-2
-
-    if ~ismember(Primary.idx(iroi), Primary.skip)
-                                %     % path                                                                                                                abbrev                 description
-            atlas_rois_list_Primary = [atlas_rois_list_Primary; char(get_subdir_regex_files(path_masks_Primary,sprintf('.*Reg%d.nii$',Primary.idx(iroi)))), Primary.abbrevs(iroi), Primary.labels(iroi)];
-    else
-        sprintf('Skipped region %d - not enough signal left after minimal denoising', Primary.idx(iroi))
+        sprintf('Skipped region %d - not enough signal left after minimal denoising', Limbic_Cereb.idx(iroi))
     end
 end
 
@@ -181,12 +144,12 @@ end
 
 %% define all ROIs independently from the atlas
 
-par.roi_type.mask_global = vertcat(atlas_rois_list_PPN, atlas_rois_list_SMN, atlas_rois_list_AssBG, atlas_rois_list_AssAnt, atlas_rois_list_AssPost, atlas_rois_list_Limbic, atlas_rois_list_Primary, {
+par.roi_type.mask_global = vertcat(atlas_rois_list_PPN, atlas_rois_list_SMN_Cereb, atlas_rois_list_AssBG, atlas_rois_list_AssCereb, atlas_rois_list_Limbic_Cereb, {
 %     % path                                                           abbrev          description
    }) ;
 
 %% Perform the timeseries' extraction
-par.outname = 'Dystonic_PPN_SMN_AssBG_AssAnt_AssPost_Limbic_Primary';
+par.outname = 'Dystonic_PPN_Cereb_SMN_AssBG_Cereb_Ass_Limbic';
 TS = job_extract_timeseries(par);
 
 %% Step 2: create correlation matrix
@@ -194,18 +157,16 @@ TS = job_extract_timeseries(par);
 %% Define some networks : not mandatory
 
 par.network.PPN = PPN.abbrevs;
-par.network.SMN = SMN.abbrevs;
+par.network.SMN_Cb = SMN_Cereb.abbrevs;
 par.network.AssBG = AssBG.abbrevs;
-par.network.AssAnt = AssAnt.abbrevs;
-par.network.AssPost = AssPost.abbrevs;
-par.network.Limbic = Limbic.abbrevs;
-par.network.Primary = Primary.abbrevs;
+par.network.AssCb = AssCereb.abbrevs;
+par.network.Limbic_Cb = Limbic_Cereb.abbrevs;
 
 %% Create connectivity matrix
 TS = job_timeseries_to_connectivity_matrix(TS,par);
 
 %% plot
-guidata = plot_resting_state_connectivity_matrix(TS, {e.getSerie('run_RS').getExam().name});
+guidata = plot_resting_state_connectivity_matrix(TS, {e.getSerie('RS').getExam().name});
 
 %% Step 3: Perfrom seed-to-voxel correlation (seed == ROI)
 par.jobname = 'seed2brain_analysis_DysPPN';
@@ -219,23 +180,15 @@ output_dir = '/home/anna.skrzatek/DYS_PPN/RSFC';
 for isubj = 1:length(e)
 %% part used to rename the files in the subject directories if one forgot to used the par.output_name in the rsfc - therefore for further copying we only need dst files
 %    src =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat') ;
-    dst_cort = fullfile(e(isubj).getSerie('RS').path, 'rsfc/PPN_SMN_AssBG_AssAnt_AssPost_Limbic_Primary__static_conn__timeseries__Dystonic_PPN_SMN_AssBG_AssAnt_AssPost_Limbic_Primary.mat');
+    dst_cereb = fullfile(e(isubj).getSerie('RS').path, 'rsfc/PPN_SMN_Cb_AssBG_AssCb__static_conn__timeseries__Dystonic_PPN_Cereb_SMN_AssBG_Cereb_Ass_Limbic.mat');
 %     src2 =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/static_conn__timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat') ;
 %     src2 =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/static_conn__timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat') ;
-    dst2_cort = fullfile(e(isubj).getSerie('RS').path,'rsfc/timeseries__Dystonic_PPN_SMN_AssBG_AssAnt_AssPost_Limbic_Primary.mat');
+    dst2_cereb = fullfile(e(isubj).getSerie('RS').path,'rsfc/timeseries__Dystonic_PPN_Cereb_SMN_AssBG_Cereb_Ass_Limbic.mat');
         
 %     if exist(src, 'file')
 %         movefile(src, dst);
 %         movefile(src2, dst2);
 %     else
-          if ~exist(dst_cort,'file')
-              fprintf('expected file "%s" not found\n', dst_cort);
-          end
-          
-          if ~exist(dst2_cort,'file')
-              fprintf('expected file "%s" not found\n', dst2_cort);
-          end
-          
           if ~exist(dst_cereb,'file')
               fprintf('expected file "%s" not found\n', dst_cereb);
           end
@@ -250,27 +203,19 @@ for isubj = 1:length(e)
 
 %% CORTICAL NETWORKS
     %% timeseries matrix
-    ifile = dst2_cort;
+    ifile = dst2_cereb;
     rs_cmat = load(ifile)   ;
 
-    ifile_out = [e(isubj).name, '_idx' , num2str(isubj) ,'_connectivity_RS_DysPPN_Cortical_timeseries.csv' ]; 
+    ifile_out = [e(isubj).name, '_idx' , num2str(isubj) ,'_connectivity_RS_DysPPN_Cerebellar_timeseries.csv' ]; 
     dlmwrite(addprefixtofilenames(ifile_out,'/network/iss/cenir/analyse/irm/users/anna.skrzatek/DYS_PPN/RSFC/'), rs_cmat.timeseries)
 
     %% static conn    
-    ifile = dst_cort;
+    ifile = dst_cereb;
     rs_cmat = load(ifile)   ;
 
-    ifile_out = [e(isubj).name , '_idx', num2str(isubj) ,'_connectivity_RS_DysPPN_Cortical_static_conn.csv' ]; 
+    ifile_out = [e(isubj).name , '_idx', num2str(isubj) ,'_connectivity_RS_DysPPN_Cerebellar_static_conn.csv' ]; 
     dlmwrite(addprefixtofilenames(ifile_out,'/network/iss/cenir/analyse/irm/users/anna.skrzatek/DYS_PPN/RSFC/'), rs_cmat.static_connectivity_matrix)
     
-    ifile_out = 'Connectivity_RS_DysPPN_labels.csv';
+    ifile_out = 'Connectivity_Cerebellar_RS_DysPPN_labels.csv';
     writetable(rs_cmat.ts_table, addprefixtofilenames(ifile_out,'/network/iss/cenir/analyse/irm/users/anna.skrzatek/DYS_PPN/RSFC/'));
 end
-
-%% Save le tableau de correspondance de l'atlas
-
-% %     save(fullfile( output_dir, 'info_networks.mat' ) , 'connectivity_matrix' , 'conn_network',  )  ;
-%     writetable(  ts_table, fullfile( output_dir, 'Correspondances_aal3.xlsx' )  ) ; % , 'conn_network',  )  ;
-
-        writetable(  network(2).table , fullfile( output_dir, 'Correspondances_Salience.xlsx' )  ) ; % , 'conn_network',  )  ;
-

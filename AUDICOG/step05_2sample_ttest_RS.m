@@ -8,8 +8,8 @@ project_dir = '/network/iss/cenir/analyse/irm/studies/AUDICOG';
 rsfc = 1;
 % ROIs = {'ParaHipp','BA_31', 'Orb_PFC', 'lAudio', 'rAudio', 'Cingulate'};
 ROIs = {'ParaHipp','lAudio', 'rAudio', 'Cingulate', 'OFC'};
-models.names = {    'rsfc_verif_ANT_RT_STD_pca_covariates',                     'rsfc_verif_Alert_pca_covariates',                                   'rsfc_verif_ANT_RT_STD_wo_pca','rsfc_verif_Alert_wo_pca',          'rsfc_verif_double_pca_covariates',                                               'rsfc_verif_double_wo_pca'};
-models.covarnames = {{'Age','Genre','pca_audio1','pca_emotionnel1','STD_RT_ANT'},{'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting'},{'Age','Genre','STD_RT_ANT'},{'Age','Genre','log_ANT_RT_Alerting'},{'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting','STD_RT_ANT'},{'Age','Genre','log_ANT_RT_Alerting','STD_RT_ANT'}};
+models.names = {    'rsfc_plsda_att1_att2_emo',                             'rsfc_plsda_emo_att1_att2',                             'rsfc_plsda_hearloss',           'rsfc_plsda_double_att_inter',                                           'rsfc_plsda_double_att',                                                      'rsfc_plsda_double_cogni',                                                    'rsfc_plsda_quadruple_inter',                                            'rsfc_plsda_quadruple',                                                  'rsfc_plsda_covars_triple_inter',                             'rsfc_plsda_covars_triple',                                  'rsfc_plsda_covariates_interaction',                    'rsfc_plsda_covariates',                          'rsfc_verif_ANT_RT_STD_pca_covariates',                     'rsfc_verif_Alert_pca_covariates',                                   'rsfc_verif_ANT_RT_STD_wo_pca','rsfc_verif_Alert_wo_pca',          'rsfc_verif_double_pca_covariates',                                               'rsfc_verif_double_wo_pca'};
+models.covarnames = {{'Age','Genre','plsda_att1','plsda_att2','plsda_emo1'},{'Age','Genre','plsda_emo1','plsda_att1','plsda_att2'},{'Age','Genre','plsda_HFaudio1'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_att1','plsda_att2'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_att1','plsda_att2'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_cogni1','plsda_cogni2'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_att1','plsda_mem1'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_att1','plsda_mem1'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_cogni1'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_cogni1'},{'Age','Genre','plsda_HFaudio1','plsda_emotionnel1'},{'Age','Genre','plsda_HFaudio1','plsda_emotionnel1'},{'Age','Genre','pca_audio1','pca_emotionnel1','STD_RT_ANT'},{'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting'},{'Age','Genre','STD_RT_ANT'},{'Age','Genre','log_ANT_RT_Alerting'},{'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting','STD_RT_ANT'},{'Age','Genre','log_ANT_RT_Alerting','STD_RT_ANT'}};
     
 cd (project_dir)
 
@@ -18,16 +18,24 @@ cd (project_dir)
 % outdirs = {'/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/RS_2sample_ttest/ALFF_BA31','/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/RS_2sample_ttest/ALFF_ParaHipp'} ;
 for imodel = 1:length(models.names)
     model_outdir = fullfile(project_dir,'/Results/RS_2sample_ttest/',models.names{imodel});
-%     mkdir(model_outdir)
+%       mkdir(model_outdir)
     for ir = 1:length(ROIs)
         outdirs{ir} = fullfile(model_outdir,ROIs{ir});
-%         mkdir(outdirs{ir});
+%       mkdir(outdirs{ir});
     end
     models.outdirs{imodel} = outdirs;
 end
 clear imodel
 
-load('e_nonchir.mat');
+% load('e_nonchir.mat');
+e = exam(main_dir, 'AUDICOG_Suj'); % all subjects with multi-echo
+% e.addSerie('RS$','tedana', 'run_RS', 1 );
+e.addSerie('RS$', 'run_RS', 1 );
+% e.getSerie('run_RS').addVolume('^s5wts_OC.nii$','s5wts_OC',1);
+% e.getSerie('run_RS').addRP('multiple_regressors','multiple_regressors',1)
+e.explore
+
+
 % fichier de correspondance numero IRM - comportement - groupe - age
 d = readtable( [ './DATA/' , 'Correspondance_Numero_Comportement_IRM.csv' ])  ;
 
@@ -36,6 +44,8 @@ d = readtable( [ './DATA/' , 'Correspondance_Numero_Comportement_IRM.csv' ])  ;
 
 tab = readtable(fullfile(project_dir,'DATA/ANT_Alerting_RT_multiregression.csv')); % from CSV: filtered by IRM==1 - definietely some errors in it
 tab = readtable(fullfile(project_dir,'DATA/AUDICOG_behavioral_data_Groups1_2.csv')); % behavioral data verified and up to date for group 1 & 2
+tab = readtable(fullfile(project_dir,'DATA/AUDICOG_behavioral_data_Groups1_2-28-02-2025.csv')); % behavioral data verified and up to date for group 1 & 2
+tab = readtable(fullfile(project_dir,'DATA/AUDICOG_behavioral_data_Groups1_2-27-03-2025.csv')); % behavioral data plsda + pca verified and up to date for group 1 & 2
 
 %tab_sel = ismember(tab.IRM, 1);
 %group = tab.Group(tab_sel);
@@ -45,6 +55,8 @@ tab = readtable(fullfile(project_dir,'DATA/AUDICOG_behavioral_data_Groups1_2.csv
 %ANT_std = tab.ANT_STD_mean(tab_sel);
 %hearing_loss = tab.pca_audio1(tab_sel);
 %emotion = str2double(tab.pca_emotionnel1(tab_sel));
+%hearing_loss = tab.plsda_audio1(tab_sel);
+%emotion = str2double(tab.plsda_emo1(tab_sel));
 
 %% Inputs
 
@@ -64,7 +76,7 @@ groups.name = {'Control' 'Tinnitus'};
 groups.val = cell(size(ROIs));
 
 %% Choose  the model you want to apply : accordingly to the desired number of covariates
-imodel = 5; % 1:rsfc_verif_ANT_RT_STD_pca_covariates 2:rsfc_verif_Alert_pca_covariates 3:rsfc_verif_ANT_RT_STD_wo_pca 4:rsfc_verif_Alert_wo_pca 5:rsfc_verif_double_pca_covariates 6:rsfc_verif_double_wo_pca
+imodel = 3; %  1:'rsfc_plsda_att1_att2_emo' 2:'rsfc_plsda_emo_att1_att2' 3:'rsfc_plsda_hearloss' 1:'rsfc_plsda_double_att_inter' 2:'rsfc_plsda_double_att' 3:'rsfc_plsda_double_cogni' 4:'rsfc_plsda_quadruple_inter' 5:'rsfc_plsda_quadruple' 6:'rsfc_plsda_covars_triple_inter' 7:'rsfc_plsda_covars_triple' 8:'rsfc_plsda_covariates_interaction' 9:'rsfc_plsda_covariates' 10:'rsfc_verif_ANT_RT_STD_pca_covariates' 11:'rsfc_verif_Alert_pca_covariates' 12:'rsfc_verif_ANT_RT_STD_wo_pca' 13:'rsfc_verif_Alert_wo_pca' 14:'rsfc_verif_double_pca_covariates' 15:'rsfc_verif_double_wo_pca'
 sprintf('Model %s chosen',models.names{imodel})
 sprintf('Covariates to be used are %s %s %s %s %s %s', models.covarnames{imodel}{:})
 
@@ -88,28 +100,91 @@ for igroup = 1:length(groups.name)
         %% Adding Covariates and defining the model
 %         for icov = 1:length(models.covarnames{imodel})
             scans{igroup}.cov{j,1} = tab.Age(tab.code_IRM == id);
-            scans{igroup}.cov{j,2} = str2double(tab.Genre(tab.code_IRM == id));
+%             scans{igroup}.cov{j,2} = str2double(tab.Genre(tab.code_IRM == id));
+            scans{igroup}.cov{j,2} = tab.Genre(tab.code_IRM == id);
             
             clear par
             par.covars = 1;
-            if imodel == 1 || imodel ==2 || imodel == 5 % PCA covars included
+            
+            if imodel == 1 || imodel ==2 || imodel ==3 || imodel == 4 || imodel == 5 || imodel == 6 || imodel == 7 || imodel == 8 || imodel == 9 || imodel == 10 || imodel == 11 || imodel == 14 % PCA covars included
                 scans{igroup}.cov{j,3} = tab.pca_audio1(tab.code_IRM == id);
                 scans{igroup}.cov{j,4} = tab.pca_emotion1(tab.code_IRM == id);
                 if imodel == 1
+                    scans{igroup}.cov{j,3} = tab.plsda_att1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,4} = tab.plsda_att2(tab.code_IRM == id);
+                    scans{igroup}.cov{j,5} = tab.plsda_emo1(tab.code_IRM == id);                    
+                    par.intercov = [1,1,2,2,2];
+                elseif imodel == 2
+                    scans{igroup}.cov{j,3} = tab.plsda_emo1(tab.code_IRM == id);                    
+                    scans{igroup}.cov{j,4} = tab.plsda_att1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,5} = tab.plsda_att2(tab.code_IRM == id);
+                    par.intercov = [1,1,2,2,2];
+                elseif imodel == 3
+                    scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);                
+                    par.intercov = [1,1,2];
+                elseif imodel == 4
+                    scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,5} = tab.plsda_att1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,6} = tab.plsda_att2(tab.code_IRM == id);
+                    par.intercov = [1,1,2,2,2,2];
+                elseif imodel == 2
+                    scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,5} = tab.plsda_att1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,6} = tab.plsda_att2(tab.code_IRM == id);
+                    par.intercov = [1,1,1,1,1,1];
+                elseif imodel == 3
+                    scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,5} = tab.plsda_cogni1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,6} = tab.plsda_cogni2(tab.code_IRM == id);
+                    par.intercov = [1,1,1,1,1,1];
+                elseif imodel == 4
+                    scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,5} = tab.plsda_att1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,6} = tab.plsda_mem1(tab.code_IRM == id);
+                    par.intercov = [2,2,1,2,2,1];
+                elseif imodel == 5
+                    scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,5} = tab.plsda_att1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,6} = tab.plsda_mem1(tab.code_IRM == id);
+                    par.intercov = [1,1,1,1,1,1];
+                elseif imodel == 6
+                    scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,5} = tab.plsda_cogni1(tab.code_IRM == id);
+                    par.intercov = [1,1,2,2,2];
+                elseif imodel == 7
+                    scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,5} = tab.plsda_cogni1(tab.code_IRM == id);
+                    par.intercov = [1,1,1,1,1];
+                elseif imodel == 8
+                    scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
+                    par.intercov = [1,1,2,2];
+                elseif imodel == 9
+                    scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
+                    scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
+                    par.intercov = [1,1,1,1];
+                elseif imodel == 10
                     scans{igroup}.cov{j,5} = tab.RT_STD(tab.code_IRM == id);
                     par.intercov = [1,1,1,1,2];
-                elseif imodel == 2
+                elseif imodel == 11
                     scans{igroup}.cov{j,5} = tab.ANT_Alert_Score(tab.code_IRM == id);
                     par.intercov = [1,1,1,1,2];
-                elseif imodel == 5
+                elseif imodel == 14
                     scans{igroup}.cov{j,5} = tab.ANT_Alert_Score(tab.code_IRM == id);
                     scans{igroup}.cov{j,6} = tab.RT_STD(tab.code_IRM == id);
                     par.intercov = [1,1,1,1,2,2];
                 end
-            elseif imodel == 3 % No PCA covars included
+            elseif imodel == 12 % No PCA covars included
                 scans{igroup}.cov{j,3} = tab.RT_STD(tab.code_IRM == id);
                 par.intercov = [1,1,2];
-            elseif imodel == 4
+            elseif imodel == 13
                 scans{igroup}.cov{j,3} = tab.ANT_Alert_Score(tab.code_IRM == id);
                 par.intercov = [1,1,2];
             else
@@ -203,7 +278,7 @@ end
 
 
 %% Contrast definition
-%imodel = 2;
+% imodel = 1;
 
 % t-stat
 Control = [1 0];
@@ -220,11 +295,527 @@ contrast_T.values = {
     }';
 
 contrast_T.types = cat(1,repmat({'T'},[1,length(contrast_T.names)]));
-for imodel = 3:6
+
+for imodel = 1:3
     % Single variable of interest
     % F-stat
-    switch(imodel) % 1:rsfc_verif_ANT_RT_STD_pca_covariates 2:rsfc_verif_Alert_pca_covariates 3:rsfc_verif_ANT_RT_STD_wo_pca 4:rsfc_verif_Alert_wo_pca 5:rsfc_verif_double_pca_covariates 6:rsfc_verif_double_wo_pca
-        case 1 % with PCAs
+    switch(imodel) % 1:'rsfc_plsda_att1_att2_emo_inter' 2:'rsfc_plsda_emo_att1_att2' 3:'rsfc_plsda_hearloss' 4:'rsfc_plsda_double_att_inter' 2:'rsfc_plsda_double_att' 3:'rsfc_plsda_double_cogni' 4:'rsfc_plsda_quadruple_inter' 5:'rsfc_plsda_quadruple' 6:'rsfc_plsda_covars_triple_inter' 7:'rsfc_plsda_covars_triple' 8:'rsfc_plsda_covariates_interaction' 9:'rsfc_plsda_covariates' 10:'rsfc_verif_ANT_RT_STD_pca_covariates' 11:'rsfc_verif_Alert_pca_covariates' 12:'rsfc_verif_ANT_RT_STD_wo_pca' 13:'rsfc_verif_Alert_wo_pca' 14:'rsfc_verif_double_pca_covariates' 15:'rsfc_verif_double_wo_pca'
+        case 1 % with PLSDAs Att1 & Att2 & Emo Interaction
+            clear contrast_F
+            clear contrast
+            disp('Interest PLS-DAs variables model : double cogni')
+            Main_seed_effect = [1 0 0 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0 0 0];
+            %Control_Tinnitus = [1 0 0 0 0 0 0 0 0 0 0 0 ; 0 -1 0 0 0 0 0 0 0 0 0 0];
+            %Tinnitus_Control = [-1 0 0 0 0 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0 0 0 0 0];
+
+            Main_effect_Emotion = [0 0 0 0 1 0 0 0 0 0 ; 0 0 0 0 0 1 0 0 0 0];
+            Main_effect_Attention1 = [0 0 0 0 0 0 1 0 0 0 ; 0 0 0 0 0 0 0 1 0 0];
+            Main_effect_Attention2 = [0 0 0 0 0 0 0 0 1 0 ; 0 0 0 0 0 0 0 0 0 1];
+            Main_effect_Age = [0 0 1 0 0 0 0 0 0 0];
+            Main_effect_Sex = [0 0 0 1 0 0 0 0 0 0];
+            
+            Inter_group_Emotion = [0 0 0 0 1 -1 0 0 0 0 ]; %0 0 0 0 0 0 0 -1 0 0 0 0];
+            Inter_group_Attention1 = [0 0 0 0 0 0 1 -1 0 0 ]; % 0 0 0 0 0 0 0 0 0 -1 0 0];
+            Inter_group_Attention2 = [0 0 0 0 0 0 0 0 1 -1];% ; 0 0 0 0 0 0 0 0 0 0 0 -1];
+            
+
+            contrast_F.names = {
+                'Main_Seed_Effect'
+                'Main_effect_Emotion'
+                'Main_effect_Attention1'
+                'Main_effect_Attention2'
+                'Main_effect_Age'
+                'Main_effect_Sex'
+                'Inter_Group_Emotion'
+                'Inter_Group_Attention1'
+                'Inter_Group_Attention2'
+                }';
+
+            contrast_F.values = {
+                Main_seed_effect
+                Main_effect_Emotion
+                Main_effect_Attention1
+                Main_effect_Attention2
+                Main_effect_Age
+                Main_effect_Sex
+                Inter_group_Emotion
+                Inter_group_Attention1
+                Inter_group_Attention2
+                }';
+            contrast_F.types = cat(1,repmat({'F'},[1,length(contrast_F.names)]));
+
+            contrast.names  = [contrast_T.names contrast_F.names ];
+            contrast.values = [contrast_T.values contrast_F.values];
+            contrast.types  = [contrast_T.types contrast_F.types];
+
+        case 2 % with PLSDAs Emo & Att1 & Att2 Interaction
+            clear contrast_F
+            clear contrast
+            disp('Interest PLS-DAs variables model : double cogni')
+            Main_seed_effect = [1 0 0 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0 0 0];
+            %Control_Tinnitus = [1 0 0 0 0 0 0 0 0 0 0 0 ; 0 -1 0 0 0 0 0 0 0 0 0 0];
+            %Tinnitus_Control = [-1 0 0 0 0 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0 0 0 0 0];
+
+            Main_effect_Emotion = [0 0 0 0 1 0 0 0 0 0 ; 0 0 0 0 0 1 0 0 0 0];
+            Main_effect_Attention1 = [0 0 0 0 0 0 1 0 0 0 ; 0 0 0 0 0 0 0 1 0 0];
+            Main_effect_Attention2 = [0 0 0 0 0 0 0 0 1 0 ; 0 0 0 0 0 0 0 0 0 1];
+            Main_effect_Age = [0 0 1 0 0 0 0 0 0 0];
+            Main_effect_Sex = [0 0 0 1 0 0 0 0 0 0];
+            Inter_group_Emotion = [0 0 0 0 1 -1 0 0 0 0 ]; %0 0 0 0 0 0 0 -1 0 0 0 0];
+            Inter_group_Attention1 = [0 0 0 0 0 0 1 -1 0 0 ]; % 0 0 0 0 0 0 0 0 0 -1 0 0];
+            Inter_group_Attention2 = [0 0 0 0 0 0 0 0 1 -1];% ; 0 0 0 0 0 0 0 0 0 0 0 -1];
+            
+
+            contrast_F.names = {
+                'Main_Seed_Effect'
+                'Main_effect_Emotion'
+                'Main_effect_Attention1'
+                'Main_effect_Attention2'
+                'Main_effect_Age'
+                'Main_effect_Sex'
+                'Inter_Group_Emotion'
+                'Inter_Group_Attention1'
+                'Inter_Group_Attention2'
+                }';
+
+            contrast_F.values = {
+                Main_seed_effect
+                Main_effect_Emotion
+                Main_effect_Attention1
+                Main_effect_Attention2
+                Main_effect_Age
+                Main_effect_Sex
+                Inter_group_Emotion
+                Inter_group_Attention1
+                Inter_group_Attention2
+                }';
+            contrast_F.types = cat(1,repmat({'F'},[1,length(contrast_F.names)]));
+
+            contrast.names  = [contrast_T.names contrast_F.names ];
+            contrast.values = [contrast_T.values contrast_F.values];
+            contrast.types  = [contrast_T.types contrast_F.types];
+        
+        
+        case 3 % with PLSDAs Hearing Interaction
+            clear contrast_F
+            clear contrast
+            disp('Interest PLS-DAs variables model : hearing')
+            Main_seed_effect = [1 0 0 0 0 0 ; 0 1 0 0 0 0];
+            %Control_Tinnitus = [1 0 0 0 0 0 0 0 0 0 0 0 ; 0 -1 0 0 0 0 0 0 0 0 0 0];
+            %Tinnitus_Control = [-1 0 0 0 0 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0 0 0 0 0];
+
+            Main_effect_Hearing_Loss = [0 0 0 0 1 0 ; 0 0 0 0 0 1];
+            Main_effect_Age = [0 0 1 0 0 0];
+            Main_effect_Sex = [0 0 0 1 0 0];
+            Inter_group_Hearing_Loss = [0 0 0 0 1 -1 ] ; % 0 0 0 0 0 -1 0 0 0 0 0 0];
+            
+            contrast_F.names = {
+                'Main_Seed_Effect'
+                'Main_effect_Hearing_Loss'
+                'Main_effect_Age'
+                'Main_effect_Sex'
+                'Inter_Group_Hearing_Loss'
+                }';
+
+            contrast_F.values = {
+                Main_seed_effect
+                Main_effect_Hearing_Loss
+                Main_effect_Age
+                Main_effect_Sex
+                Inter_group_Hearing_Loss
+                }';
+            contrast_F.types = cat(1,repmat({'F'},[1,length(contrast_F.names)]));
+
+            contrast.names  = [contrast_T.names contrast_F.names ];
+            contrast.values = [contrast_T.values contrast_F.values];
+            contrast.types  = [contrast_T.types contrast_F.types];
+        
+        
+        
+        case 4 % with PLSDAs Hearing & Emo & Att1 & Att2 Interaction
+            clear contrast_F
+            clear contrast
+            disp('Interest PLS-DAs variables model : double cogni')
+            Main_seed_effect = [1 0 0 0 0 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0 0 0 0 0];
+            %Control_Tinnitus = [1 0 0 0 0 0 0 0 0 0 0 0 ; 0 -1 0 0 0 0 0 0 0 0 0 0];
+            %Tinnitus_Control = [-1 0 0 0 0 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0 0 0 0 0];
+
+            Main_effect_Hearing_Loss = [0 0 0 0 1 0 0 0 0 0 0 0 ; 0 0 0 0 0 1 0 0 0 0 0 0];
+            Main_effect_Emotion = [0 0 0 0 0 0 1 0 0 0 0 0 ; 0 0 0 0 0 0 0 1 0 0 0 0];
+            Main_effect_Attention1 = [0 0 0 0 0 0 0 0 1 0 0 0 ; 0 0 0 0 0 0 0 0 0 1 0 0];
+            Main_effect_Attention2 = [0 0 0 0 0 0 0 0 0 0 1 0 ; 0 0 0 0 0 0 0 0 0 0 0 1];
+            Main_effect_Age = [0 0 1 0 0 0 0 0 0 0 0 0];
+            Main_effect_Sex = [0 0 0 1 0 0 0 0 0 0 0 0];
+            Inter_group_Hearing_Loss = [0 0 0 0 1 -1 0 0 0 0 0 0 ] ; % 0 0 0 0 0 -1 0 0 0 0 0 0];
+            Inter_group_Emotion = [0 0 0 0 0 0 1 -1 0 0 0 0 ]; %0 0 0 0 0 0 0 -1 0 0 0 0];
+            Inter_group_Attention1 = [0 0 0 0 0 0 0 0 1 -1 0 0 ]; % 0 0 0 0 0 0 0 0 0 -1 0 0];
+            Inter_group_Attention2 = [0 0 0 0 0 0 0 0 0 0 1 -1];% ; 0 0 0 0 0 0 0 0 0 0 0 -1];
+            
+
+            contrast_F.names = {
+                'Main_Seed_Effect'
+                'Main_effect_Hearing_Loss'
+                'Main_effect_Emotion'
+                'Main_effect_Attention1'
+                'Main_effect_Attention2'
+                'Main_effect_Age'
+                'Main_effect_Sex'
+                'Inter_Group_Hearing_Loss'
+                'Inter_Group_Emotion'
+                'Inter_Group_Attention1'
+                'Inter_Group_Attention2'
+                }';
+
+            contrast_F.values = {
+                Main_seed_effect
+                Main_effect_Hearing_Loss
+                Main_effect_Emotion
+                Main_effect_Attention1
+                Main_effect_Attention2
+                Main_effect_Age
+                Main_effect_Sex
+                Inter_group_Hearing_Loss
+                Inter_group_Emotion
+                Inter_group_Attention1
+                Inter_group_Attention2
+                }';
+            contrast_F.types = cat(1,repmat({'F'},[1,length(contrast_F.names)]));
+
+            contrast.names  = [contrast_T.names contrast_F.names ];
+            contrast.values = [contrast_T.values contrast_F.values];
+            contrast.types  = [contrast_T.types contrast_F.types];
+
+        case 5 % with PLSDAs Hearing & Emo & Att1 & Att2
+            clear contrast_F
+            clear contrast
+            disp('Interest PLS-DAs variables model : double cogni')
+            Main_seed_effect = [1 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0];
+            %Control_Tinnitus = [1 0 0 0 0 0 0 0 ; 0 -1 0 0 0 0 0 0];
+            %Tinnitus_Control = [-1 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0];
+
+            Main_effect_Hearing_Loss = [0 0 0 0 1 0 0 0];
+            Main_effect_Emotion = [0 0 0 0 0 1 0 0];
+            Main_effect_Attention1 = [0 0 0 0 0 0 1 0];
+            Main_effect_Attention2 = [0 0 0 0 0 0 0 1];
+            Main_effect_Age = [0 0 1 0 0 0 0];
+            Main_effect_Sex = [0 0 0 1 0 0 0];
+
+            contrast_F.names = {
+                'Main_Seed_Effect'
+                'Main_effect_Hearing_Loss'
+                'Main_effect_Emotion'
+                'Main_effect_Attention1'
+                'Main_effect_Attention2'
+                'Main_effect_Age'
+                'Main_effect_Sex'
+                }';
+
+            contrast_F.values = {
+                Main_seed_effect
+                Main_effect_Hearing_Loss
+                Main_effect_Emotion
+                Main_effect_Attention1
+                Main_effect_Attention2
+                Main_effect_Age
+                Main_effect_Sex
+                }';
+            contrast_F.types = cat(1,repmat({'F'},[1,length(contrast_F.names)]));
+
+            contrast.names  = [contrast_T.names contrast_F.names ];
+            contrast.values = [contrast_T.values contrast_F.values];
+            contrast.types  = [contrast_T.types contrast_F.types];
+
+        case 6 % with PLSDAs Hearing & Emo & Cogni1 & Cogni2
+            clear contrast_F
+            clear contrast
+            disp('Interest PLS-DAs variables model : double cogni')
+            Main_seed_effect = [1 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0];
+            %Control_Tinnitus = [1 0 0 0 0 0 0 0 ; 0 -1 0 0 0 0 0 0];
+            %Tinnitus_Control = [-1 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0];
+
+            Main_effect_Hearing_Loss = [0 0 0 0 1 0 0 0];
+            Main_effect_Emotion = [0 0 0 0 0 1 0 0];
+            Main_effect_Cognition1 = [0 0 0 0 0 0 1 0];
+            Main_effect_Cognition2 = [0 0 0 0 0 0 0 1];
+            Main_effect_Age = [0 0 1 0 0 0 0];
+            Main_effect_Sex = [0 0 0 1 0 0 0];
+
+            contrast_F.names = {
+                'Main_Seed_Effect'
+                'Main_effect_Hearing_Loss'
+                'Main_effect_Emotion'
+                'Main_effect_Cognition1'
+                'Main_effect_Cognition2'
+                'Main_effect_Age'
+                'Main_effect_Sex'
+                }';
+
+            contrast_F.values = {
+                Main_seed_effect
+                Main_effect_Hearing_Loss
+                Main_effect_Emotion
+                Main_effect_Cognition1
+                Main_effect_Cognition2
+                Main_effect_Age
+                Main_effect_Sex
+                }';
+            contrast_F.types = cat(1,repmat({'F'},[1,length(contrast_F.names)]));
+
+            contrast.names  = [contrast_T.names contrast_F.names ];
+            contrast.values = [contrast_T.values contrast_F.values];
+            contrast.types  = [contrast_T.types contrast_F.types];
+
+        case 7 % with PLSDAs Hearing & Emo & Att & Mem Interaction
+            clear contrast_F
+            clear contrast
+            disp('PLSD-A HL & Emo & Att & Mem Interaction model')
+            Main_seed_effect = [1 0 0 0 0 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0 0 0 0 0];
+            %Control_Tinnitus = [1 0 0 0 0 0 0 0 0 0 0 0 ; 0 -1 0 0 0 0 0 0 0 0 0 0];
+            %Tinnitus_Control = [-1 0 0 0 0 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0 0 0 0 0];
+
+            Main_effect_Hearing_Loss = [0 0 0 0 0 0 1 0 0 0 0 0];
+            Main_effect_Emotion = [0 0 0 0 0 0 0 1 0 0 0 0 ; 0 0 0 0 0 0 0 0 1 0 0 0];
+            Main_effect_Attention = [0 0 0 0 0 0 0 0 0 1 0 0 ; 0 0 0 0 0 0 0 0 0 0 1 0];
+            Main_effect_Memory = [0 0 0 0 0 0 0 0 0 0 0 1];
+            Main_effect_Age = [0 0 1 0 0 0 0 0 0 0 0 0 ; 0 0 0 1 0 0 0 0 0 0 0 0];
+            Main_effect_Sex = [0 0 0 0 1 0 0 0 0 0 0 0 ; 0 0 0 0 0 1 0 0 0 0 0 0];
+            Inter_group_Emotion = [0 0 0 0 0 0 0 1 0 0 0 0 ; 0 0 0 0 0 0 0 0 -1 0 0 0];
+            Inter_group_Attention = [0 0 0 0 0 0 0 0 0 1 0 0 ; 0 0 0 0 0 0 0 0 0 0 -1 0];
+            Inter_group_Age = [0 0 1 0 0 0 0 0 0 0 0 0 ; 0 0 0 -1 0 0 0 0 0 0 0 0];
+            Inter_group_Sex = [0 0 0 0 1 0 0 0 0 0 0 0 ; 0 0 0 0 0 -1 0 0 0 0 0 0];
+            
+
+            contrast_F.names = {
+                'Main_Seed_Effect'
+                'Main_effect_Hearing_Loss'
+                'Main_effect_Emotion'
+                'Main_effect_Attention'
+                'Main_effect_Memory'
+                'Main_effect_Age'
+                'Main_effect_Sex'
+                'Inter_Group_Emotion'
+                'Inter_Group_Attention'
+                'Inter_Group_Age'
+                'Inter_Group_Sex'
+                }';
+
+            contrast_F.values = {
+                Main_seed_effect
+                Main_effect_Hearing_Loss
+                Main_effect_Emotion
+                Main_effect_Attention
+                Main_effect_Memory
+                Main_effect_Age
+                Main_effect_Sex
+                Inter_group_Emotion
+                Inter_group_Attention
+                Inter_group_Age
+                Inter_group_Sex
+                }';
+            contrast_F.types = cat(1,repmat({'F'},[1,length(contrast_F.names)]));
+
+            contrast.names  = [contrast_T.names contrast_F.names ];
+            contrast.values = [contrast_T.values contrast_F.values];
+            contrast.types  = [contrast_T.types contrast_F.types];
+
+        case 8 % with PLSDAs Hearing & Emo & Att & Mem
+            clear contrast_F
+            clear contrast
+            disp('No interest variable model with PLS-DAs')
+            Main_seed_effect = [1 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0];
+            %Control_Tinnitus = [1 0 0 0 0 0 0 0 ; 0 -1 0 0 0 0 0 0];
+            %Tinnitus_Control = [-1 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0];
+
+            Main_effect_Hearing_Loss = [0 0 0 0 1 0 0 0];
+            Main_effect_Emotion = [0 0 0 0 0 1 0 0];
+            Main_effect_Attention = [0 0 0 0 0 0 1 0];
+            Main_effect_Memory = [0 0 0 0 0 0 0 1];
+            Main_effect_Age = [0 0 1 0 0 0 0];
+            Main_effect_Sex = [0 0 0 1 0 0 0];
+
+            contrast_F.names = {
+                'Main_Seed_Effect'
+                'Main_effect_Hearing_Loss'
+                'Main_effect_Emotion'
+                'Main_effect_Attention'
+                'Main_effect_Memory'
+                'Main_effect_Age'
+                'Main_effect_Sex'
+                }';
+
+            contrast_F.values = {
+                Main_seed_effect
+                Main_effect_Hearing_Loss
+                Main_effect_Emotion
+                Main_effect_Attention
+                Main_effect_Memory
+                Main_effect_Age
+                Main_effect_Sex
+                }';
+            contrast_F.types = cat(1,repmat({'F'},[1,length(contrast_F.names)]));
+
+            contrast.names  = [contrast_T.names contrast_F.names ];
+            contrast.values = [contrast_T.values contrast_F.values];
+            contrast.types  = [contrast_T.types contrast_F.types];
+
+        case 9 % with PLSDAs Hearing & Emo & Cogni Interaction
+            clear contrast_F
+            clear contrast
+            disp('No interest variable model with PLS-DAs')
+            Main_seed_effect = [1 0 0 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0 0 0];
+            Control_Tinnitus = [1 0 0 0 0 0 0 0 0 0 0 ; 0 -1 0 0 0 0 0 0 0 0 0];
+            Tinnitus_Control = [-1 0 0 0 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0 0 0 0];
+
+            Main_effect_Hearing_Loss = [0 0 0 0 1 0 0 0 0 0 ; 0 0 0 0 0 1 0 0 0 0];
+            Main_effect_Emotion = [0 0 0 0 0 0 1 0 0 0 ; 0 0 0 0 0 0 0 1 0 0];
+            Main_effect_Cognition = [0 0 0 0 0 0 0 0 1 0 ; 0 0 0 0 0 0 0 0 0 1];
+            Inter_Group_Audio = [0 0 0 0 1 0 0 0 0 0 ; 0 0 0 0 0 -1 0 0 0 0];
+            Inter_Group_Emotion = [0 0 0 0 0 0 1 0 0 0 ; 0 0 0 0 0 0 0 -1 0 0];
+            Inter_Group_Cognition = [0 0 0 0 0 0 0 0 1 0 ; 0 0 0 0 0 0 0 0 0 -1];
+            Main_effect_Age = [0 0 1 0 0 0 0 0 0 0];
+            Main_effect_Sex = [0 0 0 1 0 0 0 0 0 0];
+
+            contrast_F.names = {
+                'Main_Seed_Effect'
+                'Main_effect_Hearing_Loss'
+                'Main_effect_Emotion'
+                'Main_effect_Cognition'
+                'Inter_Group_Hearing_Loss'
+                'Inter_Group_Emotion'
+                'Inter_Group_Cognition'
+                'Main_effect_Age'
+                'Main_effect_Sex'
+                }';
+
+            contrast_F.values = {
+                Main_seed_effect
+                Main_effect_Hearing_Loss
+                Main_effect_Emotion
+                Main_effect_Cognition
+                Inter_Group_Audio
+                Inter_Group_Emotion
+                Inter_Group_Cognition
+                Main_effect_Age
+                Main_effect_Sex
+                }';
+            contrast_F.types = cat(1,repmat({'F'},[1,length(contrast_F.names)]));
+
+            contrast.names  = [contrast_T.names contrast_F.names ];
+            contrast.values = [contrast_T.values contrast_F.values];
+            contrast.types  = [contrast_T.types contrast_F.types];
+
+        case 10 % with PLSDAs Hearing & Emo & Cogni
+            clear contrast_F
+            clear contrast
+            disp('No interest variable model with PLS-DAs')
+            Main_seed_effect = [1 0 0 0 0 0 0 ; 0 1 0 0 0 0 0];
+            %Control_Tinnitus = [1 0 0 0 0 0 0 0 ; 0 -1 0 0 0 0 0 0];
+            %Tinnitus_Control = [-1 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0];
+
+            Main_effect_Hearing_Loss = [0 0 0 0 1 0 0];
+            Main_effect_Emotion = [0 0 0 0 0 1 0];
+            Main_effect_Cognition = [0 0 0 0 0 0 1];
+            Main_effect_Age = [0 0 1 0 0 0 0];
+            Main_effect_Sex = [0 0 0 1 0 0 0];
+
+            contrast_F.names = {
+                'Main_Seed_Effect'
+                'Main_effect_Hearing_Loss'
+                'Main_effect_Emotion'
+                'Main_effect_Cognition'
+                'Main_effect_Age'
+                'Main_effect_Sex'
+                }';
+
+            contrast_F.values = {
+                Main_seed_effect
+                Main_effect_Hearing_Loss
+                Main_effect_Emotion
+                Main_effect_Cognition
+                Main_effect_Age
+                Main_effect_Sex
+                }';
+            contrast_F.types = cat(1,repmat({'F'},[1,length(contrast_F.names)]));
+
+            contrast.names  = [contrast_T.names contrast_F.names ];
+            contrast.values = [contrast_T.values contrast_F.values];
+            contrast.types  = [contrast_T.types contrast_F.types];
+
+        case 11 % with PLSDAs & Interaction
+            clear contrast_F
+            clear contrast
+            disp('Emo & Hearing as interest variables')
+            Main_seed_effect = [1 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0];
+            %Control_Tinnitus = [1 0 0 0 0 0 0 0 ; 0 -1 0 0 0 0 0 0];
+            %Tinnitus_Control = [-1 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0];
+
+            Main_effect_Hearing_Loss = [0 0 0 0 1 0 0 0 ; 0 0 0 0 0 1 0 0];
+            Main_effect_Emotion = [0 0 0 0 0 0 1 0 ; 0 0 0 0 0 0 0 1];
+            Inter_Group_Hearing_Loss = [0 0 0 0 1 -1 0 0];
+            Inter_Group_Emotion = [0 0 0 0 0 0 1 -1];
+            Main_effect_Age = [0 0 1 0 0 0 0 0];
+            Main_effect_Sex = [0 0 0 1 0 0 0 0];
+
+            contrast_F.names = {
+                'Main_Seed_Effect'
+                'Main_effect_Hearing_Loss'
+                'Interaction_Group_x_Hearing_Loss'
+                'Main_effect_Emotion'
+                'Interaction_Group_x_Emotion'
+                'Main_effect_Age'
+                'Main_effect_Sex'
+                }';
+
+            contrast_F.values = {
+                Main_seed_effect
+                Main_effect_Hearing_Loss
+                Inter_Group_Hearing_Loss
+                Main_effect_Emotion
+                Inter_Group_Emotion
+                Main_effect_Age
+                Main_effect_Sex
+                }';
+            contrast_F.types = cat(1,repmat({'F'},[1,length(contrast_F.names)]));
+
+            contrast.names  = [contrast_T.names contrast_F.names ];
+            contrast.values = [contrast_T.values contrast_F.values];
+            contrast.types  = [contrast_T.types contrast_F.types];
+
+        case 12 % with PCAs
+            clear contrast_F
+            clear contrast
+            disp('No interest variable model with PLS-DAs')
+            Main_seed_effect = [1 0 0 0 0 0 ; 0 1 0 0 0 0];
+            %Control_Tinnitus = [1 0 0 0 0 0 0 0 ; 0 -1 0 0 0 0 0 0];
+            %Tinnitus_Control = [-1 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0];
+
+            Main_effect_Hearing_Loss = [0 0 0 0 1 0];
+            Main_effect_Emotion = [0 0 0 0 0 1];
+            Main_effect_Age = [0 0 1 0 0 0];
+            Main_effect_Sex = [0 0 0 1 0 0];
+
+            contrast_F.names = {
+                'Main_Seed_Effect'
+                'Main_effect_Hearing_Loss'
+                'Main_effect_Emotion'
+                'Main_effect_Age'
+                'Main_effect_Sex'
+                }';
+
+            contrast_F.values = {
+                Main_seed_effect
+                Main_effect_Hearing_Loss
+                Main_effect_Emotion
+                Main_effect_Age
+                Main_effect_Sex
+                }';
+            contrast_F.types = cat(1,repmat({'F'},[1,length(contrast_F.names)]));
+
+            contrast.names  = [contrast_T.names contrast_F.names ];
+            contrast.values = [contrast_T.values contrast_F.values];
+            contrast.types  = [contrast_T.types contrast_F.types];
+
+        case 13 % with PCAs
             clear contrast_F
             clear contrast
             disp('Single variable models with PCAs')
@@ -264,7 +855,7 @@ for imodel = 3:6
             contrast.values = [contrast_T.values contrast_F.values];
             contrast.types  = [contrast_T.types contrast_F.types];
 
-        case 2
+        case 14
             clear contrast_F
             clear contrast
             Main_seed_effect = [1 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0];
@@ -300,7 +891,7 @@ for imodel = 3:6
             contrast.values = [contrast_T.values contrast_F.values];
             contrast.types  = [contrast_T.types contrast_F.types];
 
-        case 3 % Without PCAs
+        case 15 % Without PCAs
             clear contrast_F
             clear contrast
             disp('Single variable models without PCAs')
@@ -331,7 +922,7 @@ for imodel = 3:6
             contrast.values = [contrast_T.values contrast_F.values];
             contrast.types  = [contrast_T.types contrast_F.types];
 
-        case 4
+        case 16
             clear contrast_F
             clear contrast
             Main_seed_effect = [1 0 0 0 0 0 ; 0 1 0 0 0 0];
@@ -361,7 +952,7 @@ for imodel = 3:6
             contrast.values = [contrast_T.values contrast_F.values];
             contrast.types  = [contrast_T.types contrast_F.types];
 
-        case 5
+        case 17
             clear contrast_F
             clear contrast
             disp('Double variable models') % with PCA
@@ -409,7 +1000,7 @@ for imodel = 3:6
             contrast.types  = [contrast_T.types contrast_F.types];
 
 
-        case 6
+        case 18
             clear contrast_F
             clear contrast
             %without PCA
