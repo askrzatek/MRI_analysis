@@ -20,7 +20,7 @@ e.explore
 clear par
 par.run = 1;
 par.sge = 0;
-par.jobname = 'timeseries_extract_AUDICOG_with_LC';
+par.jobname = 'timeseries_extract_AUDICOG_left_right_sep';
 par.display = 0;
 par.redo = 0;
 par.volume   =  e.getSerie('run_RS').getVolume('s5wts_OC') ;  % Choisir le s5 ou s8 (en fonction de la taille des structures etudiees par exemple...)
@@ -35,10 +35,20 @@ path_masks_audio= '/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/Audio/
 % path_masks_yeo_aal3 = '/network/iss/cenir/analyse/irm/studies/AUDICOG/Networks_Masks/Yeo_networks_with_aal3_masks' ; 
 path_masks_Tinnitus = get_subdir_regex(ROI_dir, 'Tinnitus_Meta');
 path_masks_Alert    = get_subdir_regex(ROI_dir, 'Alerting_effect');
+path_masks_ANT      = get_subdir_regex(ROI_dir, 'ANT_Model_Petersen_Posner');
 
 par.roi_type.mask_global = {
 %     % path                                                           abbrev          description
-       char(get_subdir_regex_files(path_masks_Tinnitus, 'ParaHipp')), 'ParaHipp',  'Bilateral_ParaHippocampus'
+%        char(get_subdir_regex_files(path_masks_Tinnitus, 'ParaHipp')), 'ParaHipp',  'Bilateral_ParaHippocampus'
+       char(get_subdir_regex_files(ROI_dir, 'Parahippocampus_L')),         'ParaHipp_l',  'Left_ParaHippocampus'
+       char(get_subdir_regex_files(ROI_dir, 'Parahippocampus_R')),         'ParaHipp_r',  'Right_ParaHippocampus'
+%        char(get_subdir_regex_files(path_masks_ANT, 'ACC')),           'ACC',       'Bilateral_Anterior_Cingulate'
+       char(get_subdir_regex_files(ROI_dir, 'Cing_Ant_L')),         'ACC_l',     'Left_Anterior_Cingulate'
+       char(get_subdir_regex_files(ROI_dir, 'Cing_Ant_R')),         'ACC_r',     'Right_Anterior_Cingulate'
+       
+%        char(get_subdir_regex_files(ROI_dir, 'Heschl_R_L')),           'A1',        'Bilateral_Heschl_Gyrus'
+       char(get_subdir_regex_files(ROI_dir, 'A1_L')),               'A1_l',        'Left_Heschl_Gyrus'
+       char(get_subdir_regex_files(ROI_dir, 'A1_R')),               'A1_r',        'Right_Heschl_Gyrus'
 %        char(get_subdir_regex_files(path_masks_Tinnitus, 'BA_31')),    'BA_31',     'Brodmann_Area_31'
 % NOT ENOUGH SIGNAL IN 3T BOLD ACQUISITIONS SO AFTER RESLICING THE MASK, THE
 % MASK BECOMES EMPTY FOR MIDBRAIN STRUCTURES LIKE LC
@@ -47,8 +57,9 @@ par.roi_type.mask_global = {
 %        char(get_subdir_regex_files(path_masks_Alert, 'LC.nii')),          'LC',        'Bilateral_Locus_Coereleus'
 %        char(get_subdir_regex_files(path_masks_Alert, 'Frontal_Orb')),          'Orb_PFC',        'Combined_Orbital_Prefrontal_Cortex'
 
-       fullfile( path_masks_audio,  'Left_Auditory_activation_fwe05_0v_50subj.nii'), 'lAudio'   ,  'Left_Loca_Audio_activation'   
-       fullfile( path_masks_audio,  'Right_Auditory_activation_fwe05_0v_50subj.nii'), 'rAudio'   ,  'Right_Loca_Audio_activation'   
+%        fullfile( path_masks_audio,  'Left_Auditory_activation_fwe05_0v_50subj.nii'), 'lAudio'   ,  'Left_Loca_Audio_activation'   
+%        fullfile( path_masks_audio,  'Right_Auditory_activation_fwe05_0v_50subj.nii'), 'rAudio'   ,  'Right_Loca_Audio_activation'   
+
 %      fullfile(path_masks_nback, 'L_Parietal_fwe05.nii') , 'l_parietal_nback', 'Left_activation_nback_parietal'
 %      fullfile(path_masks_nback, 'R_Parietal_fwe05.nii') , 'r_parietal_nback', 'Right_activation_nback_parietal'
 %      fullfile(path_masks_nback, 'L_MFG_fwe05.nii')      , 'l_MedialFG_nback', 'Left_activation_nback_frontal'
@@ -70,7 +81,9 @@ par.roi_type.mask_global = {
 par.roi_type.sphere_global = {
 %     % [x y z]mm      radius(mm)   abbrev    fullname
         [+2,-42,+32],  15,          'Cingulate', 'Cingulate_Cluster1_Moring2022'
-        [-26,+46,-2],  10,          'OFC', 'Orbitofrontal_Cortex_Cluster_Haupt2019'
+
+%         [-26,+46,-2],  10,          'OFC', 'Orbitofrontal_Cortex_Cluster_Haupt2019'
+
 %     [ -14,+4,-3 ],   3,          's3lGPe', 's3 left GPe'
 %     [ -15,-2,-4 ],   2,          's2lGPi', 's2 left GPi'
     };
