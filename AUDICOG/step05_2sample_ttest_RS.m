@@ -13,8 +13,8 @@ ROIs = {'ParaHipp_l','ParaHipp_r','ACC_l','ACC_r','A1_l','A1_r','Cingulate'}; %b
 
 %  1: rsfc_pca_audio2_pca_emo2_att1_att2 2: rsfc_pca_audio2 3: rsfc_pca_emo2_att1_att2 4: rsfc_pca_audio1_audio2 5: rsfc_pca_emo1_emo2_att1_att2 6:rsfc_pca_att1_att2_emo1_emo2 7:'rsfc_plsda_att1_att2_emo' 8:'rsfc_plsda_emo_att1_att2' 9:'rsfc_plsda_hearloss' 10:'rsfc_plsda_audio_emo_double_att_inter' 11:'rsfc_plsda_audio1_emo1_double_att' 12:'rsfc_plsda_audio_emo_double_cogni' 13:'rsfc_plsda_audio_emo_att_mem_inter' 14:'rsfc_plsda_audio_emo_att_mem' 15:'rsfc_plsda_audio_emo_cogni1_inter' 16:'rsfc_plsda_audio_emo_cogni1' 17:'rsfc_plsda_audio_emo_inter' 18:'rsfc_plsda_audio_emo' 19:'rsfc_verif_ANT_RT_STD_pca_audio1_emo1' 20:'rsfc_verif_Alert_pca_audio1_emo1' 21: 'rsfc_verif_ANT_RT_STD_wo_pca' 22: 'rsfc_verif_Alert_wo_pca' 23: 'rsfc_verif_double_Alert_STD_RT_pca_covariates'  24: 'rsfc_verif_double_Alert_STD_RT_wo_pca'rsfc_verif_Alert_pca_covariates' 21:'rsfc_verif_ANT_RT_STD_wo_pca' 22:'rsfc_verif_Alert_wo_pca' 23:'rsfc_verif_double_pca_covariates' 24:'rsfc_verif_double_wo_pca'
                                 %1                                                          %2                          %3                                                      %4                                        %5                                                    %6                                                              %7                                                  %8                                                      %9                              %10                                                                         %11                                                                                 %12                                                                      %13                                                            %14                                                                         %15                                                        %16                                                          %17                                                     %18                                         %19                                                             %20                                                               %21                           %22                                     %23                                                                                     %24
-models.names = {    'rsfc_pca_audio2_pca_emo2_att1_att2',                           'rsfc_pca_audio2',          'rsfc_pca_emo2_att1_att2',                       'rsfc_pca_audio1_audio2',                  'rsfc_pca_emo1_emo2_att1_att2',                             'rsfc_pca_att1_att2_emo1_emo2',                             'rsfc_plsda_att1_att2_emo',                             'rsfc_plsda_emo_att1_att2',                             'rsfc_plsda_hearloss',           'rsfc_plsda__audio_emo_double_att_inter',                                           'rsfc_plsda_audio1_emo1_double_att',                                       'rsfc_plsda_audio_emo_double_cogni',                                         'rsfc_plsda_audio_emo_att_mem_inter',                             'rsfc_plsda_audio_emo_att_mem',                                                  'rsfc_plsda_audio_emo_cogni1_inter',                      'rsfc_plsda_audio_emo_cogni1',                  'rsfc_plsda_audio_emo_inter',                    'rsfc_plsda_audio_emo',                              'rsfc_verif_ANT_RT_STD_pca_audio1_emo1',                     'rsfc_verif_Alert_pca_audio1_emo1',                              'rsfc_verif_ANT_RT_STD_wo_pca',   'rsfc_verif_Alert_wo_pca',          'rsfc_verif_double_Alert_STD_RT_pca_covariates',                                     'rsfc_verif_double_Alert_STD_RT_wo_pca'};
-models.covarnames = {{'Age','Genre','pca_audio2','pca_emo2','pca_att1','pca_att2'},{'Age','Genre','pca_audio2'},{'Age','Genre','pca_emo2','pca_att1','pca_att2'},{'Age','Genre','pca_audio1','pca_audio2'},{'Age','Genre','pca_emo1','pca_emo2','pca_att1','pca_att2'},{'Age','Genre','pca_att1','pca_att2','pca_emo1','pca_emo2'},{'Age','Genre','plsda_att1','plsda_att2','plsda_emo1'},{'Age','Genre','plsda_emo1','plsda_att1','plsda_att2'},{'Age','Genre','plsda_HFaudio1'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_att1','plsda_att2'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_att1','plsda_att2'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_cogni1','plsda_cogni2'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_att1','plsda_mem1'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_att1','plsda_mem1'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_cogni1'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_cogni1'},{'Age','Genre','plsda_HFaudio1','plsda_emotionnel1'},{'Age','Genre','plsda_HFaudio1','plsda_emotionnel1'},{'Age','Genre','pca_audio1','pca_emotionnel1','STD_RT_ANT'},{'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting'},{'Age','Genre','STD_RT_ANT'},{'Age','Genre','log_ANT_RT_Alerting'},{'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting','STD_RT_ANT'},{'Age','Genre','log_ANT_RT_Alerting','STD_RT_ANT'}};
+models.names = {    'rsfc_pca_audio2_pca_emo2_att1_att2_no_interaction',           'rsfc_pca_audio2_pca_emo2_att1_att2',                           'rsfc_pca_audio2',          'rsfc_pca_emo2_att1_att2',                       'rsfc_pca_audio1_audio2',                  'rsfc_pca_emo1_emo2_att1_att2',                             'rsfc_pca_att1_att2_emo1_emo2',                             'rsfc_plsda_att1_att2_emo',                             'rsfc_plsda_emo_att1_att2',                             'rsfc_plsda_hearloss',           'rsfc_plsda__audio_emo_double_att_inter',                                           'rsfc_plsda_audio1_emo1_double_att',                                       'rsfc_plsda_audio_emo_double_cogni',                                         'rsfc_plsda_audio_emo_att_mem_inter',                             'rsfc_plsda_audio_emo_att_mem',                                                  'rsfc_plsda_audio_emo_cogni1_inter',                      'rsfc_plsda_audio_emo_cogni1',                  'rsfc_plsda_audio_emo_inter',                    'rsfc_plsda_audio_emo',                              'rsfc_verif_ANT_RT_STD_pca_audio1_emo1',                     'rsfc_verif_Alert_pca_audio1_emo1',                              'rsfc_verif_ANT_RT_STD_wo_pca',   'rsfc_verif_Alert_wo_pca',          'rsfc_verif_double_Alert_STD_RT_pca_covariates',                                     'rsfc_verif_double_Alert_STD_RT_wo_pca'};
+models.covarnames = {{'Age','Genre','pca_audio2','pca_emo2','pca_att1','pca_att2'},{'Age','Genre','pca_audio2','pca_emo2','pca_att1','pca_att2'},{'Age','Genre','pca_audio2'},{'Age','Genre','pca_emo2','pca_att1','pca_att2'},{'Age','Genre','pca_audio1','pca_audio2'},{'Age','Genre','pca_emo1','pca_emo2','pca_att1','pca_att2'},{'Age','Genre','pca_att1','pca_att2','pca_emo1','pca_emo2'},{'Age','Genre','plsda_att1','plsda_att2','plsda_emo1'},{'Age','Genre','plsda_emo1','plsda_att1','plsda_att2'},{'Age','Genre','plsda_HFaudio1'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_att1','plsda_att2'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_att1','plsda_att2'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_cogni1','plsda_cogni2'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_att1','plsda_mem1'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_att1','plsda_mem1'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_cogni1'},{'Age','Genre','plsda_HFaudio1','plsda_emo1','plsda_cogni1'},{'Age','Genre','plsda_HFaudio1','plsda_emotionnel1'},{'Age','Genre','plsda_HFaudio1','plsda_emotionnel1'},{'Age','Genre','pca_audio1','pca_emotionnel1','STD_RT_ANT'},{'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting'},{'Age','Genre','STD_RT_ANT'},{'Age','Genre','log_ANT_RT_Alerting'},{'Age','Genre','pca_audio1','pca_emotionnel1','log_ANT_RT_Alerting','STD_RT_ANT'},{'Age','Genre','log_ANT_RT_Alerting','STD_RT_ANT'}};
     
 cd (project_dir)
 
@@ -86,7 +86,7 @@ groups.name = {'Control' 'Tinnitus'};
 groups.val = cell(size(ROIs));
 
 %% Choose  the model you want to apply : accordingly to the desired number of covariates
-imodel = 1; %  %  %  1: rsfc_pca_audio2_pca_emo2_att1_att2 2: rsfc_pca_audio2 3: rsfc_pca_emo2_att1_att2 4: rsfc_pca_audio1_audio2 5: rsfc_pca_emo1_emo2_att1_att2 6:rsfc_pca_att1_att2_emo1_emo2 7:'rsfc_plsda_att1_att2_emo' 8:'rsfc_plsda_emo_att1_att2' 9:'rsfc_plsda_hearloss' 10:'rsfc_plsda_audio_emo_double_att_inter' 11:'rsfc_plsda_audio1_emo1_double_att' 12:'rsfc_plsda_audio_emo_double_cogni' 13:'rsfc_plsda_audio_emo_att_mem_inter' 14:'rsfc_plsda_audio_emo_att_mem' 15:'rsfc_plsda_audio_emo_cogni1_inter' 16:'rsfc_plsda_audio_emo_cogni1' 17:'rsfc_plsda_audio_emo_inter' 18:'rsfc_plsda_audio_emo' 19:'rsfc_verif_ANT_RT_STD_pca_audio1_emo1' 20:'rsfc_verif_Alert_pca_audio1_emo1' 21: 'rsfc_verif_ANT_RT_STD_wo_pca' 22: 'rsfc_verif_Alert_wo_pca' 23: 'rsfc_verif_double_Alert_STD_RT_pca_covariates'  24: 'rsfc_verif_double_Alert_STD_RT_wo_pca'
+imodel = 1; %  %  %  1:rsfc_pca_audio2_pca_emo2_att1_att2_no_interaction 1: rsfc_pca_audio2_pca_emo2_att1_att2 2: rsfc_pca_audio2 3: rsfc_pca_emo2_att1_att2 4: rsfc_pca_audio1_audio2 5: rsfc_pca_emo1_emo2_att1_att2 6:rsfc_pca_att1_att2_emo1_emo2 7:'rsfc_plsda_att1_att2_emo' 8:'rsfc_plsda_emo_att1_att2' 9:'rsfc_plsda_hearloss' 10:'rsfc_plsda_audio_emo_double_att_inter' 11:'rsfc_plsda_audio1_emo1_double_att' 12:'rsfc_plsda_audio_emo_double_cogni' 13:'rsfc_plsda_audio_emo_att_mem_inter' 14:'rsfc_plsda_audio_emo_att_mem' 15:'rsfc_plsda_audio_emo_cogni1_inter' 16:'rsfc_plsda_audio_emo_cogni1' 17:'rsfc_plsda_audio_emo_inter' 18:'rsfc_plsda_audio_emo' 19:'rsfc_verif_ANT_RT_STD_pca_audio1_emo1' 20:'rsfc_verif_Alert_pca_audio1_emo1' 21: 'rsfc_verif_ANT_RT_STD_wo_pca' 22: 'rsfc_verif_Alert_wo_pca' 23: 'rsfc_verif_double_Alert_STD_RT_pca_covariates'  24: 'rsfc_verif_double_Alert_STD_RT_wo_pca'
 for imodel = 1:24
     sprintf('Model %s chosen',models.names{imodel})
     sprintf('Covariates to be used are %s %s %s %s %s %s', models.covarnames{imodel}{:})
@@ -125,113 +125,119 @@ for imodel = 1:24
                         scans{igroup}.cov{j,4} = tab.emo_pca2(tab.code_IRM == id);
                         scans{igroup}.cov{j,5} = tab.cogni_pca1(tab.code_IRM == id);
                         scans{igroup}.cov{j,6} = tab.cogni_pca2(tab.code_IRM == id);
-                        par.intercov = [1,1,2,2,2,2];
+                        par.intercov = [1,1,1,1,1,1];
                     elseif imodel == 2
                         scans{igroup}.cov{j,3} = tab.audio_pca2(tab.code_IRM == id);
-                        par.intercov = [1,1,2];
+                        scans{igroup}.cov{j,4} = tab.emo_pca2(tab.code_IRM == id);
+                        scans{igroup}.cov{j,5} = tab.cogni_pca1(tab.code_IRM == id);
+                        scans{igroup}.cov{j,6} = tab.cogni_pca2(tab.code_IRM == id);
+                        par.intercov = [1,1,2,2,2,2];
                     elseif imodel == 3
+                        scans{igroup}.cov{j,3} = tab.audio_pca2(tab.code_IRM == id);
+                        par.intercov = [1,1,2];
+                    elseif imodel == 4
                         scans{igroup}.cov{j,3} = tab.emo_pca2(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.cogni_pca1(tab.code_IRM == id);
                         scans{igroup}.cov{j,5} = tab.cogni_pca2(tab.code_IRM == id);
                         par.intercov = [1,1,2,2,2];
-                    elseif imodel == 4
+                    elseif imodel == 5
                         scans{igroup}.cov{j,3} = tab.audio_pca1(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.audio_pca2(tab.code_IRM == id);
                         par.intercov = [1,1,2,2];
-                    elseif imodel == 5
+                    elseif imodel == 6
                         scans{igroup}.cov{j,3} = tab.emo_pca1(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.emo_pca2(tab.code_IRM == id);
                         scans{igroup}.cov{j,5} = tab.cogni_pca1(tab.code_IRM == id);
                         scans{igroup}.cov{j,6} = tab.cogni_pca2(tab.code_IRM == id);                    
                         par.intercov = [1,1,2,2,2,2];
-                    elseif imodel == 6
+                    elseif imodel == 7
                         scans{igroup}.cov{j,3} = tab.cogni_pca1(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.cogni_pca2(tab.code_IRM == id);
                         scans{igroup}.cov{j,5} = tab.emo_pca1(tab.code_IRM == id);
                         scans{igroup}.cov{j,6} = tab.emo_pca2(tab.code_IRM == id);                    
                         par.intercov = [1,1,2,2,2,2];
-                    elseif imodel == 7
+                    elseif imodel == 8
                         scans{igroup}.cov{j,3} = tab.plsda_att1(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.plsda_att2(tab.code_IRM == id);
                         scans{igroup}.cov{j,5} = tab.plsda_emo1(tab.code_IRM == id);                    
                         par.intercov = [1,1,2,2,2];
-                    elseif imodel == 8
+                    elseif imodel == 9
                         scans{igroup}.cov{j,3} = tab.plsda_emo1(tab.code_IRM == id);                    
                         scans{igroup}.cov{j,4} = tab.plsda_att1(tab.code_IRM == id);
                         scans{igroup}.cov{j,5} = tab.plsda_att2(tab.code_IRM == id);
                         par.intercov = [1,1,2,2,2];
-                    elseif imodel == 9
+                    elseif imodel == 10
                         scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);                
                         par.intercov = [1,1,2];
-                    elseif imodel == 10
-                        scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
-                        scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
-                        scans{igroup}.cov{j,5} = tab.plsda_att1(tab.code_IRM == id);
-                        scans{igroup}.cov{j,6} = tab.plsda_att2(tab.code_IRM == id);
-                        par.intercov = [1,1,2,2,2,2];
                     elseif imodel == 11
                         scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
                         scans{igroup}.cov{j,5} = tab.plsda_att1(tab.code_IRM == id);
                         scans{igroup}.cov{j,6} = tab.plsda_att2(tab.code_IRM == id);
-                        par.intercov = [1,1,1,1,1,1];
+                        par.intercov = [1,1,2,2,2,2];
                     elseif imodel == 12
+                        scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
+                        scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
+                        scans{igroup}.cov{j,5} = tab.plsda_att1(tab.code_IRM == id);
+                        scans{igroup}.cov{j,6} = tab.plsda_att2(tab.code_IRM == id);
+                        par.intercov = [1,1,1,1,1,1];
+                    elseif imodel == 13
                         scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
                         scans{igroup}.cov{j,5} = tab.plsda_cogni1(tab.code_IRM == id);
                         scans{igroup}.cov{j,6} = tab.plsda_cogni2(tab.code_IRM == id);
                         par.intercov = [1,1,1,1,1,1];
-                    elseif imodel == 13
-                        scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
-                        scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
-                        scans{igroup}.cov{j,5} = tab.plsda_att1(tab.code_IRM == id);
-                        scans{igroup}.cov{j,6} = tab.plsda_mem1(tab.code_IRM == id);
-                        par.intercov = [2,2,1,2,2,1];
                     elseif imodel == 14
                         scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
                         scans{igroup}.cov{j,5} = tab.plsda_att1(tab.code_IRM == id);
                         scans{igroup}.cov{j,6} = tab.plsda_mem1(tab.code_IRM == id);
-                        par.intercov = [1,1,1,1,1,1];
+                        par.intercov = [2,2,1,2,2,1];
                     elseif imodel == 15
                         scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
-                        scans{igroup}.cov{j,5} = tab.plsda_cogni1(tab.code_IRM == id);
-                        par.intercov = [1,1,2,2,2];
+                        scans{igroup}.cov{j,5} = tab.plsda_att1(tab.code_IRM == id);
+                        scans{igroup}.cov{j,6} = tab.plsda_mem1(tab.code_IRM == id);
+                        par.intercov = [1,1,1,1,1,1];
                     elseif imodel == 16
                         scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
                         scans{igroup}.cov{j,5} = tab.plsda_cogni1(tab.code_IRM == id);
-                        par.intercov = [1,1,1,1,1];
+                        par.intercov = [1,1,2,2,2];
                     elseif imodel == 17
                         scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
-                        par.intercov = [1,1,2,2];
+                        scans{igroup}.cov{j,5} = tab.plsda_cogni1(tab.code_IRM == id);
+                        par.intercov = [1,1,1,1,1];
                     elseif imodel == 18
                         scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
-                        par.intercov = [1,1,1,1];
+                        par.intercov = [1,1,2,2];
                     elseif imodel == 19
+                        scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
+                        scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
+                        par.intercov = [1,1,1,1];
+                    elseif imodel == 20
                         scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
                         scans{igroup}.cov{j,5} = tab.ANT_STD_mean(tab.code_IRM == id);
                         par.intercov = [1,1,1,1,2];
-                    elseif imodel == 20
+                    elseif imodel == 21
                         scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
                         scans{igroup}.cov{j,5} = tab.ANT_S_Alerting(tab.code_IRM == id);
                         par.intercov = [1,1,1,1,2];
-                    elseif imodel == 23
+                    elseif imodel == 24
                         scans{igroup}.cov{j,3} = tab.plsda_HFaudio1(tab.code_IRM == id);
                         scans{igroup}.cov{j,4} = tab.plsda_emo1(tab.code_IRM == id);
                         scans{igroup}.cov{j,5} = tab.ANT_S_Alerting(tab.code_IRM == id);
                         scans{igroup}.cov{j,6} = tab.ANT_STD_mean(tab.code_IRM == id);
                         par.intercov = [1,1,1,1,2,2];
                     end
-                elseif imodel == 21 % No PCA covars included
+                elseif imodel == 22 % No PCA covars included
                     scans{igroup}.cov{j,3} = tab.ANT_STD_mean(tab.code_IRM == id);
                     par.intercov = [1,1,2];
-                elseif imodel == 22
+                elseif imodel == 23
                     scans{igroup}.cov{j,3} = tab.ANT_S_Alerting(tab.code_IRM == id);
                     par.intercov = [1,1,2];
                 else
@@ -348,7 +354,49 @@ for imodel = 1:24
     % Single variable of interest
     % F-stat
     switch(imodel) % %  %  1: rsfc_pca_audio2_pca_emo2_att1_att2 2: rsfc_pca_audio2 3: rsfc_pca_emo2_att1_att2 4: rsfc_pca_audio1_audio2 5: rsfc_pca_emo1_emo2_att1_att2 6:rsfc_pca_att1_att2_emo1_emo2 7:'rsfc_plsda_att1_att2_emo' 8:'rsfc_plsda_emo_att1_att2' 9:'rsfc_plsda_hearloss' 10:'rsfc_plsda_audio_emo_double_att_inter' 11:'rsfc_plsda_audio1_emo1_double_att' 12:'rsfc_plsda_audio_emo_double_cogni' 13:'rsfc_plsda_audio_emo_att_mem_inter' 14:'rsfc_plsda_audio_emo_att_mem' 15:'rsfc_plsda_audio_emo_cogni1_inter' 16:'rsfc_plsda_audio_emo_cogni1' 17:'rsfc_plsda_audio_emo_inter' 18:'rsfc_plsda_audio_emo' 19:'rsfc_verif_ANT_RT_STD_pca_audio1_emo1' 20:'rsfc_verif_Alert_pca_audio1_emo1' 21: 'rsfc_verif_ANT_RT_STD_wo_pca' 22: 'rsfc_verif_Alert_wo_pca' 23: 'rsfc_verif_double_Alert_STD_RT_pca_covariates'  24: 'rsfc_verif_double_Alert_STD_RT_wo_pca'
-        case 1 % with scaled PCAs Audio2 & Emo2 & Att1 & Att2 Interaction
+        case 1 % with scaled PCAs Audio2 & Emo2 & Att1 & Att2 wo-Interaction
+            clear contrast_F
+            clear contrast
+            disp('Interest PCAs variables model : audio2, emo 2, double cogni')
+            Main_seed_effect = [1 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0];
+            %Control_Tinnitus = [1 0 0 0 0 0 0 0 0 0 0 0 ; 0 -1 0 0 0 0 0 0 0 0 0 0];
+            %Tinnitus_Control = [-1 0 0 0 0 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0 0 0 0 0];
+
+            Main_effect_Audio2     = [0 0 0 0 1 0 0 0];
+            Main_effect_Emotion2   = [0 0 0 0 0 1 0 0];
+            Main_effect_Attention1 = [0 0 0 0 0 0 1 0];
+            Main_effect_Attention2 = [0 0 0 0 0 0 0 1];
+            Main_effect_Age        = [0 0 1 0 0 0 0 0];
+            Main_effect_Sex        = [0 0 0 1 0 0 0 0];
+            
+
+            contrast_F.names = {
+                'Main_Seed_Effect'
+                'Main_effect_Audio2'
+                'Main_effect_Emotion2'
+                'Main_effect_Attention1'
+                'Main_effect_Attention2'
+                'Main_effect_Age'
+                'Main_effect_Sex'
+                }';
+
+            contrast_F.values = {
+                Main_seed_effect
+                Main_effect_Audio2
+                Main_effect_Emotion2
+                Main_effect_Attention1
+                Main_effect_Attention2
+                Main_effect_Age
+                Main_effect_Sex
+                }';
+            contrast_F.types = cat(1,repmat({'F'},[1,length(contrast_F.names)]));
+
+            contrast.names  = [contrast_T.names contrast_F.names ];
+            contrast.values = [contrast_T.values contrast_F.values];
+            contrast.types  = [contrast_T.types contrast_F.types];
+            
+            
+        case 2 % with scaled PCAs Audio2 & Emo2 & Att1 & Att2 Interaction
             clear contrast_F
             clear contrast
             disp('Interest PCAs variables model : audio2, emo 2, double cogni')
@@ -403,7 +451,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
             
             
-        case 2 % with PCA Audio2 Interaction
+        case 3 % with PCA Audio2 Interaction
             clear contrast_F
             clear contrast
             disp('Interest scaled PCAs variables model : double audio')
@@ -438,7 +486,7 @@ for imodel = 1:24
             contrast.values = [contrast_T.values contrast_F.values];
             contrast.types  = [contrast_T.types contrast_F.types];
             
-        case 3 % with scaled PCAs Emo2 & Att1 & Att2 Interaction
+        case 4 % with scaled PCAs Emo2 & Att1 & Att2 Interaction
             clear contrast_F
             clear contrast
             disp('Interest PLS-DAs variables model : double cogni')
@@ -486,7 +534,7 @@ for imodel = 1:24
             contrast.values = [contrast_T.values contrast_F.values];
             contrast.types  = [contrast_T.types contrast_F.types];
 
-        case 4 % with PCAs Audio1 & Audio2 Interaction
+        case 5 % with PCAs Audio1 & Audio2 Interaction
             clear contrast_F
             clear contrast
             disp('Interest scaled PCAs variables model : double audio')
@@ -527,7 +575,7 @@ for imodel = 1:24
             contrast.values = [contrast_T.values contrast_F.values];
             contrast.types  = [contrast_T.types contrast_F.types];
 
-        case 5 % with scaled PCAs Emo1 & Emo2 & Att1 & Att2 Interaction
+        case 6 % with scaled PCAs Emo1 & Emo2 & Att1 & Att2 Interaction
             clear contrast_F
             clear contrast
             disp('Interest PCAs variables model : double emo, double cogni')
@@ -581,7 +629,7 @@ for imodel = 1:24
             contrast.values = [contrast_T.values contrast_F.values];
             contrast.types  = [contrast_T.types contrast_F.types];
 
-        case 6 % with scaled PCAs Att1 & Att2 & Emo1 & Emo2 Interaction
+        case 7 % with scaled PCAs Att1 & Att2 & Emo1 & Emo2 Interaction
             clear contrast_F
             clear contrast
             disp('Interest PCAs variables model : double cogni, double emo')
@@ -636,7 +684,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
         % 7:'rsfc_plsda_att1_att2_emo'
-        case 7 % with PLSDAs Att1 & Att2 & Emo Interaction
+        case 8 % with PLSDAs Att1 & Att2 & Emo Interaction
             clear contrast_F
             clear contrast
             disp('Interest PLS-DAs variables model : double cogni, emo')
@@ -685,7 +733,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             %8:'rsfc_plsda_emo_att1_att2' 
-        case 8 % with PLSDAs Emo & Att1 & Att2 Interaction
+        case 9 % with PLSDAs Emo & Att1 & Att2 Interaction
             clear contrast_F
             clear contrast
             disp('Interest PLS-DAs variables model : double cogni, emo')
@@ -734,7 +782,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
         
         %9:'rsfc_plsda_hearloss' 
-        case 9 % with PLSDAs Hearing Interaction
+        case 10 % with PLSDAs Hearing Interaction
             clear contrast_F
             clear contrast
             disp('Interest PLS-DAs variables model : hearing')
@@ -771,7 +819,7 @@ for imodel = 1:24
         
         
         %10:'rsfc_plsda_audio_emo_double_att_inter' 
-        case 10 % with PLSDAs Hearing & Emo & Att1 & Att2 Interaction
+        case 11 % with PLSDAs Hearing & Emo & Att1 & Att2 Interaction
             clear contrast_F
             clear contrast
             disp('Interest PLS-DAs variables model : audio, emo, double cogni')
@@ -826,7 +874,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             % 11:'rsfc_plsda_audio1_emo1_double_att' 
-        case 11 % with PLSDAs Hearing & Emo & Att1 & Att2
+        case 12 % with PLSDAs Hearing & Emo & Att1 & Att2
             clear contrast_F
             clear contrast
             disp('Interest PLS-DAs variables model : audio, emo, double cogni no interaction')
@@ -867,7 +915,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             %12:'rsfc_plsda_audio_emo_double_cogni' 
-        case 12 % with PLSDAs Hearing & Emo & Cogni1 & Cogni2
+        case 13 % with PLSDAs Hearing & Emo & Cogni1 & Cogni2
             clear contrast_F
             clear contrast
             disp('Interest PLS-DAs variables model : double cogni')
@@ -908,7 +956,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             %13:'rsfc_plsda_audio_emo_att_mem_inter' 
-        case 13 % with PLSDAs Hearing & Emo & Att & Mem Interaction
+        case 14 % with PLSDAs Hearing & Emo & Att & Mem Interaction
             clear contrast_F
             clear contrast
             disp('PLSD-A HL & Emo & Att & Mem Interaction model')
@@ -963,7 +1011,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             %14:'rsfc_plsda_audio_emo_att_mem' 
-        case 14 % with PLSDAs Hearing & Emo & Att & Mem
+        case 15 % with PLSDAs Hearing & Emo & Att & Mem
             clear contrast_F
             clear contrast
             disp('No interest variable model with PLS-DAs')
@@ -1004,7 +1052,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             % 15:'rsfc_plsda_audio_emo_cogni1_inter' 
-        case 15 % with PLSDAs Hearing & Emo & Cogni Interaction
+        case 16 % with PLSDAs Hearing & Emo & Cogni Interaction
             clear contrast_F
             clear contrast
             disp('No interest variable model with PLS-DAs')
@@ -1052,7 +1100,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             %16:'rsfc_plsda_audio_emo_cogni1' 
-        case 16 % with PLSDAs Hearing & Emo & Cogni
+        case 17 % with PLSDAs Hearing & Emo & Cogni
             clear contrast_F
             clear contrast
             disp('No interest variable model with PLS-DAs')
@@ -1090,7 +1138,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             %17:'rsfc_plsda_audio_emo_inter' 
-        case 17 % with PLSDAs & Interaction
+        case 18 % with PLSDAs & Interaction
             clear contrast_F
             clear contrast
             disp('Emo & Hearing as interest variables')
@@ -1132,7 +1180,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             %18:'rsfc_plsda_audio_emo' 
-        case 18 % with PCAs
+        case 19 % with PCAs
             clear contrast_F
             clear contrast
             disp('No interest variable model with PLS-DAs')
@@ -1167,7 +1215,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             %19:'rsfc_verif_ANT_RT_STD_pca_audio1_emo1' 
-        case 19 % with PCAs
+        case 20 % with PCAs
             clear contrast_F
             clear contrast
             disp('Single variable models with PCAs')
@@ -1208,7 +1256,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             %20:'rsfc_verif_Alert_pca_audio1_emo1' 
-        case 20
+        case 21
             clear contrast_F
             clear contrast
             Main_seed_effect                = [1 0 0 0 0 0 0 0 ; 0 1 0 0 0 0 0 0];
@@ -1245,7 +1293,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             %21: 'rsfc_verif_ANT_RT_STD_wo_pca' 
-        case 21 % Without PCAs
+        case 22 % Without PCAs
             clear contrast_F
             clear contrast
             disp('Single variable models without PCAs')
@@ -1277,7 +1325,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             %22: 'rsfc_verif_Alert_wo_pca' 
-        case 22
+        case 23
             clear contrast_F
             clear contrast
             Main_seed_effect                = [1 0 0 0 0 0 ; 0 1 0 0 0 0];
@@ -1308,7 +1356,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             %23: 'rsfc_verif_double_Alert_STD_RT_pca_covariates'  
-        case 23
+        case 24
             clear contrast_F
             clear contrast
             disp('Double variable models') % with PCA
@@ -1356,7 +1404,7 @@ for imodel = 1:24
             contrast.types  = [contrast_T.types contrast_F.types];
 
             %24: 'rsfc_verif_double_Alert_STD_RT_wo_pca'
-        case 24
+        case 25
             clear contrast_F
             clear contrast
             %without PCA
