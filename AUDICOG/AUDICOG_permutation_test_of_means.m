@@ -72,6 +72,8 @@ writetable(AUDICOG_permut_test_tab,'AUDICOG_seed2seed_CEN_permutation_test_20_05
 %% DMNETWORK
 Xmat = readtable(fullfile(main_dir, 'AUDICOG_23_01_25_distribution_ROI2ROI_DMN_Tinnitus_Alert_AudioACT.csv'));
 Xmat = readtable(fullfile(main_dir, 'AUDICOG_20_05_25_distribution_ROI2ROI_DMN_Tinnitus_Alert_AudioACT.csv'));
+Xmat = readtable(fullfile(main_dir, 'AUDICOG_20_07_25_distribution_ROI2ROI_DMN_hubs.csv'));
+Xmat = readtable(fullfile(main_dir, 'AUDICOG_30_08_25_distribution_ROI2ROI_DMN_united_CAREN.csv'));
 
 pval = [];
 obs_d = [];
@@ -96,7 +98,9 @@ AUDICOG_permut_test_tab = table(ROInames.',pval,obs_d,es);
 cd ('/network/iss/cenir/analyse/irm/studies/AUDICOG/Results/RS_seed2seed/')
 % writetable(AUDICOG_permut_test_tab,'AUDICOG_seed2seed_DMN_permutation_test_23_01_25.csv');
 % writetable(AUDICOG_permut_test_tab,'AUDICOG_seed2seed_DMN_permutation_test_13_05_25.csv');
-writetable(AUDICOG_permut_test_tab,'AUDICOG_seed2seed_DMN_permutation_test_20_05_25.csv');
+% writetable(AUDICOG_permut_test_tab,'AUDICOG_seed2seed_DMN_permutation_test_20_05_25.csv');
+% writetable(AUDICOG_permut_test_tab,'AUDICOG_seed2seed_DMN_hubs_permutation_test_20_07_25.csv');
+writetable(AUDICOG_permut_test_tab,'AUDICOG_seed2seed_DMN_united_CAREN_permutation_test_30_08_25.csv');
 
 %% 3 NETWORKS
 Xmat = readtable(fullfile(main_dir, 'AUDICOG_23_01_25_distribution_ROI2ROI_SN_CEN_DMN.csv'));
