@@ -43,12 +43,26 @@ par.roi_type.mask_global = {
        char(get_subdir_regex_files(ROI_dir, 'Parahippocampus_L')),         'ParaHipp_l',  'Left_ParaHippocampus'
        char(get_subdir_regex_files(ROI_dir, 'Parahippocampus_R')),         'ParaHipp_r',  'Right_ParaHippocampus'
 %        char(get_subdir_regex_files(path_masks_ANT, 'ACC')),           'ACC',       'Bilateral_Anterior_Cingulate'
-       char(get_subdir_regex_files(ROI_dir, 'Cing_Ant_L')),         'ACC_l',     'Left_Anterior_Cingulate'
-       char(get_subdir_regex_files(ROI_dir, 'Cing_Ant_R')),         'ACC_r',     'Right_Anterior_Cingulate'
+       char(get_subdir_regex_files(ROI_dir, 'Cing_Ant_L')),                'ACC_l',     'Left_Anterior_Cingulate'
+       char(get_subdir_regex_files(ROI_dir, 'Cing_Ant_R')),                'ACC_r',     'Right_Anterior_Cingulate'
+
+       char(get_subdir_regex_files(ROI_dir, 'Pariet_Inf_L')),              'Pariet_Inf_l',     'Left_Inferior_Parietal'
+       char(get_subdir_regex_files(ROI_dir, 'Pariet_Inf_R')),              'Pariet_Inf_r',     'Right_Inferior_Parietal'
+
+       char(get_subdir_regex_files(ROI_dir, 'Temp_Mid_L')),                'Temp_Mid_l',     'Left_Middle_Temporal'
+       char(get_subdir_regex_files(ROI_dir, 'Temp_Mid_R')),                'Temp_Mid_r',     'Right_Middle_Temporal'
+       
+       char(get_subdir_regex_files(ROI_dir, 'Front_Inf_L')),                'Front_Inf_l',     'Left_Inferior_Frontal'
+       char(get_subdir_regex_files(ROI_dir, 'Front_Inf_R')),                'Front_Inf_r',     'Right_Inferior_Frontal'
+
+       char(get_subdir_regex_files(ROI_dir, 'Precuneus_L')),                'Precuneus_l',     'Left_Precuneus'
+       char(get_subdir_regex_files(ROI_dir, 'Precuneus_R')),                'Precuneus_r',     'Right_Precuneus'
+
        
 %        char(get_subdir_regex_files(ROI_dir, 'Heschl_R_L')),           'A1',        'Bilateral_Heschl_Gyrus'
-       char(get_subdir_regex_files(ROI_dir, 'A1_L')),               'A1_l',        'Left_Heschl_Gyrus'
-       char(get_subdir_regex_files(ROI_dir, 'A1_R')),               'A1_r',        'Right_Heschl_Gyrus'
+%        char(get_subdir_regex_files(ROI_dir, 'A1_L')),                      'A1_l',        'Left_Heschl_Gyrus'
+%        char(get_subdir_regex_files(ROI_dir, 'A1_R')),                      'A1_r',        'Right_Heschl_Gyrus'
+       
 %        char(get_subdir_regex_files(path_masks_Tinnitus, 'BA_31')),    'BA_31',     'Brodmann_Area_31'
 % NOT ENOUGH SIGNAL IN 3T BOLD ACQUISITIONS SO AFTER RESLICING THE MASK, THE
 % MASK BECOMES EMPTY FOR MIDBRAIN STRUCTURES LIKE LC
