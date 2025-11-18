@@ -37,8 +37,10 @@ par.mask_threshold  = 0.001;
 %% define ROI, using several methods
 
 % par.roi_type.atlas_cat12 = 'aal3';
-path_masks_PPN = get_subdir_regex(ROI_dir,'PPN');
-path_masks_SMN       = get_subdir_regex(ROI_dir, 'SMN');
+path_masks_PPN      = get_subdir_regex(ROI_dir,'PPN');
+path_masks_SMN      = get_subdir_regex(ROI_dir, 'SMN');
+path_masks_SMN_Cb   = get_subdir_regex(ROI_dir, 'SMN_Cereb');
+
 % path_masks_Assoc_BG       = get_subdir_regex(ROI_dir, 'Assoc_BG');
 % path_masks_Assoc_Post          = get_subdir_regex(ROI_dir, 'Assoc_Post');
 % path_masks_Assoc_Ant              = get_subdir_regex(ROI_dir, 'Assoc_Ant');
@@ -60,6 +62,11 @@ SMN.labels  = tab.label(tab.SMN(~isnan(tab.SMN)));
 SMN.abbrevs = tab.abbrev(tab.SMN(~isnan(tab.SMN)));
 SMN.idx = tab.id(tab.SMN(~isnan(tab.SMN)));
 
+
+SMN_Cereb.labels  = tab.label(tab.SMN_Cereb(~isnan(tab.SMN_Cereb)));
+SMN_Cereb.abbrevs = tab.abbrev(tab.SMN_Cereb(~isnan(tab.SMN_Cereb)));
+SMN_Cereb.idx = tab.id(tab.SMN_Cereb(~isnan(tab.SMN_Cereb)));
+
 % AssBG.labels  = tab.label(tab.Assoc_BG(~isnan(tab.Assoc_BG)));
 % AssBG.abbrevs = tab.abbrev(tab.Assoc_BG(~isnan(tab.Assoc_BG)));
 % AssBG.idx = tab.id(tab.Assoc_BG(~isnan(tab.Assoc_BG)));
@@ -80,8 +87,9 @@ SMN.idx = tab.id(tab.SMN(~isnan(tab.SMN)));
 % Primary.abbrevs = tab.abbrev(tab.Primary(~isnan(tab.Primary)));
 % Primary.idx = tab.id(tab.Primary(~isnan(tab.Primary)));
 
-PPN.skip = [];
-SMN.skip = [];
+PPN.skip       = [];
+SMN.skip       = [];
+SMN_Cereb.skip = [];
 % AssBG.skip = [];
 % AssAnt.skip = [];
 % AssPost.skip = [];
@@ -90,6 +98,7 @@ SMN.skip = [];
 
 atlas_rois_list_PPN = [];
 atlas_rois_list_SMN = [];
+atlas_rois_list_SMN_Cereb = [];
 % atlas_rois_list_AssBG = [];
 % atlas_rois_list_AssAnt = [];
 % atlas_rois_list_AssPost = [];
@@ -115,6 +124,17 @@ for iroi = 1 : length(SMN.labels)
             atlas_rois_list_SMN = [atlas_rois_list_SMN; char(get_subdir_regex_files(path_masks_SMN,sprintf('.*Reg%d.nii$',SMN.idx(iroi)))), SMN.abbrevs(iroi), SMN.labels(iroi)];
     else
         sprintf('Skipped region %d - not enough signal left after minimal denoising', SMN.idx(iroi))
+    end
+end
+
+for iroi = 1 : length(SMN_Cereb.labels)
+% nroi = dir(path_masks_Salience_CAREN);
+% for iroi = 1: length(nroi)-2
+    if ~ismember(SMN_Cereb.idx(iroi), SMN_Cereb.skip)
+                                %     % path                                                                                                abbrev             description
+            atlas_rois_list_SMN_Cereb = [atlas_rois_list_SMN_Cereb; char(get_subdir_regex_files(path_masks_SMN,sprintf('.*Reg%d.nii$',SMN_Cereb.idx(iroi)))), SMN_Cereb.abbrevs(iroi), SMN_Cereb.labels(iroi)];
+    else
+        sprintf('Skipped region %d - not enough signal left after minimal denoising', SMN_Cereb.idx(iroi))
     end
 end
 
@@ -184,7 +204,7 @@ end
 %% define all ROIs independently from the atlas
 % par.roi_type.mask_global = vertcat(atlas_rois_list_PPN, atlas_rois_list_SMN, atlas_rois_list_AssBG, atlas_rois_list_AssAnt, atlas_rois_list_AssPost, atlas_rois_list_Limbic, atlas_rois_list_Primary, {
 
-par.roi_type.mask_global = vertcat(atlas_rois_list_PPN, atlas_rois_list_SMN, {
+par.roi_type.mask_global = vertcat(atlas_rois_list_PPN, atlas_rois_list_SMN, atlas_rois_list_SMN_Cereb, {
 %     % path                                                           abbrev          description
    }) ;
 
@@ -197,8 +217,9 @@ TS = job_extract_timeseries(par);
 
 %% Define some networks : not mandatory
 
-par.network.PPN = PPN.abbrevs;
-par.network.SMN = SMN.abbrevs;
+par.network.PPN       = PPN.abbrevs;
+par.network.SMN       = SMN.abbrevs;
+par.network.SMN_Cereb = SMN_Cereb.abbrevs;
 % par.network.AssBG = AssBG.abbrevs;
 % par.network.AssAnt = AssAnt.abbrevs;
 % par.network.AssPost = AssPost.abbrevs;
@@ -224,7 +245,7 @@ for isubj = 1:length(e)
 %% part used to rename the files in the subject directories if one forgot to used the par.output_name in the rsfc - therefore for further copying we only need dst files
 %    src =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat') ;
 %     dst_cort = fullfile(e(isubj).getSerie('RS').path, 'rsfc/PPN_SMN_AssBG_AssAnt_AssPost_Limbic_Primary__static_conn__timeseries__Dystonic_PPN_SMN_AssBG_AssAnt_AssPost_Limbic_Primary.mat');
-    dst_cort = fullfile(e(isubj).getSerie('RS').path, 'rsfc/PPN_SMN__static_conn__timeseries__Dystonic_PPN_SMN.mat');
+    dst_cort = fullfile(e(isubj).getSerie('RS').path, 'rsfc/PPN_SMN_SMN_Cereb__static_conn__timeseries__Dystonic_PPN_SMN.mat');
 %     src2 =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/static_conn__timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat') ;
 %     src2 =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/static_conn__timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat') ;
 %     dst2_cort = fullfile(e(isubj).getSerie('RS').path,'rsfc/timeseries__Dystonic_PPN_SMN_AssBG_AssAnt_AssPost_Limbic_Primary.mat');
