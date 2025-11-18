@@ -34,8 +34,8 @@ rp = fullfile(e.getSerie('tedana').getPath(),'multiple_regressors.txt');
 
 % define input volumes and confounds
 clear par
-par.run             = 0;
-par.sge             = 1;
+par.run             = 1;
+par.sge             = 0;
 par.mem             = '16G';
 par.jobname         = 'timeseries_extract_AUDICOG_salience_tinnitus';
 par.jobname         = 'timeseries_extract_AUDICOG_cEx_tinnitus';
@@ -221,6 +221,7 @@ par.outname = 'Salience_Tinnitus_Alert_Audio';
 par.outname = 'Executive_Tinnitus_Alert_Audio';
 par.outname = 'DMN_Tinnitus_Alert_Audio';
 par.outname = 'SN_CEN_DMN_SMN_VIS_CAREN';
+par.outname = 'AUDICOG_CAREN_3Net';
 TS = job_extract_timeseries(par);
 
 %% Step 2: create correlation matrix
@@ -253,6 +254,34 @@ par.network.Vis = atlas_rois_list_Vis(:,2);
 TS = job_timeseries_to_connectivity_matrix(TS,par);
 
 %% plot
+% fichier de correspondance numero IRM - comportement - groupe - age
+cd(main_dir)
+d = readtable( [ './DATA/' , 'Correspondance_Numero_Comportement_IRM.csv' ])  ;
+
+% séparation des paths en fonction des groupes expérimentaux
+groups.name = {'Control','Tinnitus'};
+groups.TS = cell((length(e)/2),length(groups.name));
+groups.e  = cell((length(e)/2),length(groups.name));
+for igroup = 1:length(groups.name)
+    j = 0 ;
+    for iSubj = 1:length(e)
+        ifile = e(iSubj).name;
+        id = str2double(ifile(25:end)) ;
+        subj_group = d.Groupe(find(d.Num_IRM == id));
+
+        if subj_group == igroup
+            j = j + 1 ;
+            groups.TS{j,igroup} = TS(iSubj);
+            groups.e{j,igroup}  = e(iSubj);
+        end
+    end
+end    
+con_FC = vertcat(groups.TS{:,1});
+tin_FC = vertcat(groups.TS{:,2});
+
+control_guidata = plot_resting_state_connectivity_matrix(con_FC);
+tinnitus_guidata = plot_resting_state_connectivity_matrix(tin_FC);
+
 guidata = plot_resting_state_connectivity_matrix(TS, {e.getSerie('run_RS').getExam().name});
 
 %% Step 3: Perfrom seed-to-voxel correlation (seed == ROI)
@@ -274,6 +303,9 @@ for isubj = 1:length(e)
     dst_SN = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__Salience_Tinnitus_Alert_Audio.mat') ;
     dst_CEN = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__Executive_Tinnitus_Alert_Audio.mat') ;
     dst_DMN = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__DMN_Tinnitus_Alert_Audio.mat') ;
+
+    dst_3Net = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__AUDICOG_CAREN_3Net.mat') ;
+
 %     src2 =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/static_conn__timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat') ;
 %     src2 =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/static_conn__timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat') ;
     dst2_allnet = fullfile(e(isubj).getSerie('run_RS').path,'tedana009a1_vt/rsfc/SN_CEN_DMN_SMN_Vis__static_conn__timeseries__SN_CEN_DMN_SMN_VIS_CAREN.mat');
@@ -284,6 +316,7 @@ for isubj = 1:length(e)
     dst2_CEN = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/CEN__static_conn__timeseries__Executive_Tinnitus_Alert_Audio.mat') ;
     dst2_DMN = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/DMN__static_conn__timeseries__DMN_Tinnitus_Alert_Audio.mat') ;
         
+    dst2_3Net = fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/SN_CEN_DMN__static_conn__timeseries__AUDICOG_CAREN_3Net.mat') ;
 %     if exist(src, 'file')
 %         movefile(src, dst);
 %         movefile(src2, dst2);
@@ -319,6 +352,14 @@ for isubj = 1:length(e)
           if ~exist(dst2_DMN,'file')
               fprintf('expected file "%s" not found\n', dst2_DMN);
           end
+          
+          if ~exist(dst_3Net,'file')
+              fprintf('expected file "%s" not found\n', dst2_3Net);
+          end
+          if ~exist(dst2_3Net,'file')
+              fprintf('expected file "%s" not found\n', dst2_3Net);
+          end
+%         
 %         fprintf('expected file "%s" not found\n', src);
 %         fprintf('expected file "%s" not found\n', src2);
 %    end
@@ -409,6 +450,26 @@ for isubj = 1:length(e)
 %     ifile_out = ['S' , num2str(isubj) ,'_connectivity_timeseries_Salience.xlsx' ]; 
 %     writematrix(  network(2).mx  , fullfile( output_dir, ifile_out )  ) ; % , 'conn_network',  )  ;
 %   
+
+%% 3 Networks: SN, CEN, DMN
+    %% timeseries matrix
+    ifile = dst_3Net;
+    rs_cmat = load(ifile)   ;
+
+    ifile_out = [e(isubj).name, '_idx' , num2str(isubj) ,'_connectivity_RS_SN_CEN_DMN_CAREN_timeseries.csv' ]; 
+    dlmwrite(addprefixtofilenames(ifile_out,'/home/anna.skrzatek/AUDICOG_backup/Analyses/Correl_Matrix/'), rs_cmat.timeseries)
+
+    %% static conn    
+    ifile = dst2_3Net;
+    rs_cmat = load(ifile)   ;
+
+    ifile_out = [e(isubj).name , '_idx', num2str(isubj) ,'_connectivity_RS_SN_CEN_DMN_CAREN_static_conn.csv' ]; 
+    dlmwrite(addprefixtofilenames(ifile_out,'/home/anna.skrzatek/AUDICOG_backup/Analyses/Correl_Matrix/'), rs_cmat.static_connectivity_matrix)
+    
+    ifile_out = 'Connectivity_RS_SN_CEN_DMN_CAREN_labels.csv';
+    writetable(rs_cmat.ts_table, addprefixtofilenames(ifile_out,'/home/anna.skrzatek/AUDICOG_backup/Analyses/Correl_Matrix/'));
+
+
 end
 
 

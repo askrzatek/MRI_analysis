@@ -45,6 +45,9 @@ par.roi_type.mask_global = {
        char(get_subdir_regex_files(path_masks_CAREN, 'ACC_L_all_DMN_CAREN')),       'ACC_l',        'Left_Anterior_Cingulate'
        char(get_subdir_regex_files(path_masks_CAREN, 'ACC_R_all_DMN_CAREN')),       'ACC_r',        'Right_Anterior_Cingulate'
 
+       char(get_subdir_regex_files(path_masks_DMN, 'Reg39')),                       'PCC_l',   'Left_ParaHippocampus'
+       char(get_subdir_regex_files(path_masks_DMN, 'Reg40')),                       'PCC_r',   'Right_ParaHippocampus'
+
        char(get_subdir_regex_files(path_masks_DMN, 'Reg65')),                       'Pariet_Inf_l', 'Left_Inferior_Parietal'
        char(get_subdir_regex_files(path_masks_DMN, 'Reg66')),                       'Pariet_Inf_r', 'Right_Inferior_Parietal'
 
@@ -89,7 +92,7 @@ par.roi_type.mask_global = {
 %    };
 
 % perform the extraction
-par.outname = 'AUDICOG_PH_ACC_ParietInf_TempMid_FrontInf_FrontMid_Precun_L_R';
+par.outname = 'AUDICOG_PH_ACC_PCC_ParInf_TempMid_FrontInf_FrontMid_Precun_L_R';
 TS = job_extract_timeseries(par);
 
 %%
@@ -122,10 +125,10 @@ output_dir = '/home/anna.skrzatek/AUDICOG_backup/Correl_Matrix';
 for isubj = 1:length(e)
 %% part used to rename the files in the subject directories if one forgot to used the par.output_name in the rsfc - therefore for further copying we only need dst files
 %    src =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat') ;
-    dst_DMN = fullfile( e(isubj).getSerie('run_RS').path, 'rsfc/timeseries__AUDICOG_PH_ACC_ParietInf_TempMid_FrontInf_FrontMid_Precun_L_R.mat') ;
+    dst_DMN = fullfile( e(isubj).getSerie('run_RS').path, 'rsfc/timeseries__AUDICOG_PH_ACC_PCC_ParInf_TempMid_FrontInf_FrontMid_Precun_L_R.mat') ;
 %     src2 =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/static_conn__timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat') ;
 %     src2 =  fullfile( e(isubj).getSerie('run_RS').path, 'tedana009a1_vt/rsfc/static_conn__timeseries__AUDICOG_CAREN_SN_CEN_DMN_AudioACT.mat') ;
-    dst2_DMN = fullfile( e(isubj).getSerie('run_RS').path, 'rsfc/static_conn__timeseries__AUDICOG_PH_ACC_ParietInf_TempMid_FrontInf_FrontMid_Precun_L_R.mat') ;
+    dst2_DMN = fullfile( e(isubj).getSerie('run_RS').path, 'rsfc/static_conn__timeseries__AUDICOG_PH_ACC_PCC_ParInf_TempMid_FrontInf_FrontMid_Precun_L_R.mat') ;
         
 %     if exist(src, 'file')
 %         movefile(src, dst);
@@ -146,17 +149,17 @@ for isubj = 1:length(e)
     ifile = dst_DMN;
     rs_cmat = load(ifile)   ;
 
-    ifile_out = [e(isubj).name, '_idx' , num2str(isubj) ,'_connectivity_AUDICOG_PH_ACC_ParietInf_TempMid_FrontInf_FrontMid_Precun_L_R_timeseries.csv' ]; 
+    ifile_out = [e(isubj).name, '_idx' , num2str(isubj) ,'_connectivity_AUDICOG_PH_ACC_PCC_ParietInf_TempMid_FrontInf_FrontMid_Precun_L_R_timeseries.csv' ]; 
     dlmwrite(addprefixtofilenames(ifile_out,'/home/anna.skrzatek/AUDICOG_backup/Analyses/Correl_Matrix/'), rs_cmat.timeseries)
 
     %% static conn    
     ifile = dst2_DMN;
     rs_cmat = load(ifile)   ;
 
-    ifile_out = [e(isubj).name , '_idx', num2str(isubj) ,'_connectivity_AUDICOG_PH_ACC_ParietInf_TempMid_FrontInf_FrontMid_Precun_L_R_static_conn.csv' ]; 
+    ifile_out = [e(isubj).name , '_idx', num2str(isubj) ,'_connectivity_AUDICOG_PH_ACC_PCC_ParietInf_TempMid_FrontInf_FrontMid_Precun_L_R_static_conn.csv' ]; 
     dlmwrite(addprefixtofilenames(ifile_out,'/home/anna.skrzatek/AUDICOG_backup/Analyses/Correl_Matrix/'), rs_cmat.static_connectivity_matrix)
     
-    ifile_out = 'Connectivity_RS_DMN_united_CAREN_labels.csv';
+    ifile_out = 'Connectivity_RS_DMN_united_CAREN2_labels.csv';
     %ifile_out = 'Connectivity_RS_SM_Visual_Net_CAREN_Tinnitus_Alert_AudioACT_labels.csv';
     writetable(rs_cmat.ts_table, addprefixtofilenames(ifile_out,'/home/anna.skrzatek/AUDICOG_backup/Analyses/Correl_Matrix/'));
 
