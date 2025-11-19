@@ -1,4 +1,4 @@
-%% DysPPN connectivity : PPN x Cortical-SubCortical
+%% DysPPN connectivity : PPN x CAREN
 clear
 clc
 %main_dir = '/network/lustre/iss02/cenir/analyse/irm/users/cecile.gallea/AGENT10_Daniela';
@@ -54,7 +54,7 @@ PPN.labels  = tab.label(tab.PPN(~isnan(tab.PPN)));
 PPN.abbrevs = tab.abbrev(tab.PPN(~isnan(tab.PPN)));
 PPN.idx = tab.id(tab.PPN(~isnan(tab.PPN)));
 
-tab          = readtable(fullfile(ROI_dir,'aal_id_labels_abbrevs_CAREN.csv'));
+tab          = readtable(fullfile('/network/iss/cenir/analyse/irm/studies/AUDICOG/Networks_Masks','aal_id_labels_abbrevs_CAREN.csv'));
 
 SM_net.labels  = strcat(tab.label_AAL(tab.smn(~isnan(tab.smn))),'_SMN');
 SM_net.abbrevs = strcat(tab.abbrev_AAL(tab.smn(~isnan(tab.smn))),'_SMN');
@@ -76,11 +76,11 @@ PPN.skip       = [];
 SM_net.skip = [];
 % SM_net.skip = [6];
 salience_net.skip = [];
-cEx_net.skip = [];
+cEx_net.skip = [31,57,61,85,154];
 % cEx_net.skip = [57];
-DM_net.skip = [];
+DM_net.skip = [44,50,51,60,93,156];
 % DM_net.skip = [51,93];
-Vis_net.skip = [];
+Vis_net.skip = [93];
 % Vis_net.skip = [93];
 
 atlas_rois_list_PPN = [];
