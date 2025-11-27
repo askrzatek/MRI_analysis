@@ -216,7 +216,7 @@ output_dir = '/home/anna.skrzatek/DYS_PPN/RSFC';
 
 for isubj = 1:length(e)
 %% part used to rename the files in the subject directories if one forgot to used the par.output_name in the rsfc - therefore for further copying we only need dst files
-    dst_CAREN = fullfile(e(isubj).getSerie('RS').path, 'rsfc/PPN_SMN_SN_CEN_DMN_VIS_CAREN__static_conn__timeseries__Dystonic_PPN_SMN_SN_CEN_DMN_VIS_CAREN.mat');
+    dst_CAREN = fullfile(e(isubj).getSerie('RS').path, 'rsfc/static_conn__timeseries__Dystonic_PPN_SMN_SN_CEN_DMN_VIS_CAREN.mat');
     dst2_CAREN = fullfile(e(isubj).getSerie('RS').path,'rsfc/timeseries__Dystonic_PPN_SMN_SN_CEN_DMN_VIS_CAREN.mat');
     if ~exist(dst_CAREN,'file')
         fprintf('expected file "%s" not found\n', dst_CAREN);
@@ -226,14 +226,14 @@ for isubj = 1:length(e)
     end
           
     %% timeseries matrix
-    ifile = dst2_cort;
+    ifile = dst2_CAREN;
     rs_cmat = load(ifile)   ;
 
     ifile_out = [e(isubj).name, '_idx' , num2str(isubj) ,'_connectivity_RS_DysPPN_SMN_SN_CEN_DMN_VIS_CAREN_timeseries.csv' ]; 
     dlmwrite(addprefixtofilenames(ifile_out,'/network/iss/cenir/analyse/irm/users/anna.skrzatek/DYS_PPN/RSFC/'), rs_cmat.timeseries)
 
     %% static conn    
-    ifile = dst_cort;
+    ifile = dst_CAREN;
     rs_cmat = load(ifile)   ;
 
     ifile_out = [e(isubj).name , '_idx', num2str(isubj) ,'_connectivity_RS_DysPPN_SMN_SN_CEN_DMN_VIS_CAREN_static_conn.csv' ]; 
